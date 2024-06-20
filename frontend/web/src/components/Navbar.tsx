@@ -13,6 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 
+// TODO: will need to remove the whole settings portion when not logged in (conditionally render depending on login state)
 const pages = ['Home', 'Trips'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
