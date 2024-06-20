@@ -12,12 +12,15 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
+import { useNavigate } from "react-router-dom";
 
 // TODO: will need to remove the whole settings portion when not logged in (conditionally render depending on login state)
 const pages = ["Home", "Trips"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 export default function Navbar() {
+    const navigate = useNavigate();
+
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -34,6 +37,12 @@ export default function Navbar() {
 
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
+    };
+
+    const navigateToPage = (page: string) => {
+        console.log("navigating to", page);
+        handleCloseNavMenu();
+        navigate(`/${page.toLowerCase()}`);
     };
 
     return (
@@ -89,7 +98,7 @@ export default function Navbar() {
                             }}
                         >
                             {pages.map((page) => (
-                                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                                <MenuItem key={page} onClick={() => navigateToPage(page)}>
                                     <Typography textAlign="center">{page}</Typography>
                                 </MenuItem>
                             ))}
@@ -118,7 +127,7 @@ export default function Navbar() {
                         {pages.map((page) => (
                             <Button
                                 key={page}
-                                onClick={handleCloseNavMenu}
+                                onClick={() => navigateToPage(page)}
                                 sx={{ my: 2, color: "white", display: "block" }}
                             >
                                 {page}
