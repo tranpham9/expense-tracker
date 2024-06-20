@@ -7,15 +7,11 @@ import Trips from "./pages/Trips";
 export default function App() {
     return (
         <>
-            <Navbar />
             <BrowserRouter>
+                <Navbar />
                 <Routes>
-                    <Route path={"/"}>
-                        <Home />
-                    </Route>
-                    <Route path={"/trips"}>
-                        <Trips />
-                    </Route>
+                    <Route path={"/home?"} element={<Home />} />
+                    <Route path={"/trips"} element={<Trips />} />
                 </Routes>
             </BrowserRouter>
         </>
