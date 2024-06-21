@@ -3,11 +3,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
+require('dotenv').config();
+const uri = process.env.MONGODB_URI;
 const MongoClient = require('mongodb').MongoClient;
-const url = 'mongodb+srv://TheBeast:COP4331@ourdatabase.gejke7n.mongodb.net/';
-const client = new MongoClient(url);
+const client = new MongoClient(uri);
 client.connect();
-
 
 // express app
 const app = express();
