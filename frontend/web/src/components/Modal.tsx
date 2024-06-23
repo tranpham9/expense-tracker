@@ -19,7 +19,7 @@ const style = {
     p: 4,
 };
 
-export default function TransitionsModal({ isOpen, setIsOpen, shouldCloseOnLostFocus = false, children }: { isOpen: boolean, setIsOpen: (newValue: boolean) => void, shouldCloseOnLostFocus?: boolean, children: ReactElement }) {
+export default function TransitionModal({ isOpen, setIsOpen, shouldCloseOnLostFocus = false, children }: { isOpen: boolean, setIsOpen: (newValue: boolean) => void, shouldCloseOnLostFocus?: boolean, children: ReactElement }) {
     const handleClose = () => {
         console.log(shouldCloseOnLostFocus)
         if (shouldCloseOnLostFocus)
