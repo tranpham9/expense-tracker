@@ -1,4 +1,6 @@
-import * as React from "react";
+import { useState, type MouseEvent } from "react";
+import { useNavigate } from "react-router-dom";
+
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -12,7 +14,6 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
-import { useNavigate } from "react-router-dom";
 
 // TODO: will need to remove the whole settings portion when not logged in (conditionally render depending on login state)
 const pages = ["Home", "Trips"];
@@ -21,13 +22,13 @@ const settings = ["Profile", "Account", "Dashboard", "Logout"];
 export default function Navbar() {
     const navigate = useNavigate();
 
-    const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
-    const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+    const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
+    const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
-    const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
+    const handleOpenNavMenu = (event: MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget);
     };
-    const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    const handleOpenUserMenu = (event: MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);
     };
 
