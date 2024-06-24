@@ -9,48 +9,54 @@ const MongoClient = require('mongodb').MongoClient;
 const client = new MongoClient(uri);
 client.connect();
 
+
+
 // express app
 const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // register
 app.post('/api/registerUser', async (req, res, next) =>
     {
-        const bodyProperties = Object.keys(req.body);
-        const numFields = bodyProperties.length;
+        /*const bodyProperties = Object.keys(req.body);
+        const numFields = bodyProperties.length;*/
 
         const db = client.db('appData');
-        const coll = db.collection('users');
-        const tripColl = db.collection('trips');
+        const userColl = db.collection('User');
+        const tripColl = db.collection('Trip');
 
-        newObjectId = ObjectId();
-        tripId = '';
+
+        //let newUserId = new ObjectId();
+        //var tripId = '';
 
         // registering with an invitation
-        if(numFields == 5){
-            var { userId, name, email, password, tripId} = req.body;
-        }
+        //if(numFields == 4){
+        const {name, email, password, tripId} = req.body;
+        //}
         // default registering
-        else {
-            var { userId, name, email, password} = req.body;
-        }
+        /*else {
+            var {name, email, password} = req.body;
+        }*/
         let newUser = {
-            _id:newObjectId,
-            name:name,
-            email:email,
-            password:password,
-            trips:[tripId]
+            //_id:newUserId,
+            name: name,
+            email: email,
+            password: password,
+            trips: [tripId]
         }
         try {
             // Update users collection with the new user
-            await usersCollection.insertOne(newUser);
+            await userColl.insertOne(newUser);
     
             // If tripId is provided, update trips collection to add user to the trip
-            if (tripId) {
+            /*if (tripId) {
                 await tripsCollection.updateOne(
                     { _id: ObjectId(tripId) }, // Find the trip by tripId
                     { $push: { users: newUserId } } // Add newUserId to the users array in the trip document
                 );
-            }
+            }*/
     
             res.status(200).json({ message: 'User registered successfully' });
         } catch (err) {
