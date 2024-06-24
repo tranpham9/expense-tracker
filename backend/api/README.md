@@ -2,21 +2,17 @@
 
 ## To Run localhost
 
-Make sure the following are installed:
+Make sure the following are installed inside of the `api` directory:
 
-In order to run on localhost ensure `node.js`, `npm`, `express`, and `mongodb` are installed:
+In order to run on localhost ensure `node.js`, `npm`, `express`, and `mongodb` are installed. To do this run
 
 ```bash
-sudo apt-get install nodejs
-sudo apt-get install npm
-sudo npm install -g n 
-sudo npm install express
-sudo npm install cors
-sudo npm install dotenv
-sudo npm install mongodb
+sudo npm install
 ```
 
-Once all dependencies have been installed, run 
+This will install all of the necessary packages.
+
+Next run
 
 ```bash 
 sudo npm start
@@ -32,4 +28,4 @@ Create a new request and set the URL to `http://localhost:5000/api/'endpoint'`. 
 
 ### Ensure You Have Your .env File Configured
 
-In order to make connections with the database, ensure that you have a `.env` 
+In order to make connections with the database, ensure that you have a `.env` file added to your local version of the source code. I emailed everyone the secrets, so check your UCF email for that.
