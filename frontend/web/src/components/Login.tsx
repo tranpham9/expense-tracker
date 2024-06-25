@@ -1,8 +1,11 @@
-import { Button, TextField } from "@mui/material";
+import { Box, Button, TextField } from "@mui/material";
 
 export default function Login() {
     return (
-        <>
+        <Box sx={{
+            textAlign: "center",
+            pt: "10px",
+        }}>
             <TextField variant="outlined" label="Email" sx={{
                 width: "90%",
                 p: "5px",
@@ -16,7 +19,7 @@ export default function Login() {
             <Button variant="contained" sx={{ m: "10px" }}>
                 Submit
             </Button>
-        </>
+        </Box>
     );
 }
 

@@ -23,12 +23,7 @@ export default function AccountOverlay() {
                         <Tab label="Signup" />
                     </Tabs>
                 </Box>
-                <Box sx={{
-                    textAlign: "center",
-                    pt: "10px",
-                }}>
-                    {activeTab ? <Signup /> : <Login />}
-                </Box>
+                {activeTab ? <Signup /> : <Login />}
             </>
         </Modal>
     );
