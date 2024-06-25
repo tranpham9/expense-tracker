@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Box, Tab, Tabs, TextField } from "@mui/material";
+import { Box, Tab, Tabs } from "@mui/material";
 
 import Modal from "./Modal";
 import Signup from "./Signup";
@@ -10,7 +10,7 @@ export default function AccountOverlay() {
     const [isModalOpen, setIsModalOpen] = useState(true);
 
     const [activeTab, setActiveTab] = useState(0);
-    const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
         setActiveTab(newValue);
     };
 
