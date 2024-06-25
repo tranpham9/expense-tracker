@@ -27,7 +27,7 @@ export default function AccountOverlay() {
                     textAlign: "center",
                     pt: "10px",
                 }}>
-                    {/* {activeTab ? <Signup /> : <Login />} */}
+                    {activeTab ? <Signup /> : <Login />}
                 </Box>
             </>
         </Modal>
