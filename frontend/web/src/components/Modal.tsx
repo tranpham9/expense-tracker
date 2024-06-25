@@ -5,19 +5,7 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import CloseIcon from "@mui/icons-material/Close";
-import { IconButton, SxProps, Theme } from "@mui/material";
-
-const style: SxProps<Theme> = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "80%",
-    bgcolor: "background.paper",
-    border: "2px solid #000",
-    boxShadow: 24,
-    p: 4,
-};
+import { IconButton } from "@mui/material";
 
 export default function TransitionModal({ isOpen, setIsOpen, shouldCloseOnLostFocus = false, children }: { isOpen: boolean, setIsOpen: (newValue: boolean) => void, shouldCloseOnLostFocus?: boolean, children: ReactElement }) {
     const close = () => {
@@ -43,8 +31,22 @@ export default function TransitionModal({ isOpen, setIsOpen, shouldCloseOnLostFo
                 }}
             >
                 <Fade in={isOpen}>
-                    <Box sx={style}>
-                        <IconButton aria-label="close" onClick={close} color="primary" sx={{ position: "absolute", top: "0px", right: "0px" }}>
+                    <Box sx={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: "80%",
+                        bgcolor: "background.paper",
+                        border: "2px solid #000",
+                        boxShadow: 24,
+                        p: 4,
+                    }}>
+                        <IconButton aria-label="close" onClick={close} color="primary" sx={{
+                            position: "absolute",
+                            top: "0px",
+                            right: "0px",
+                        }}>
                             <CloseIcon />
                         </IconButton>
                         {children}
