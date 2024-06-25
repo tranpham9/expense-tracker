@@ -17,16 +17,16 @@ export default function Home() {
                     <Container sx={{
                         width: "100%",
                         textAlign: "center",
-                        mt: "10px",
+                        pt: "10px",
                     }}>
                         <TextField variant="outlined" label="email" sx={{
                             width: "80%",
-                            margin: "5px",
+                            p: "5px",
                         }} />
                         <br />
                         <TextField variant="outlined" label="password" sx={{
                             width: "80%",
-                            margin: "5px",
+                            p: "5px",
                         }} />
                     </Container>
                 </>
