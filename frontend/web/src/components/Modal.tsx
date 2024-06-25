@@ -41,6 +41,9 @@ export default function TransitionModal({ isOpen, setIsOpen, shouldCloseOnLostFo
                         border: "2px solid #000",
                         boxShadow: 24,
                         p: 4,
+                        ":focus": { // disables outline when modal first takes/traps focus
+                            outline: "none",
+                        },
                     }}>
                         <IconButton aria-label="close" onClick={close} color="primary" sx={{
                             position: "absolute",
