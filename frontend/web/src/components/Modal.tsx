@@ -4,8 +4,8 @@ import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
-// import Button from "@mui/material/Button";
-// import Typography from "@mui/material/Typography";
+import CloseIcon from "@mui/icons-material/Close";
+import { IconButton } from "@mui/material";
 
 const style = {
     position: "absolute" as "absolute",
@@ -44,6 +44,9 @@ export default function TransitionModal({ isOpen, setIsOpen, shouldCloseOnLostFo
             >
                 <Fade in={isOpen}>
                     <Box sx={style}>
+                        <IconButton aria-label="close" onClick={close} color="primary" sx={{ position: "absolute", top: "0px", right: "0px" }}>
+                            <CloseIcon />
+                        </IconButton>
                         {children}
                     </Box>
                 </Fade>
