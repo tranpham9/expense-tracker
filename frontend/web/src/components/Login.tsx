@@ -4,12 +4,12 @@ export default function Login() {
     return (
         <>
             <TextField variant="outlined" label="Email" sx={{
-                width: "80%",
+                width: "90%",
                 p: "5px",
             }} />
             <br />
             <TextField variant="outlined" label="Password" sx={{
-                width: "80%",
+                width: "90%",
                 p: "5px",
             }} />
             <br />
