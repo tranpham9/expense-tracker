@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { Container, TextField, Typography } from "@mui/material";
+
 import Modal from "../components/Modal";
 
 export default function Home() {
@@ -7,10 +9,26 @@ export default function Home() {
     return (
         <>
             <p>This is the home page.</p>
-            <Modal isOpen={isModalOpen} setIsOpen={setIsModalOpen} shouldCloseOnLostFocus={true}>
+            <Modal isOpen={isModalOpen} setIsOpen={setIsModalOpen}>
                 <>
-                    <h1>The login/signup popup will look like this</h1>
-                    <p>Sample Text.</p>
+                    <Typography variant="h3" component="h1" sx={{ textAlign: "center" }}>
+                        Login
+                    </Typography>
+                    <Container sx={{
+                        width: "100%",
+                        textAlign: "center",
+                        mt: "10px",
+                    }}>
+                        <TextField variant="outlined" label="email" sx={{
+                            width: "80%",
+                            margin: "5px",
+                        }} />
+                        <br />
+                        <TextField variant="outlined" label="password" sx={{
+                            width: "80%",
+                            margin: "5px",
+                        }} />
+                    </Container>
                 </>
             </Modal>
         </>
