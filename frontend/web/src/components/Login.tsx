@@ -11,19 +11,15 @@ export default function Login() {
             <TextField
                 variant="outlined"
                 label="Email"
-                sx={{
-                    width: "90%",
-                    p: "5px",
-                }}
+                sx={{ width: "90%" }}
+                margin="dense"
             />
             <br />
             <TextField
                 variant="outlined"
                 label="Password"
-                sx={{
-                    width: "90%",
-                    p: "5px",
-                }}
+                sx={{ width: "90%" }}
+                margin="dense"
             />
             <br />
             <Button
