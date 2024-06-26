@@ -42,6 +42,7 @@ export default function Signup() {
                 variant="contained"
                 sx={{ m: "10px" }}
                 onClick={signup}
+                disabled={[name, email, password].some((value) => value === "")}
             >
                 Submit
             </Button>
