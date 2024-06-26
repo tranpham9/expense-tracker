@@ -15,11 +15,26 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 
+type Page = {
+    name: string;
+    customPath?: string;
+    requiresLoggedIn?: boolean;
+};
+
 // TODO: will need to remove the whole settings portion when not logged in (conditionally render depending on login state)
-const pages = ["Home", "Trips"];
+const pages: Page[] = [
+    {
+        name: "Home",
+    },
+    {
+        name: "Trips",
+        requiresLoggedIn: true,
+    },
+];
+
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
-export default function Navbar() {
+export default function Navbar({ isLoggedIn = false }) {
     const navigate = useNavigate();
 
     const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -40,10 +55,10 @@ export default function Navbar() {
         setAnchorElUser(null);
     };
 
-    const navigateToPage = (page: string) => {
+    const navigateToPage = (page: Page) => {
         console.log("navigating to", page);
         handleCloseNavMenu();
-        navigate(`/${page.toLowerCase()}`);
+        navigate(`/${page.customPath ?? page.name.toLowerCase()}`);
     };
 
     return (
@@ -105,8 +120,12 @@ export default function Navbar() {
                             }}
                         >
                             {pages.map((page) => (
-                                <MenuItem key={page} onClick={() => navigateToPage(page)}>
-                                    <Typography textAlign="center">{page}</Typography>
+                                <MenuItem
+                                    key={page.name}
+                                    onClick={() => navigateToPage(page)}
+                                    disabled={page.requiresLoggedIn && !isLoggedIn}
+                                >
+                                    <Typography textAlign="center">{page.name}</Typography>
                                 </MenuItem>
                             ))}
                         </Menu>
@@ -139,11 +158,12 @@ export default function Navbar() {
                     }}>
                         {pages.map((page) => (
                             <Button
-                                key={page}
+                                key={page.name}
                                 onClick={() => navigateToPage(page)}
+                                disabled={page.requiresLoggedIn && !isLoggedIn}
                                 sx={{ my: 2, color: "white", display: "block" }}
                             >
-                                {page}
+                                {page.name}
                             </Button>
                         ))}
                     </Box>
