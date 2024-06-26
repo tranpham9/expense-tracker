@@ -1,9 +1,12 @@
 const express = require('express');
+const path = require('path');
 
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
 require('dotenv').config();
+// Heroku will pass the port we must listen on via the environment, otherwise default to 5000.
+const port = process.env.PORT || 5000;
 const uri = process.env.MONGODB_URI;
 const MongoClient = require('mongodb').MongoClient;
 const client = new MongoClient(uri);
@@ -86,6 +89,9 @@ app.post('/api/login', async (req, res, next) =>
 
 });
 
-app.listen(5000, () => {
-    console.log('listening on port 5000')
-})
+// Serve the static frontend files
+app.use(express.static(path.join(__dirname, '../../frontend/web/dist')));
+
+app.listen(port, () => {
+    console.log(`listening on port ${port}`)
+});

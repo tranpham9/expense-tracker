@@ -1,0 +1,8 @@
+{
+    "name": "expense-tracker-heroku",
+    "description": "For deploying backend and frontend to Heroku",
+    "version": "0.0.1",
+    "scripts": {
+        "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix backend/api && NPM_CONFIG_PRODUCTION=false npm install --prefix frontend/web && npm run build --prefix frontend/web"
+    }
+}
