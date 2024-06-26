@@ -15,10 +15,17 @@ export default function AccountOverlay() {
     };
 
     return (
-        <Modal isOpen={isModalOpen} setIsOpen={setIsModalOpen}>
+        <Modal
+            isOpen={isModalOpen}
+            setIsOpen={setIsModalOpen}
+        >
             <>
-                <Box sx={{ width: '100%' }}>
-                    <Tabs value={activeTab} onChange={handleTabChange} centered>
+                <Box sx={{ width: "100%" }}>
+                    <Tabs
+                        value={activeTab}
+                        onChange={handleTabChange}
+                        centered
+                    >
                         <Tab label="Login" />
                         <Tab label="Signup" />
                     </Tabs>

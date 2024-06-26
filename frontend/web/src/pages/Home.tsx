@@ -1,6 +1,5 @@
 import AccountOverlay from "../components/AccountOverlay";
 
-
 export default function Home() {
     return (
         <>

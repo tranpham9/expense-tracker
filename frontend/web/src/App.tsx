@@ -16,8 +16,14 @@ export default function App() {
             <BrowserRouter>
                 <Navbar isLoggedIn={isLoggedIn} />
                 <Routes>
-                    <Route path={"/home?"} element={<Home />} />
-                    <Route path={"/trips"} element={<Trips />} />
+                    <Route
+                        path={"/home?"}
+                        element={<Home />}
+                    />
+                    <Route
+                        path={"/trips"}
+                        element={<Trips />}
+                    />
                 </Routes>
             </BrowserRouter>
         </>

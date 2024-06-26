@@ -2,26 +2,43 @@ import { Box, Button, TextField } from "@mui/material";
 
 export default function Signup() {
     return (
-        <Box sx={{
-            textAlign: "center",
-            pt: "10px",
-        }}>
-            <TextField variant="outlined" label="Name" sx={{
-                width: "90%",
-                p: "5px",
-            }} />
+        <Box
+            sx={{
+                textAlign: "center",
+                pt: "10px",
+            }}
+        >
+            <TextField
+                variant="outlined"
+                label="Name"
+                sx={{
+                    width: "90%",
+                    p: "5px",
+                }}
+            />
             <br />
-            <TextField variant="outlined" label="Email" sx={{
-                width: "90%",
-                p: "5px",
-            }} />
+            <TextField
+                variant="outlined"
+                label="Email"
+                sx={{
+                    width: "90%",
+                    p: "5px",
+                }}
+            />
             <br />
-            <TextField variant="outlined" label="Password" sx={{
-                width: "90%",
-                p: "5px",
-            }} />
+            <TextField
+                variant="outlined"
+                label="Password"
+                sx={{
+                    width: "90%",
+                    p: "5px",
+                }}
+            />
             <br />
-            <Button variant="contained" sx={{ m: "10px" }}>
+            <Button
+                variant="contained"
+                sx={{ m: "10px" }}
+            >
                 Submit
             </Button>
         </Box>

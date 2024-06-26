@@ -7,14 +7,23 @@ import Fade from "@mui/material/Fade";
 import CloseIcon from "@mui/icons-material/Close";
 import { IconButton } from "@mui/material";
 
-export default function TransitionModal({ isOpen, setIsOpen, shouldCloseOnLostFocus = false, children }: { isOpen: boolean, setIsOpen: (newValue: boolean) => void, shouldCloseOnLostFocus?: boolean, children: ReactElement }) {
+export default function TransitionModal({
+    isOpen,
+    setIsOpen,
+    shouldCloseOnLostFocus = false,
+    children,
+}: {
+    isOpen: boolean;
+    setIsOpen: (newValue: boolean) => void;
+    shouldCloseOnLostFocus?: boolean;
+    children: ReactElement;
+}) {
     const close = () => {
         setIsOpen(false);
     };
 
     const handleClose = () => {
-        if (shouldCloseOnLostFocus)
-            close();
+        if (shouldCloseOnLostFocus) close();
     };
 
     return (
@@ -31,25 +40,33 @@ export default function TransitionModal({ isOpen, setIsOpen, shouldCloseOnLostFo
                 }}
             >
                 <Fade in={isOpen}>
-                    <Box sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        width: { xs: "60%", sm: "400px" },
-                        bgcolor: "background.paper",
-                        border: "2px solid #000",
-                        boxShadow: 24,
-                        p: 4,
-                        ":focus": { // disables outline when modal first takes/traps focus
-                            outline: "none",
-                        },
-                    }}>
-                        <IconButton aria-label="close" onClick={close} color="primary" sx={{
+                    <Box
+                        sx={{
                             position: "absolute",
-                            top: "0px",
-                            right: "0px",
-                        }}>
+                            top: "50%",
+                            left: "50%",
+                            transform: "translate(-50%, -50%)",
+                            width: { xs: "60%", sm: "400px" },
+                            bgcolor: "background.paper",
+                            border: "2px solid #000",
+                            boxShadow: 24,
+                            p: 4,
+                            ":focus": {
+                                // disables outline when modal first takes/traps focus
+                                outline: "none",
+                            },
+                        }}
+                    >
+                        <IconButton
+                            aria-label="close"
+                            onClick={close}
+                            color="primary"
+                            sx={{
+                                position: "absolute",
+                                top: "0px",
+                                right: "0px",
+                            }}
+                        >
                             <CloseIcon />
                         </IconButton>
                         {children}
