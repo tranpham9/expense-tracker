@@ -1,9 +1,10 @@
 import { useState } from "react";
 
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button } from "@mui/material";
 
 import NameInput from "./inputs/NameInput";
 import EmailInput from "./inputs/EmailInput";
+import PasswordInput from "./inputs/PasswordInput";
 
 // TODO: need to make the submit button be disabled if not all fields are valid (it should start disabled since fields don't start as red until the user starts typing in them)
 export default function Signup() {
@@ -27,12 +28,7 @@ export default function Signup() {
             <br />
             <EmailInput setEmail={setEmail} />
             <br />
-            <TextField
-                variant="outlined"
-                label="Password"
-                sx={{ width: "90%" }}
-                margin="dense"
-            />
+            <PasswordInput setPassword={setPassword} />
             <br />
             <Button
                 variant="contained"

@@ -1,8 +1,9 @@
 import { useState } from "react";
 
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button } from "@mui/material";
 
 import EmailInput from "./inputs/EmailInput";
+import PasswordInput from "./inputs/PasswordInput";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -22,12 +23,7 @@ export default function Login() {
         >
             <EmailInput setEmail={setEmail} />
             <br />
-            <TextField
-                variant="outlined"
-                label="Password"
-                sx={{ width: "90%" }}
-                margin="dense"
-            />
+            <PasswordInput setPassword={setPassword} />
             <br />
             <Button
                 variant="contained"

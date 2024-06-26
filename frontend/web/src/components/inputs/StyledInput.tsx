@@ -1,20 +1,23 @@
-import { ChangeEventHandler } from "react";
+import { ChangeEventHandler, HTMLInputTypeAttribute } from "react";
 
 import { TextField } from "@mui/material";
 
 export default function StyledInput({
+    type = "text",
     label = "",
     error = "",
     required = true,
     onChange,
 }: {
-    label: string;
-    error: string;
+    type?: HTMLInputTypeAttribute;
+    label?: string;
+    error?: string;
     required?: boolean;
     onChange?: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
 }) {
     return (
         <TextField
+            type={type}
             label={label}
             variant="outlined"
             margin="dense"
