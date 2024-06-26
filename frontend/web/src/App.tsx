@@ -9,12 +9,16 @@ import { useState } from "react";
 
 // TODO: once logging in and JWT is set up, need to handle redirecting from trips to home if not logged in/authenticated
 export default function App() {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    // TODO: this should default to false once logging in is set up
+    const [isLoggedIn, setIsLoggedIn] = useState(true);
 
     return (
         <>
             <BrowserRouter>
-                <Navbar isLoggedIn={isLoggedIn} />
+                <Navbar
+                    isLoggedIn={isLoggedIn}
+                    setIsLoggedIn={setIsLoggedIn}
+                />
                 <Routes>
                     <Route
                         path={"/home?"}

@@ -21,20 +21,12 @@ type Page = {
     requiresLoggedIn?: boolean;
 };
 
-// TODO: will need to remove the whole settings portion when not logged in (conditionally render depending on login state)
-const pages: Page[] = [
-    {
-        name: "Home",
-    },
-    {
-        name: "Trips",
-        requiresLoggedIn: true,
-    },
-];
+type Option = {
+    name: string;
+    action: () => void;
+};
 
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
-
-export default function Navbar({ isLoggedIn = false }) {
+export default function Navbar({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean; setIsLoggedIn: (newValue: boolean) => void }) {
     const navigate = useNavigate();
 
     const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -46,13 +38,16 @@ export default function Navbar({ isLoggedIn = false }) {
     const handleOpenUserMenu = (event: MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);
     };
-
     const handleCloseNavMenu = () => {
         setAnchorElNav(null);
     };
-
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
+    };
+
+    const handleOptionClick = (option: Option) => {
+        handleCloseUserMenu();
+        option.action();
     };
 
     const navigateToPage = (page: Page) => {
@@ -60,6 +55,37 @@ export default function Navbar({ isLoggedIn = false }) {
         handleCloseNavMenu();
         navigate(`/${page.customPath ?? page.name.toLowerCase()}`);
     };
+
+    const pages: Page[] = [
+        {
+            name: "Home",
+        },
+        {
+            name: "Trips",
+            requiresLoggedIn: true,
+        },
+    ];
+
+    const options: Option[] = [
+        {
+            name: "Profile",
+            action: () => {
+                // TODO: impl
+            },
+        },
+        {
+            name: "Settings",
+            action: () => {
+                // TODO: impl
+            },
+        },
+        {
+            name: "Logout",
+            action: () => {
+                setIsLoggedIn(false);
+            },
+        },
+    ];
 
     return (
         <AppBar position="static">
@@ -176,44 +202,47 @@ export default function Navbar({ isLoggedIn = false }) {
                         ))}
                     </Box>
 
-                    <Box sx={{ flexGrow: 0 }}>
-                        <Tooltip title="Open settings">
-                            <IconButton
-                                onClick={handleOpenUserMenu}
-                                sx={{ p: 0 }}
-                            >
-                                <Avatar
-                                    alt="Remy Sharp"
-                                    src="/static/images/avatar/2.jpg"
-                                />
-                            </IconButton>
-                        </Tooltip>
-                        <Menu
-                            sx={{ mt: "45px" }}
-                            id="menu-appbar"
-                            anchorEl={anchorElUser}
-                            anchorOrigin={{
-                                vertical: "top",
-                                horizontal: "right",
-                            }}
-                            keepMounted
-                            transformOrigin={{
-                                vertical: "top",
-                                horizontal: "right",
-                            }}
-                            open={Boolean(anchorElUser)}
-                            onClose={handleCloseUserMenu}
-                        >
-                            {settings.map((setting) => (
-                                <MenuItem
-                                    key={setting}
-                                    onClick={handleCloseUserMenu}
+                    {/* Only render if logged in */}
+                    {isLoggedIn && (
+                        <Box sx={{ flexGrow: 0 }}>
+                            <Tooltip title="Open options">
+                                <IconButton
+                                    onClick={handleOpenUserMenu}
+                                    sx={{ p: 0 }}
                                 >
-                                    <Typography textAlign="center">{setting}</Typography>
-                                </MenuItem>
-                            ))}
-                        </Menu>
-                    </Box>
+                                    <Avatar
+                                        alt="Remy Sharp"
+                                        src="/static/images/avatar/2.jpg"
+                                    />
+                                </IconButton>
+                            </Tooltip>
+                            <Menu
+                                sx={{ mt: "45px" }}
+                                id="menu-appbar"
+                                anchorEl={anchorElUser}
+                                anchorOrigin={{
+                                    vertical: "top",
+                                    horizontal: "right",
+                                }}
+                                keepMounted
+                                transformOrigin={{
+                                    vertical: "top",
+                                    horizontal: "right",
+                                }}
+                                open={Boolean(anchorElUser)}
+                                onClose={handleCloseUserMenu}
+                            >
+                                {options.map((option) => (
+                                    <MenuItem
+                                        key={option.name}
+                                        onClick={() => handleOptionClick(option)}
+                                    >
+                                        <Typography textAlign="center">{option.name}</Typography>
+                                    </MenuItem>
+                                ))}
+                            </Menu>
+                        </Box>
+                    )}
                 </Toolbar>
             </Container>
         </AppBar>
