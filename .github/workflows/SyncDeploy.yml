@@ -1,8 +1,6 @@
-name: Deploy
+name: SyncDeploy
 run-name: This syncs up the deploy branch with 
-on:
-  repository_dispatch:
-    types: deploy
+on: workflow_dispatch
 jobs:
   sync-deploy:
     runs-on: ubuntu-latest
