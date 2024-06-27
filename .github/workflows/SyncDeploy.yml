@@ -10,6 +10,8 @@ jobs:
           fetch-depth: 0
       - run: |
           git branch
+          git fetch origin deploy:deploy
+          git branch
           git checkout deploy
           git merge --ff-only main
           git push
