@@ -7,7 +7,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: deploy
+          fetch-depth: 0
       - run: |
-          git merge --ff-only origin/main
+          git branch
+          git checkout deploy
+          git merge --ff-only main
           git push
