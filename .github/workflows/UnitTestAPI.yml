@@ -1,0 +1,19 @@
+name: UnitTestAPI
+run-name: This runs Jest Unit Tests for the API
+on:
+  push:
+    branches:
+      - deploy
+jobs:
+  run-unit-tests-for-api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - run: npm ci
+      - run: npm test
