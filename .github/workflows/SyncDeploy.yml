@@ -14,4 +14,4 @@ jobs:
           git fetch origin deploy:deploy
           git checkout deploy
           git merge --ff-only main
-          git push
+          git push --set-upstream origin deploy
