@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          git pull
+          git fetch origin deploy:deploy
           git checkout deploy
           git merge --ff-only main
           git push
