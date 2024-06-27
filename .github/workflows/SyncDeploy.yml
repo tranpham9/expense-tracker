@@ -10,5 +10,5 @@ jobs:
       - uses: actions/checkout@v4
       - run: |
           git checkout deploy
-          git reset --hard main
+          git merge --ff-only main
           git push
