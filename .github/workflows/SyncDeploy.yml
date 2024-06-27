@@ -1,0 +1,16 @@
+name: Deploy
+run-name: This syncs up the deploy branch with 
+on:
+  repository_dispatch:
+    types: deploy
+jobs:
+  sync-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git checkout main
+          git pull
+          git checkout deploy
+          git rebase main
+          git push
