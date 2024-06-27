@@ -9,8 +9,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          git checkout main
-          git pull
           git checkout deploy
-          git rebase main
+          git reset --hard main
           git push
