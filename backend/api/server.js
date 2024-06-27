@@ -47,6 +47,11 @@ app.post('/api/registerUser', async (req, res, next) =>
 
             // retrieve only the _id from the database
             const result = await userColl.findOne(query, projection)
+            if(result)
+                res.status(200).json({ message: 'User registered successfully' });
+            else{
+                res.status(500).json({error: 'Failed to register user'});
+            }
 
             // If tripId is provided, update trips collection to add user to the trip
             if (tripId) {
@@ -55,8 +60,8 @@ app.post('/api/registerUser', async (req, res, next) =>
                     { $push: { User: result._id } } // Add newUserId to the users array in the trip document
                 );
             }
-    
-            res.status(200).json({ message: 'User registered successfully' });
+            
+
         } catch (err) {
             console.error('Error registering user:', err);
             res.status(500).json({ error: 'Failed to register user' });
@@ -84,13 +89,27 @@ app.post('/api/login', async (req, res, next) =>
         }
     }
     else{
-        res.status(200).json({error: "User doesn't exist"});
+        res.status(500).json({error: "User doesn't exist"});
     }
 
 });
 
 // Serve the static frontend files
 app.use(express.static(path.join(__dirname, '../../frontend/web/dist')));
+app.use((req, res, next) => 
+    {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader(
+        'Access-Control-Allow-Headers',
+        'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+      );
+      res.setHeader(
+        'Access-Control-Allow-Methods',
+        'GET, POST, PATCH, DELETE, OPTIONS'
+      );
+      next();
+    });
+      
 
 app.listen(port, () => {
     console.log(`listening on port ${port}`)
