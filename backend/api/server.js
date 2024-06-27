@@ -16,6 +16,7 @@ client.connect();
 
 // express app
 const app = express();
+app.use(cors());
 
 // Allow all CORS Requests (ie. allow SwaggerHub to make API calls)
 app.use(cors());
@@ -32,8 +33,11 @@ app.post('/api/registerUser', async (req, res, next) =>
         const tripColl = db.collection('Trip');
 
         // incoming name, email, password, tripId(invitation)
+        
         const {name, email, password, tripId} = req.body;
-
+        if(!name || !email || !password){
+            res.status(400).json({error: 'Bad Request'});
+        }
         let newUser = {
             name: name,
             email: email,
@@ -41,6 +45,9 @@ app.post('/api/registerUser', async (req, res, next) =>
             trips: [tripId]
         }
         try {
+            const check = await userColl.find(newUser.email);
+            if(check)
+                res.status(500).json({error: 'Failed to register user'});
             // Update users collection with the new user
             await userColl.insertOne(newUser);
 
@@ -99,20 +106,6 @@ app.post('/api/login', async (req, res, next) =>
 
 // Serve the static frontend files
 app.use(express.static(path.join(__dirname, '../../frontend/web/dist')));
-app.use((req, res, next) => 
-    {
-      res.setHeader('Access-Control-Allow-Origin', '*');
-      res.setHeader(
-        'Access-Control-Allow-Headers',
-        'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-      );
-      res.setHeader(
-        'Access-Control-Allow-Methods',
-        'GET, POST, PATCH, DELETE, OPTIONS'
-      );
-      next();
-    });
-      
 
 app.listen(port, () => {
     console.log(`listening on port ${port}`)
