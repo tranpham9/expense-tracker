@@ -6,8 +6,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: deploy
       - run: |
-          git fetch origin deploy:deploy
-          git checkout deploy
-          git merge --ff-only main
+          git merge --ff-only origin/main
           git push
