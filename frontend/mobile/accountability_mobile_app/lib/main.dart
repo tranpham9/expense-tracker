@@ -18,7 +18,10 @@ class MainApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
       ),
       home: Scaffold(
-        appBar: AppBar(title: Text(_title)),
+        appBar: AppBar(
+          title: Text(_title),
+          centerTitle: true,
+        ),
         body: LoginPage(),
       ),
     );
@@ -58,15 +61,16 @@ class _LoginPage extends State<LoginPage> {
                 child: TextField(
                   controller: email,
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(), labelText: 'Email'),
+                      border: OutlineInputBorder(), labelText: 'Email*'),
                 )),
             // Enter Password
             Container(
                 padding: EdgeInsets.all(10),
                 child: TextField(
+                  obscureText: true,
                   controller: password,
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(), labelText: 'Password'),
+                      border: OutlineInputBorder(), labelText: 'Password*'),
                 )),
             // Forgot Password
             TextButton(
@@ -86,6 +90,11 @@ class _LoginPage extends State<LoginPage> {
                   onPressed: () {
                     print(email.text);
                     print(password.text);
+                    // TODO: Call the API to log the user in
+
+                    // If login was successful, route the user to their home page
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => HomePage()));
                   },
                 )),
             Row(
@@ -99,13 +108,160 @@ class _LoginPage extends State<LoginPage> {
                         decoration: TextDecoration.underline,
                         decorationThickness: 1.5),
                   ),
+                  // TODO: This won't
                   onPressed: () {
-                    // Direct to Register Page
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => RegisterPage()));
                   },
-                )
+                ),
               ],
             ),
           ],
         ));
+  }
+}
+
+class RegisterPage extends StatefulWidget {
+  @override
+  State<RegisterPage> createState() => _RegisterPage();
+}
+
+class _RegisterPage extends State<RegisterPage> {
+  // Grab text that will be entered by the user
+  TextEditingController name = TextEditingController();
+  TextEditingController email = TextEditingController();
+  TextEditingController password = TextEditingController();
+  TextEditingController confirmPassword = TextEditingController();
+
+  // Set the main layout of the login page
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: EdgeInsets.all(10),
+        child: ListView(
+          // Have our list of containers that will take in text input
+          children: <Widget>[
+            Container(
+              alignment: Alignment.center,
+              child: Text(
+                'Register',
+                style: TextStyle(fontSize: 20),
+              ),
+            ),
+            // Enter Name
+            Container(
+                padding: EdgeInsets.all(10),
+                child: TextField(
+                  controller: name,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(), labelText: 'Name'),
+                )),
+            // Enter Email
+            Container(
+                padding: EdgeInsets.all(10),
+                child: TextField(
+                  controller: email,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(), labelText: 'Email*'),
+                )),
+            // Enter Password
+            Container(
+                padding: EdgeInsets.all(10),
+                child: TextField(
+                  obscureText: true,
+                  controller: password,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(), labelText: 'Password*'),
+                )),
+            // Confirm Password
+            Container(
+                padding: EdgeInsets.all(10),
+                child: TextField(
+                  obscureText: true,
+                  controller: confirmPassword,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Confirm Password*'),
+                )),
+            // Confirm Register
+            Container(
+                height: 50,
+                padding: EdgeInsets.all(10),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 95, 170, 232),
+                  ),
+                  child: Text('Register'),
+                  onPressed: () {
+                    print(name.text);
+                    print(email.text);
+                    print(password.text);
+                    print(confirmPassword.text);
+                  },
+                )),
+          ],
+        ));
+  }
+}
+
+class HomePage extends StatefulWidget {
+  @override
+  State<HomePage> createState() => _HomePage();
+}
+
+class _HomePage extends State<HomePage> {
+  // Determine the page that we want to route to
+  var selectedIndex = 0;
+  // We need a list of the different page we can go to from the home screen
+  final List<Widget> _tabs = [TripsPage(), AddTripsPage(), ProfilePage()];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // Determine which page to display
+      body: _tabs[selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+          // Keep track of the selected tab
+          currentIndex: selectedIndex,
+          onTap: (int index) {
+            setState(() {
+              selectedIndex = index;
+            });
+          },
+          items: [
+            BottomNavigationBarItem(icon: Icon(Icons.map), label: "Trips"),
+            BottomNavigationBarItem(icon: Icon(Icons.add), label: "Add"),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+          ]),
+    );
+  }
+}
+
+class TripsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text("Trips Page!"),
+    );
+  }
+}
+
+class AddTripsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text("Add Trips Page!"),
+    );
+  }
+}
+
+class ProfilePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text("Profile Page"),
+    );
   }
 }
