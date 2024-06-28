@@ -219,31 +219,69 @@ class _HomePage extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // Determine which page to display
-      body: _tabs[selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-          // Keep track of the selected tab
-          currentIndex: selectedIndex,
-          onTap: (int index) {
-            setState(() {
-              selectedIndex = index;
-            });
-          },
-          items: [
-            BottomNavigationBarItem(icon: Icon(Icons.map), label: "Trips"),
-            BottomNavigationBarItem(icon: Icon(Icons.add), label: "Add"),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-          ]),
+    return PopScope(
+      // Ensure that once the user logs in, the have to use log out button
+      canPop: false,
+      child: Scaffold(
+        // Determine which page to display
+        body: _tabs[selectedIndex],
+        // Place the search bar at the top of the screen
+        bottomNavigationBar: BottomNavigationBar(
+            // Keep track of the selected tab
+            currentIndex: selectedIndex,
+            onTap: (int index) {
+              setState(() {
+                selectedIndex = index;
+              });
+            },
+            items: [
+              BottomNavigationBarItem(icon: Icon(Icons.map), label: "Trips"),
+              BottomNavigationBarItem(icon: Icon(Icons.add), label: "Add"),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.person), label: "Profile"),
+            ]),
+      ),
     );
   }
 }
 
 class TripsPage extends StatelessWidget {
+  // Grab the search field when we want to search
+  TextEditingController _searchQuery = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text("Trips Page!"),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "Username's Trips",
+        ),
+        centerTitle: true,
+        // We don't need a back button to go to some main page
+        automaticallyImplyLeading: false,
+      ),
+      body: Padding(
+          padding: EdgeInsets.all(10),
+          child: Container(
+            padding: EdgeInsets.all(10),
+            child: TextField(
+                controller: _searchQuery,
+                decoration: InputDecoration(
+                    hintText: 'Search...',
+                    // Clear the search field
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: () => {_searchQuery.clear()},
+                    ),
+                    prefixIcon: IconButton(
+                      icon: Icon(Icons.search),
+                      onPressed: () {
+                        print(_searchQuery.text);
+                      },
+                    ),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20.0)))),
+          )),
     );
   }
 }
@@ -251,8 +289,14 @@ class TripsPage extends StatelessWidget {
 class AddTripsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text("Add Trips Page!"),
+    return Scaffold(
+      // Display the title at the top of the screen
+      appBar: AppBar(
+        title: Text("Add a Trip"),
+        centerTitle: true,
+        // We don't need a back button to go to some main page
+        automaticallyImplyLeading: false,
+      ),
     );
   }
 }
@@ -260,8 +304,14 @@ class AddTripsPage extends StatelessWidget {
 class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text("Profile Page"),
+    return Scaffold(
+      // Display the title at the top of the screen
+      appBar: AppBar(
+        title: Text("Username's Profile"),
+        centerTitle: true,
+        // We don't need a back button to go to some main page
+        automaticallyImplyLeading: false,
+      ),
     );
   }
 }
