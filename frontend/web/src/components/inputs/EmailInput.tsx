@@ -14,6 +14,7 @@ export default function EmailInput({ setEmail }: { setEmail: (newName: string) =
         setError("");
         setEmail(event.target.value);
     };
+
     return (
         <StyledInput
             label="Email"

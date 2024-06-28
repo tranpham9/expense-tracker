@@ -38,6 +38,7 @@ export default function PasswordInput({ setPassword }: { setPassword: (newName: 
         setError("");
         setPassword(event.target.value);
     };
+
     return (
         <StyledInput
             type="password"

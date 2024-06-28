@@ -20,6 +20,7 @@ export default function NameInput({ setName }: { setName: (newName: string) => v
         setError("");
         setName(event.target.value);
     };
+
     return (
         <StyledInput
             label="Name"

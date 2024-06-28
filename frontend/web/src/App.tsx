@@ -13,23 +13,21 @@ export default function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(true);
 
     return (
-        <>
-            <BrowserRouter>
-                <Navbar
-                    isLoggedIn={isLoggedIn}
-                    setIsLoggedIn={setIsLoggedIn}
+        <BrowserRouter>
+            <Navbar
+                isLoggedIn={isLoggedIn}
+                setIsLoggedIn={setIsLoggedIn}
+            />
+            <Routes>
+                <Route
+                    path={"/home?"}
+                    element={<Home />}
                 />
-                <Routes>
-                    <Route
-                        path={"/home?"}
-                        element={<Home />}
-                    />
-                    <Route
-                        path={"/trips"}
-                        element={<Trips />}
-                    />
-                </Routes>
-            </BrowserRouter>
-        </>
+                <Route
+                    path={"/trips"}
+                    element={<Trips />}
+                />
+            </Routes>
+        </BrowserRouter>
     );
 }
