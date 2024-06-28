@@ -1,5 +1,4 @@
-name: SyncDeploy
-run-name: This syncs up the deploy branch with 
+name: Sync Deploy Branch
 on: workflow_dispatch
 jobs:
   sync-deploy:
