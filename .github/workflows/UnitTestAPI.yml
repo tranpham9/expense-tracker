@@ -1,5 +1,4 @@
-name: UnitTestAPI
-run-name: This runs Jest Unit Tests for the API
+name: Unit Test API
 on:
   push:
     branches:
