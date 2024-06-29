@@ -1,11 +1,14 @@
 name: Deploy to Heroku
 on:
-  push:
-    branches:
-      - deploy
+  workflow_run:
+    workflows:
+      - Sync Deploy Branch
+    types:
+      - completed
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == "success" }}
     steps:
       - uses: actions/checkout@v2
       - uses: akhileshns/heroku-deploy@v3.13.15
@@ -13,3 +16,8 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "accountability" # Must be unique in Heroku
           heroku_email: "pa233796@ucf.edu"
+  fail:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == "failure" }}
+    steps:
+      - run: echo "Couldn't deploy since 'Sync Deploy Branch' failed"
