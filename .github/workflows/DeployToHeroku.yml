@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == "success" }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v2
       - uses: akhileshns/heroku-deploy@v3.13.15
@@ -18,6 +18,6 @@ jobs:
           heroku_email: "pa233796@ucf.edu"
   fail:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == "failure" }}
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     steps:
       - run: echo "Couldn't deploy since 'Sync Deploy Branch' failed"
