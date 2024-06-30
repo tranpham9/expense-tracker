@@ -2,6 +2,7 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 void main() => runApp(const MainApp());
@@ -444,6 +445,7 @@ class TripsPage extends StatelessWidget {
         // Store the search bar and ListView of the trips
         child: Column(
           children: [
+            // Search Bar
             TextField(
               controller: _searchQuery,
               decoration: InputDecoration(
@@ -464,21 +466,29 @@ class TripsPage extends StatelessWidget {
                 ),
               ),
             ),
+            // List of Trips
             Expanded(
               // Useful for building lists of unknown length
               child: ListView.builder(
                 itemCount: trips.length,
                 // Callback to determine how to format each trip in the list
                 itemBuilder: (context, index) {
-                  // Grab the trip from the list
+                  // Grab the trip object from the list
                   Trip trip = trips[index];
                   return ListTile(
                     title: Text(trip.name),
                     subtitle: Text(trip.notes),
-                    trailing: Text('Leader: ${trip.leaderId}'),
+                    trailing: Text('${trip.membersIds.length}'),
                     onTap: () {
                       // Handle onTap event if needed
                       print('Tapped ${trip.name}');
+                      // TODO: Open the ViewTripPage by passing the trip you click on
+                      Navigator.push(
+                        context,
+                        // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
+                        MaterialPageRoute(
+                            builder: (context) => ViewTripPage(trip)),
+                      );
                     },
                   );
                 },
@@ -486,6 +496,26 @@ class TripsPage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class ViewTripPage extends StatefulWidget {
+  final Trip trip;
+  // Pass the trip that you clicked on to the view page
+  const ViewTripPage(this.trip);
+
+  @override
+  State<ViewTripPage> createState() => _ViewTripPage();
+}
+
+class _ViewTripPage extends State<ViewTripPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('${widget.trip.name}'),
       ),
     );
   }
