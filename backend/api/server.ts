@@ -46,6 +46,7 @@ app.post("/api/registerUser", async (req, res, next) => {
     const { name, email, password, tripId } = req.body;
     if (!name || !email || !password) {
         res.status(400).json({ error: "Bad Request" });
+        return;
     }
 
     const newUser: User = {
@@ -58,6 +59,7 @@ app.post("/api/registerUser", async (req, res, next) => {
         const check = await userColl.find({ email: newUser.email });
         if (check) {
             res.status(500).json({ error: "Failed to register user" });
+            return;
         }
 
         // Update users collection with the new user
@@ -70,14 +72,15 @@ app.post("/api/registerUser", async (req, res, next) => {
             res.status(200).json({ message: "User registered successfully" });
         } else {
             res.status(500).json({ error: "Failed to register user" });
+            return;
         }
 
         // If tripId is provided, update trips collection to add user to the trip
         if (tripId) {
             // use createFromHexString ( https://github.com/dotansimha/graphql-code-generator/issues/6830#issuecomment-2105266455 )
             await tripColl.updateOne(
-                { $push: { User: result._id } } // Add newUserId to the users array in the trip document
                 { _id: ObjectId.createFromHexString(tripId) }, // Find the trip by tripId
+                { $push: { memberIds: result._id } } // Add newUserId to the users array in the trip document
             );
         }
     } catch (err) {
