@@ -10,6 +10,10 @@ const uri = process.env.MONGODB_URI!;
 const client = new MongoClient(uri);
 client.connect();
 
+const DB_NAME = "appData";
+const USER_COLLECTION_NAME = "User";
+const TRIP_COLLECTION_NAME = "Trip";
+
 // express app
 const app = express();
 
@@ -37,9 +41,9 @@ type Trip = {
 
 // register
 app.post("/api/registerUser", async (req, res, next) => {
-    const db = client.db("appData");
-    const userCollection: Collection<User> = db.collection("User");
-    const tripCollection: Collection<Trip> = db.collection("Trip");
+    const db = client.db(DB_NAME);
+    const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
+    const tripCollection: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
 
     // incoming: name, email, password, tripId? (invitation)
 
@@ -78,10 +82,8 @@ app.post("/api/registerUser", async (req, res, next) => {
         // If tripId is provided, update trips collection to add user to the trip
         if (tripId) {
             // use createFromHexString ( https://github.com/dotansimha/graphql-code-generator/issues/6830#issuecomment-2105266455 )
-            await tripCollection.updateOne(
-                { _id: ObjectId.createFromHexString(tripId) }, // Find the trip by tripId
-                { $push: { memberIds: result._id } } // Add newUserId to the users array in the trip document
-            );
+            // finds the trip by id and pushes it to the array of members
+            await tripCollection.updateOne({ _id: ObjectId.createFromHexString(tripId) }, { $push: { memberIds: result._id } });
         }
     } catch (err) {
         console.error("Error registering user:", err);
@@ -90,12 +92,12 @@ app.post("/api/registerUser", async (req, res, next) => {
 });
 
 app.post("/api/login", async (req, res, next) => {
-    const db = client.db("appData");
-    const userColl = db.collection("User");
+    const db = client.db(DB_NAME);
+    const userCollection = db.collection(USER_COLLECTION_NAME);
 
     const { email, password } = req.body;
 
-    const user = await userColl.findOne({ email: email });
+    const user = await userCollection.findOne({ email: email });
 
     if (user) {
         const result = password === user.password;
