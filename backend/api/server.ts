@@ -38,10 +38,10 @@ type Trip = {
 // register
 app.post("/api/registerUser", async (req, res, next) => {
     const db = client.db("appData");
-    const userColl: Collection<User> = db.collection("User");
-    const tripColl: Collection<Trip> = db.collection("Trip");
+    const userCollection: Collection<User> = db.collection("User");
+    const tripCollection: Collection<Trip> = db.collection("Trip");
 
-    // incoming name, email, password, tripId(invitation)
+    // incoming: name, email, password, tripId? (invitation)
 
     const { name, email, password, tripId } = req.body;
     if (!name || !email || !password) {
@@ -56,18 +56,18 @@ app.post("/api/registerUser", async (req, res, next) => {
         trips: [tripId],
     };
     try {
-        const check = await userColl.find({ email: newUser.email });
+        const check = await userCollection.find({ email: newUser.email });
         if (check) {
             res.status(500).json({ error: "Failed to register user" });
             return;
         }
 
         // Update users collection with the new user
-        await userColl.insertOne(newUser);
+        await userCollection.insertOne(newUser);
 
         // query for the _id automatically created by mongodb
         // retrieve only the _id from the database
-        const result = await userColl.findOne({ email }, { projection: { _id: true } });
+        const result = await userCollection.findOne({ email }, { projection: { _id: true } });
         if (result) {
             res.status(200).json({ message: "User registered successfully" });
         } else {
@@ -78,7 +78,7 @@ app.post("/api/registerUser", async (req, res, next) => {
         // If tripId is provided, update trips collection to add user to the trip
         if (tripId) {
             // use createFromHexString ( https://github.com/dotansimha/graphql-code-generator/issues/6830#issuecomment-2105266455 )
-            await tripColl.updateOne(
+            await tripCollection.updateOne(
                 { _id: ObjectId.createFromHexString(tripId) }, // Find the trip by tripId
                 { $push: { memberIds: result._id } } // Add newUserId to the users array in the trip document
             );
