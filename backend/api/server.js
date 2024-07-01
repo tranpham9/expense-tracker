@@ -1,14 +1,14 @@
-const express = require("express");
-const path = require("path");
+import express, { json, urlencoded } from "express";
+import { join } from "path";
 
-const bodyParser = require("body-parser");
-const cors = require("cors");
+import bodyParser from "body-parser";
+import cors from "cors";
 
 require("dotenv").config();
 // Heroku will pass the port we must listen on via the environment, otherwise default to 5000.
 const port = process.env.PORT || 5000;
 const uri = process.env.MONGODB_URI;
-const MongoClient = require("mongodb").MongoClient;
+import { MongoClient } from "mongodb";
 const client = new MongoClient(uri);
 client.connect();
 
@@ -19,8 +19,8 @@ app.use(cors());
 // Allow all CORS Requests (ie. allow SwaggerHub to make API calls)
 app.use(cors());
 // Parse incoming JSON, if any
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(json());
+app.use(urlencoded({ extended: true }));
 
 // register
 app.post("/api/registerUser", async (req, res, next) => {
@@ -92,7 +92,7 @@ app.post("/api/login", async (req, res, next) => {
 });
 
 // Serve the static frontend files
-app.use(express.static(path.join(__dirname, "../../frontend/web/dist")));
+app.use(express.static(join(__dirname, "../../frontend/web/dist")));
 
 app.listen(port, () => {
     console.log(`listening on port ${port}`);
