@@ -4,7 +4,8 @@ import { join } from "path";
 import bodyParser from "body-parser";
 import cors from "cors";
 
-require("dotenv").config();
+import "dotenv/config";
+
 // Heroku will pass the port we must listen on via the environment, otherwise default to 5000.
 const port = process.env.PORT || 5000;
 const uri = process.env.MONGODB_URI;
