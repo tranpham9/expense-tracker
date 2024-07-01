@@ -15,7 +15,6 @@ client.connect();
 
 // express app
 const app = express();
-app.use(cors());
 
 // Allow all CORS Requests (ie. allow SwaggerHub to make API calls)
 app.use(cors());
