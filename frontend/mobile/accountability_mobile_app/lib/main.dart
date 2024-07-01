@@ -1,5 +1,6 @@
 // Use "flutter run" in the shell when you need to debug
 import 'dart:core';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -104,9 +105,9 @@ class _LoginPage extends State<LoginPage> {
             padding: const EdgeInsets.all(10),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 95, 170, 232),
+                backgroundColor: Theme.of(context).primaryColor,
               ),
-              child: const Text('Login'),
+              child: const Text('Login', style: TextStyle(color: Colors.white)),
               onPressed: () {
                 print(email.text);
                 print(password.text);
@@ -225,9 +226,12 @@ class _RegisterPage extends State<RegisterPage> {
               padding: const EdgeInsets.all(10),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 95, 170, 232),
+                  backgroundColor: Theme.of(context).primaryColor,
                 ),
-                child: const Text('Register'),
+                child: const Text(
+                  'Register',
+                  style: TextStyle(color: Colors.white),
+                ),
                 onPressed: () {
                   print(name.text);
                   print(email.text);
@@ -281,9 +285,12 @@ class _ForgotPassswordPage extends State<ForgotPassswordPage> {
               padding: const EdgeInsets.all(10),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 95, 170, 232),
+                  backgroundColor: Theme.of(context).primaryColor,
                 ),
-                child: const Text('Send Recovery Email'),
+                child: const Text(
+                  'Send Recovery Email',
+                  style: TextStyle(color: Colors.white),
+                ),
                 onPressed: () {
                   print(recoveryEmail.text);
                   // TODO: Call the API to send recorvery email to the user
@@ -511,11 +518,193 @@ class ViewTripPage extends StatefulWidget {
 }
 
 class _ViewTripPage extends State<ViewTripPage> {
+  //For Testing Only
+  List<Expense> expenses = [
+    Expense(
+        id: "1",
+        name: "Mcdonalds",
+        tripId: "192381",
+        cost: 15.09,
+        description: "We ate at Mcdonalds",
+        membersIds: ["13", "14"],
+        payerId: "1451"),
+    Expense(
+        id: "1",
+        name: "Mcdonalds",
+        tripId: "192381",
+        cost: 15.09,
+        description: "We ate at Mcdonalds",
+        membersIds: ["13", "14"],
+        payerId: "1451"),
+    Expense(
+        id: "1",
+        name: "Mcdonalds",
+        tripId: "192381",
+        cost: 15.09,
+        description: "We ate at Mcdonalds",
+        membersIds: ["13", "14"],
+        payerId: "1451"),
+    Expense(
+        id: "1",
+        name: "Mcdonalds",
+        tripId: "192381",
+        cost: 15.09,
+        description: "We ate at Mcdonalds",
+        membersIds: ["13", "14"],
+        payerId: "1451"),
+    Expense(
+        id: "1",
+        name: "Mcdonalds",
+        tripId: "192381",
+        cost: 15.09,
+        description: "We ate at Mcdonalds",
+        membersIds: ["13", "14"],
+        payerId: "1451"),
+  ];
+
+  List<User> members = [
+    User(id: "123", name: "Bob", email: "bob@email.com", trips: ["123", "123"]),
+    User(
+        id: "123",
+        name: "Alice",
+        email: "alice@email.com",
+        trips: ["123", "123"]),
+    User(
+        id: "123",
+        name: "John",
+        email: "john@email.com",
+        trips: ["123", "123"]),
+    User(
+        id: "123",
+        name: "Abigail",
+        email: "abijail@email.com",
+        trips: ["123", "123"]),
+    User(
+        id: "123",
+        name: "Jack",
+        email: "jack@email.com",
+        trips: ["123", "123"]),
+    User(
+        id: "123",
+        name: "Eddy",
+        email: "jack@email.com",
+        trips: ["123", "123"]),
+    User(
+        id: "123",
+        name: "Tony",
+        email: "jack@email.com",
+        trips: ["123", "123"]),
+  ];
   @override
   Widget build(BuildContext context) {
+    Trip trip = widget.trip;
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.trip.name}'),
+        title: Text('${trip.name}'),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          // List the notes of the trip
+          ListTile(
+            title: Text('${trip.notes}'),
+            subtitle: Text('Notes'),
+            // List the edit button
+            // TODO: If we only have one button, maybe remove the row widget
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton(
+                    onPressed: () {
+                      // TODO: Bring up overlay to edit the name and description
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                    ),
+                    child: Text(
+                      "Edit",
+                      style: TextStyle(color: Colors.white),
+                    )),
+              ],
+            ),
+          ),
+          ListTile(
+            title: Text(
+              "Members",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          // Display the members of the trip
+          Row(
+            children: [
+              // Plus button to add a member
+              SizedBox(
+                width: 75,
+                height: 75,
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    shape: CircleBorder(),
+                    padding: EdgeInsets.all(10),
+                  ),
+                  child: Icon(Icons.add),
+                ),
+              ),
+              Expanded(
+                child: SizedBox(
+                  width: 75,
+                  height: 75,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: members.length,
+                    itemBuilder: (context, index) {
+                      User member = members[index];
+                      return SizedBox(
+                        width: 100,
+                        height: 100,
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            shape: CircleBorder(),
+                            padding: EdgeInsets.all(10),
+                          ),
+                          child: Text('${member.name}'),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          ListTile(
+            title: Text(
+              "Expenses",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          // Display a ListView of the expenses associated with the trips
+          Expanded(
+            child: ListView.builder(
+              // Callback to determine how to format each trip in the list
+              itemBuilder: (context, index) {
+                Expense expense = expenses[index];
+                return ListTile(
+                  title: Text(expense.name),
+                  subtitle: Text(expense.description),
+                  trailing: Text('\$${expense.cost}'),
+                  onTap: () {
+                    // Handle onTap event if needed
+                    print('Tapped ${expense.name}');
+                    // TODO: Open the ViewTripPage by passing the trip you click on
+                  },
+                );
+              },
+              itemCount: expenses.length,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -582,9 +771,12 @@ class AddTripsPage extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 95, 170, 232),
+                  backgroundColor: Theme.of(context).primaryColor,
                 ),
-                child: const Text('Add Trip'),
+                child: const Text(
+                  'Add Trip',
+                  style: TextStyle(color: Colors.white),
+                ),
                 onPressed: () {
                   print(name.text);
                   print(notes.text);
@@ -670,7 +862,7 @@ class User {
   String id;
   String name;
   String email;
-  List<Trip> trips;
+  List<String> trips;
   // Constructor for a User
   User(
       {required this.id,
