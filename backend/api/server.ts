@@ -113,7 +113,13 @@ app.post("/api/login", async (req, res, next) => {
 });
 
 // Serve the static frontend files
-app.use(express.static(join(__dirname, "../../frontend/web/dist")));
+const FRONTEND_DIST_PATH = join(__dirname, "../../frontend/web/dist");
+app.use(express.static(FRONTEND_DIST_PATH));
+
+// any get request provides the index.html file (which avoids issues with pathing/routing)
+app.get("*", (req, res, next) => {
+    res.sendFile(join(FRONTEND_DIST_PATH, "index.html"));
+});
 
 app.listen(port, () => {
     console.log(`listening on port ${port}`);
