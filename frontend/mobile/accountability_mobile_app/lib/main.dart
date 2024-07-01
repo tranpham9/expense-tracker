@@ -803,15 +803,40 @@ class ProfilePage extends StatelessWidget {
         // We don't need a back button to go to some main page
         automaticallyImplyLeading: false,
       ),
-      body: ListView(
+      body: Column(
         children: [
-          ListTile(
-            title: Text("your name"),
-            subtitle: Text("username"),
+          Expanded(
+            child: ListView(
+              children: [
+                ListTile(
+                  title: Text("Your Name"),
+                  subtitle: Text("Username"),
+                ),
+                ListTile(
+                  title: Text("Your Email"),
+                  subtitle: Text("Email"),
+                ),
+              ],
+            ),
           ),
-          ListTile(
-            title: Text("your email"),
-            subtitle: Text("email"),
+          // TODO: No material widget found.
+          Container(
+            height: 55,
+            width: 270,
+            padding: const EdgeInsets.all(10),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).primaryColor,
+              ),
+              child: const Text(
+                'Logout',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                // TODO: Log the user out
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+            ),
           ),
         ],
       ),
