@@ -56,28 +56,28 @@ app.post("/api/registerUser", async (req, res, next) => {
         name: name.toString(),
         email: (email.toString() as string).trim().toLocaleLowerCase(), // trimmed and converted to lowercase in order to properly detect whether email already exists
         password: password.toString(),
-        trips: [tripId && ObjectId.createFromHexString(tripId.toString())],
+        trips: [] // the user doesn't own the provided tripId; they are only added *to* it
     };
 
     try {
         // ensure email doesn't already exist
         const check = await userCollection.findOne({ email });
         if (check) {
-            console.error("Attempted to register a user with an existing email.");
+            console.error("Attempted to register a user with an existing email");
             res.status(500).json({ error: "Failed to register user" });
             return;
         }
 
+        // insert new user
         const insertionResult = await userCollection.insertOne(newUser);
         if (!insertionResult.acknowledged) {
             res.status(500).json({ error: "Failed to register user" });
             return;
         }
 
-        // if tripId is provided, update trips collection to add user to the trip
+        // if tripId is provided, add user to trip
         if (tripId) {
             // use createFromHexString ( https://github.com/dotansimha/graphql-code-generator/issues/6830#issuecomment-2105266455 )
-            // finds the trip by id and pushes it to the array of members
             // TODO: might need to handle this failing?  Would need to check .acknowledged boolean
             await tripCollection.updateOne({ _id: ObjectId.createFromHexString(tripId) }, { $push: { memberIds: insertionResult.insertedId } });
         }
