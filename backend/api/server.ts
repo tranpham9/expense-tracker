@@ -117,7 +117,7 @@ app.post("/api/login", async (req, res, next) => {
 });
 
 // Serve the static frontend files
-const FRONTEND_DIST_PATH = join(__dirname, "../../frontend/web/dist");
+const FRONTEND_DIST_PATH = join(__dirname, "../../../frontend/web/dist"); // starting from dist folder for server.js (compiled from server.ts)
 app.use(express.static(FRONTEND_DIST_PATH));
 
 // any get request provides the index.html file (which avoids issues with pathing/routing)
