@@ -47,7 +47,8 @@ app.post("/api/registerUser", async (req, res, next) => {
 
     const { name, email, password, tripId } = req.body;
     if (!name || !email || !password) {
-        res.status(400).json({ error: "Bad Request" });
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400
+        res.status(400).json({ error: "Malformed Request" });
         return;
     }
 
@@ -56,7 +57,7 @@ app.post("/api/registerUser", async (req, res, next) => {
         name: name.toString(),
         email: (email.toString() as string).trim().toLocaleLowerCase(), // trimmed and converted to lowercase in order to properly detect whether email already exists
         password: password.toString(),
-        trips: [] // the user doesn't own the provided tripId; they are only added *to* it
+        trips: [], // the user doesn't own the provided tripId; they are only added *to* it
     };
 
     try {
@@ -64,14 +65,16 @@ app.post("/api/registerUser", async (req, res, next) => {
         const check = await userCollection.findOne({ email });
         if (check) {
             console.error("Attempted to register a user with an existing email");
-            res.status(500).json({ error: "Failed to register user" });
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+            res.status(401).json({ error: "Failed to register user" });
             return;
         }
 
         // insert new user
         const insertionResult = await userCollection.insertOne(newUser);
         if (!insertionResult.acknowledged) {
-            res.status(500).json({ error: "Failed to register user" });
+            console.error("Failed to insert new user");
+            res.status(401).json({ error: "Failed to register user" });
             return;
         }
 
@@ -83,7 +86,7 @@ app.post("/api/registerUser", async (req, res, next) => {
         }
     } catch (err) {
         console.error("Error registering user:", err);
-        res.status(500).json({ error: "Failed to register user" });
+        res.status(401).json({ error: "Failed to register user" });
         return;
     }
 
