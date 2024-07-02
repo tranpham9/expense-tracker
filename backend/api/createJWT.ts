@@ -1,46 +1,43 @@
-//TODO: Likely needs to be changed to TypeScript
-const jwt = require("jsonwebtoken");
-require("dotenv").config();
+import "dotenv/config";
+import { sign, verify, decode } from "jsonwebtoken";
 
 //Create a token based on the name, email and password
 //TODO: Maybe remove password and just use another field.
-exports.createToken = function (userId, name, email) {
-    return _createToken(userId, name, email);
-};
-//Helper function to actually create the JWT
-_createToken = function (userId, name, email) {
+export function createToken(userId: string, name: string, email: string) {
+    let ret;
     try {
         const expiration = new Date();
-        const user = { name: name, email: email, userId: userId };
+        const user = { name, email, userId };
         //Sign the token based on user credentials
-        const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
+        // FIXME: I think that the first parameter (user) is supposed to be a string; should it be stringified json?
+        const accessToken = sign(user, process.env.ACCESS_TOKEN_SECRET!);
 
-        var ret = { accessToken: accessToken };
+        ret = { accessToken: accessToken };
     } catch (e) {
-        var ret = { error: e.message };
+        ret = { error: (e as Error).message };
     }
     return ret;
-};
+}
 //If the JWT has expired, kick the user off
-exports.isExpired = function (token) {
-    var isError = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, verifiedJwt) => {
-        if (err) {
-            return true;
-        } else {
-            return false;
-        }
-    });
-
-    return isError;
-};
+export function isExpired(token: string) {
+    // TODO: is a custom verify callback even needed here?
+    return verify(token, process.env.ACCESS_TOKEN_SECRET!, (err, verifiedJwt) => !!err);
+}
 //Each time a valid operation has taken place refresh and get a new JWT
-exports.refresh = function (token) {
-    var ud = jwt.decode(token, { complete: true });
+function refresh(token: string) {
+    let ud = decode(token, { complete: true });
+    // TODO: return whatever would be "correct" to return here if the decode fails
+    if (!ud) {
+        return null;
+    }
     //Grab the user information and use it to refresh the token
     //TODO:  Change this here to get the fields that we pass
-    var userId = ud.payload.userId;
-    var name = ud.payload.name;
-    var email = ud.payload.email;
+    // @ts-ignore
+    let userId = ud.payload.userId;
+    // @ts-ignore
+    let name = ud.payload.name;
+    // @ts-ignore
+    let email = ud.payload.email;
 
-    return _createToken(userId, name, email);
-};
+    return createToken(userId, name, email);
+}
