@@ -66,14 +66,8 @@ app.post("/api/registerUser", async (req, res, next) => {
             password: password,
             trips: [tripId],
         };
-        await userCollection.insertOne(newUser);
-
-        // query for the _id automatically created by mongodb
-        // retrieve only the _id from the database
-        const result = await userCollection.findOne({ email }, { projection: { _id: true } });
-        if (result) {
-            res.status(200).json({ message: "User registered successfully" });
-        } else {
+        const insertionResult = await userCollection.insertOne(newUser);
+        if (!insertionResult.acknowledged) {
             res.status(500).json({ error: "Failed to register user" });
             return;
         }
@@ -82,12 +76,17 @@ app.post("/api/registerUser", async (req, res, next) => {
         if (tripId) {
             // use createFromHexString ( https://github.com/dotansimha/graphql-code-generator/issues/6830#issuecomment-2105266455 )
             // finds the trip by id and pushes it to the array of members
-            await tripCollection.updateOne({ _id: ObjectId.createFromHexString(tripId) }, { $push: { memberIds: result._id } });
+            // TODO: might need to handle this failing?  Would need to check .acknowledged boolean
+            await tripCollection.updateOne({ _id: ObjectId.createFromHexString(tripId) }, { $push: { memberIds: insertionResult.insertedId } });
         }
     } catch (err) {
         console.error("Error registering user:", err);
         res.status(500).json({ error: "Failed to register user" });
+        return;
     }
+
+    console.log("A user was registered successfully");
+    res.status(200).json({ message: "User registered successfully" });
 });
 
 app.post("/api/login", async (req, res, next) => {
