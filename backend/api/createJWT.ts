@@ -1,9 +1,10 @@
 import "dotenv/config";
 import { sign, verify, decode } from "jsonwebtoken";
+import { ObjectId } from "mongodb";
 
 //Create a token based on the name, email and password
 //TODO: Maybe remove password and just use another field.
-export function createToken(userId: string, name: string, email: string) {
+export function createToken(userId: ObjectId, name: string, email: string) {
     let ret;
     try {
         const expiration = new Date();

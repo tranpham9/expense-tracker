@@ -3,6 +3,7 @@ import express, { json, urlencoded } from "express";
 import { join } from "path";
 import cors from "cors";
 import { Collection, MongoClient, ObjectId } from "mongodb";
+import { createToken } from "./createJWT"
 
 // Heroku will pass the port we must listen on via the environment, otherwise default to 5000.
 const port = process.env.PORT || 5000;
@@ -91,8 +92,8 @@ app.post("/api/registerUser", async (req, res, next) => {
         return;
     }
 
-    console.log("A user was registered successfully");
-    res.status(200).json({ message: "User registered successfully" });
+    // console.log("A user was registered successfully");
+    res.status(200);
 });
 
 app.post("/api/login", async (req, res, next) => {
@@ -108,9 +109,17 @@ app.post("/api/login", async (req, res, next) => {
     // trimmed and converted to lowercase to standardize format of emails
     const properEmail = (email.toString() as string).trim().toLocaleLowerCase();
 
+    var ret;
+
     const foundUser = await userCollection.findOne({ email: properEmail });
     if (foundUser && password === foundUser.password) {
-        res.status(200).json({ message: foundUser._id });
+        ret = createToken(foundUser._id, foundUser.name, foundUser.email);
+        res.status(200).json({
+            "id" : foundUser._id,
+            "name" : foundUser.name,
+            "email" : foundUser.email,
+            ret
+        });
     } else {
         res.status(401).json({ error: "Invalid login credentials" });
     }
