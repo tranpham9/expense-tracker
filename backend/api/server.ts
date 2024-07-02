@@ -24,7 +24,6 @@ app.use(json());
 app.use(urlencoded({ extended: true }));
 
 type User = {
-    _id?: ObjectId;
     name: string;
     email: string;
     password: string;
@@ -32,7 +31,6 @@ type User = {
 };
 
 type Trip = {
-    _id?: ObjectId;
     name: string;
     notes: string;
     memberIds: ObjectId[];
