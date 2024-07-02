@@ -61,10 +61,10 @@ app.post("/api/registerUser", async (req, res, next) => {
 
         // Update users collection with the new user
         const newUser: User = {
-            name: name,
-            email: email,
-            password: password,
-            trips: [tripId],
+            name: name.toString(),
+            email: email.toString().trim(), // trimmed in order to properly detect whether email already exists
+            password: password.toString(),
+            trips: [ObjectId.createFromHexString(tripId.toString())],
         };
         const insertionResult = await userCollection.insertOne(newUser);
         if (!insertionResult.acknowledged) {
