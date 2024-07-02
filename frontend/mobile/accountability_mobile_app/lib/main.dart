@@ -1,10 +1,14 @@
+// TODO: Break up some of the code into different files to make it more managable
 // Use "flutter run" in the shell when you need to debug
 import 'dart:core';
 import 'dart:math';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
+// Needed to make API calls
+import 'package:http/http.dart' as http;
 
 void main() => runApp(const MainApp());
 
@@ -617,6 +621,13 @@ class _ViewTripPage extends State<ViewTripPage> {
                 ElevatedButton(
                     onPressed: () {
                       // TODO: Bring up overlay to edit the name and description
+                      print("clicked on edit");
+                      // Navigate to the name and notes edit page
+                      Navigator.push(
+                          context,
+                          // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
+                          MaterialPageRoute(
+                              builder: (context) => EditNameNotesPage(trip)));
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
@@ -642,7 +653,15 @@ class _ViewTripPage extends State<ViewTripPage> {
                 width: 75,
                 height: 75,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    print("click on add member");
+                    // TODO: Bring up pop up to add new member to the trip
+                    Navigator.push(
+                        context,
+                        // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
+                        MaterialPageRoute(
+                            builder: (context) => AddMemberToTrip()));
+                  },
                   style: ElevatedButton.styleFrom(
                     shape: CircleBorder(),
                     padding: EdgeInsets.all(10),
@@ -650,6 +669,7 @@ class _ViewTripPage extends State<ViewTripPage> {
                   child: Icon(Icons.add),
                 ),
               ),
+              // Display the members of the trip in a horizontal scroll format
               Expanded(
                 child: SizedBox(
                   width: 75,
@@ -663,7 +683,17 @@ class _ViewTripPage extends State<ViewTripPage> {
                         width: 100,
                         height: 100,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // TODO: Bring up pop up to display that members information.
+                            // Optionally, if the user is the leader of this trip, then give option to remove from trip
+                            print("click on ${member.name}");
+                            Navigator.push(
+                                context,
+                                // Display the information of the member that was clicked on
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        ViewMemberPage(member)));
+                          },
                           style: ElevatedButton.styleFrom(
                             shape: CircleBorder(),
                             padding: EdgeInsets.all(10),
@@ -677,7 +707,6 @@ class _ViewTripPage extends State<ViewTripPage> {
               ),
             ],
           ),
-
           ListTile(
             title: Text(
               "Expenses",
@@ -698,6 +727,11 @@ class _ViewTripPage extends State<ViewTripPage> {
                     // Handle onTap event if needed
                     print('Tapped ${expense.name}');
                     // TODO: Open the ViewTripPage by passing the trip you click on
+                    Navigator.push(
+                        context,
+                        // Display the information of the member that was clicked on
+                        MaterialPageRoute(
+                            builder: (context) => ViewExpensePage(expense)));
                   },
                 );
               },
@@ -808,6 +842,7 @@ class ProfilePage extends StatelessWidget {
           Expanded(
             child: ListView(
               children: [
+                // TODO: Give the user the ability to change their name and password
                 ListTile(
                   title: Text("Your Name"),
                   subtitle: Text("Username"),
@@ -839,6 +874,245 @@ class ProfilePage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class EditNameNotesPage extends StatefulWidget {
+  // Each trip has both a name and notes associated with it
+  final Trip trip;
+  // Make sure to pass the name and notes of the trip to the function
+  const EditNameNotesPage(this.trip);
+
+  @override
+  State<EditNameNotesPage> createState() => _EditNameNotesPage();
+}
+
+class _EditNameNotesPage extends State<EditNameNotesPage> {
+  TextEditingController nameController = TextEditingController();
+  TextEditingController notesController = TextEditingController();
+
+  @override
+  void initState() {
+    // Set the text fields to the current values
+    nameController.text = widget.trip.name;
+    notesController.text = widget.trip.notes;
+  }
+
+  Widget build(BuildContext context) {
+    // Build the page
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Edit Trip'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            TextFormField(
+              controller: nameController,
+              decoration: InputDecoration(
+                labelText: 'Trip Name',
+              ),
+            ),
+            TextFormField(
+              controller: notesController,
+              decoration: InputDecoration(
+                labelText: 'Notes',
+              ),
+              maxLines: null,
+            ),
+            SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: () {
+                // Save the changes and go back to the screen
+                widget.trip.name = nameController.text;
+                print("trip name changed to ${widget.trip.name}");
+                widget.trip.notes = notesController.text;
+                print("trip notes changed to ${widget.trip.notes}");
+                // TODO: Write the changes with the API
+
+                // Go back to the last screen
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).primaryColor),
+              child: Text(
+                'Save',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void saveEdits() {
+    // Call API
+  }
+}
+
+class ViewMemberPage extends StatefulWidget {
+  // Each trip has both a name and notes associated with it
+  final User member;
+  // Make sure to pass the name and notes of the trip to the function
+  const ViewMemberPage(this.member);
+
+  @override
+  State<ViewMemberPage> createState() => _ViewMemberPage();
+}
+
+class _ViewMemberPage extends State<ViewMemberPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('${widget.member.name}'),
+        centerTitle: true,
+      ),
+      body: Container(
+        child: Text('${widget.member.email}'),
+      ),
+    );
+  }
+}
+
+class AddMemberToTrip extends StatelessWidget {
+  // Get the email of the person that you want to add
+  final TextEditingController email = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // Display the title at the top of the screen
+      appBar: AppBar(
+        title: const Text("Add a Member"),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(10),
+        child: ListView(
+          // Have our list of containers that will take in text input
+          children: <Widget>[
+            // Enter Name
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: TextField(
+                controller: email,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Email',
+                ),
+              ),
+            ),
+            // Confirm Add Trip
+            Container(
+              height: 50,
+              padding: const EdgeInsets.all(10),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).primaryColor,
+                ),
+                child: const Text(
+                  'Add Trip',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  print('Adding ${email.text}');
+                  // TODO: Call the API to add the trip
+
+                  // Go back to the last screen
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ViewExpensePage extends StatefulWidget {
+  // Each trip has both a name and notes associated with it
+  final Expense expense;
+  // Make sure to pass the name and notes of the trip to the function
+  const ViewExpensePage(this.expense);
+
+  @override
+  State<ViewExpensePage> createState() => _ViewExpensePage();
+}
+
+class _ViewExpensePage extends State<ViewExpensePage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // Display the title at the top of the screen
+      appBar: AppBar(
+        title: Text('${widget.expense.name}'),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          // Have our list of containers that will take in text input
+          children: <Widget>[
+            // Display notes
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: Text("${widget.expense.description}"),
+            ),
+            // Display cost
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: Text("\$${widget.expense.cost}"),
+            ),
+            // Display Payer
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: Text("${widget.expense.payerId} payed"),
+            ),
+            ListTile(
+              title: Text("Who Was Apart of This Expense?"),
+            ),
+            // Display Members
+            Expanded(
+              // Build a list of all of the members in the trip
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  String member = widget.expense.membersIds[index];
+                  return ListTile(
+                    title: Text(member),
+                  );
+                },
+                itemCount: widget.expense.membersIds.length,
+              ),
+            ),
+            // Confirm Edit
+            Container(
+              height: 50,
+              padding: const EdgeInsets.all(10),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).primaryColor,
+                ),
+                child: const Text(
+                  'Confirm Edit',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  // TODO: Call the API to add the trip
+
+                  // Go back to the last screen
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
