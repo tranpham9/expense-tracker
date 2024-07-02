@@ -53,20 +53,21 @@ app.post("/api/registerUser", async (req, res, next) => {
         return;
     }
 
-    const newUser: User = {
-        name: name,
-        email: email,
-        password: password,
-        trips: [tripId],
-    };
     try {
-        const check = await userCollection.find({ email: newUser.email });
+        const check = await userCollection.findOne({ email });
         if (check) {
+            console.error("Attempted to register a user with an existing email.");
             res.status(500).json({ error: "Failed to register user" });
             return;
         }
 
         // Update users collection with the new user
+        const newUser: User = {
+            name: name,
+            email: email,
+            password: password,
+            trips: [tripId],
+        };
         await userCollection.insertOne(newUser);
 
         // query for the _id automatically created by mongodb
