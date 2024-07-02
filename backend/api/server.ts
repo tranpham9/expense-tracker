@@ -99,19 +99,19 @@ app.post("/api/login", async (req, res, next) => {
     const userCollection = db.collection(USER_COLLECTION_NAME);
 
     const { email, password } = req.body;
+    if (!email || !password) {
+        res.status(400).json({ error: "Malformed Request" });
+        return;
+    }
 
-    const user = await userCollection.findOne({ email: email });
+    // trimmed and converted to lowercase to standardize format of emails
+    const properEmail = (email.toString() as string).trim().toLocaleLowerCase();
 
-    if (user) {
-        const result = password === user.password;
-
-        if (result) {
-            res.status(200).json({ message: user._id });
-        } else {
-            res.status(400).json({ error: "Email/Password doesn't match" });
-        }
+    const foundUser = await userCollection.findOne({ email: properEmail });
+    if (foundUser && password === foundUser.password) {
+        res.status(200).json({ message: foundUser._id });
     } else {
-        res.status(500).json({ error: "User doesn't exist" });
+        res.status(401).json({ error: "Invalid login credentials" });
     }
 });
 
