@@ -24,7 +24,7 @@ export function isExpired(token: string) {
     return verify(token, process.env.ACCESS_TOKEN_SECRET!, (err, verifiedJwt) => !!err);
 }
 //Each time a valid operation has taken place refresh and get a new JWT
-function refresh(token: string) {
+export function refresh(token: string) {
     let ud = decode(token, { complete: true });
     // TODO: return whatever would be "correct" to return here if the decode fails
     if (!ud) {
