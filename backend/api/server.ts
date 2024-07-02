@@ -53,11 +53,12 @@ app.post("/api/registerUser", async (req, res, next) => {
     }
 
     // TODO: need to validate email is in valid form and that nothing is too long
+    // TODO: ensure trips should also include non-owning trips (i.e. ones where the user is a part of but not the creater/owner of)
     const newUser: User = {
         name: name.toString(),
         email: (email.toString() as string).trim().toLocaleLowerCase(), // trimmed and converted to lowercase in order to properly detect whether email already exists
         password: password.toString(),
-        trips: [], // the user doesn't own the provided tripId; they are only added *to* it
+        trips: [tripId && ObjectId.createFromHexString(tripId.toString())],
     };
 
     try {
