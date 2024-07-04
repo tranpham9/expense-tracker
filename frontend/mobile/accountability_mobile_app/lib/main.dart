@@ -36,13 +36,12 @@ class MainApp extends StatelessWidget {
   }
 }
 
-// Does storing what the user types in count as stateful?
+// User Related Widgets
 class LoginPage extends StatefulWidget {
   @override
   State<LoginPage> createState() => _LoginPage();
 }
 
-// Can log a user in, route them to forgot password or register
 class _LoginPage extends State<LoginPage> {
   // Grab text that will be entered by the user
   final TextEditingController email = TextEditingController();
@@ -125,6 +124,7 @@ class _LoginPage extends State<LoginPage> {
               },
             ),
           ),
+          // Give a new user ability to register
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -237,11 +237,9 @@ class _RegisterPage extends State<RegisterPage> {
                   style: TextStyle(color: Colors.white),
                 ),
                 onPressed: () {
-                  print(name.text);
-                  print(email.text);
-                  print(password.text);
-                  print(confirmPassword.text);
                   // TODO: Call the API to register the user
+                  // Also alert the user that they need to confirm w/ their email
+                  // Then, direct them to the login to login
                 },
               ),
             ),
@@ -252,6 +250,7 @@ class _RegisterPage extends State<RegisterPage> {
   }
 }
 
+// TODO: Could possibly be an overlay??
 class ForgotPassswordPage extends StatefulWidget {
   @override
   State<ForgotPassswordPage> createState() => _ForgotPassswordPage();
@@ -348,11 +347,12 @@ class _HomePage extends State<HomePage> {
   }
 }
 
+// Trip Related Widgets
 class TripsPage extends StatelessWidget {
   // Grab the search field when we want to search
   final TextEditingController _searchQuery = TextEditingController();
 
-  //FOR TESTING ONLY
+  //FOR TESTING ONLY TODO: Perhaps create a 'model' folder and put models and fake data there
   List<Trip> trips = [
     Trip(
         id: "t1id1",
@@ -445,6 +445,7 @@ class TripsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
+          // TODO: Put actual username here
           "Username's Trips",
         ),
         centerTitle: true,
@@ -469,6 +470,7 @@ class TripsPage extends StatelessWidget {
                 prefixIcon: IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: () {
+                    // TODO: Perform a search and filter the matches to the top
                     print(_searchQuery.text);
                   },
                 ),
@@ -491,9 +493,6 @@ class TripsPage extends StatelessWidget {
                     subtitle: Text(trip.notes),
                     trailing: Text('${trip.membersIds.length}'),
                     onTap: () {
-                      // Handle onTap event if needed
-                      print('Tapped ${trip.name}');
-                      // TODO: Open the ViewTripPage by passing the trip you click on
                       Navigator.push(
                         context,
                         // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
@@ -522,11 +521,11 @@ class ViewTripPage extends StatefulWidget {
 }
 
 class _ViewTripPage extends State<ViewTripPage> {
-  //For Testing Only
+  //For Testing Only TODO: Move to another folder for models if we can
   List<Expense> expenses = [
     Expense(
         id: "1",
-        name: "Mcdonalds",
+        name: "Red Robins",
         tripId: "192381",
         cost: 15.09,
         description: "We ate at Mcdonalds",
@@ -534,7 +533,7 @@ class _ViewTripPage extends State<ViewTripPage> {
         payerId: "1451"),
     Expense(
         id: "1",
-        name: "Mcdonalds",
+        name: "Burger King",
         tripId: "192381",
         cost: 15.09,
         description: "We ate at Mcdonalds",
@@ -542,7 +541,7 @@ class _ViewTripPage extends State<ViewTripPage> {
         payerId: "1451"),
     Expense(
         id: "1",
-        name: "Mcdonalds",
+        name: "Five Guys",
         tripId: "192381",
         cost: 15.09,
         description: "We ate at Mcdonalds",
@@ -550,7 +549,7 @@ class _ViewTripPage extends State<ViewTripPage> {
         payerId: "1451"),
     Expense(
         id: "1",
-        name: "Mcdonalds",
+        name: "Gas",
         tripId: "192381",
         cost: 15.09,
         description: "We ate at Mcdonalds",
@@ -558,14 +557,30 @@ class _ViewTripPage extends State<ViewTripPage> {
         payerId: "1451"),
     Expense(
         id: "1",
-        name: "Mcdonalds",
+        name: "Hotel",
+        tripId: "192381",
+        cost: 15.09,
+        description: "We ate at Mcdonalds",
+        membersIds: ["13", "14"],
+        payerId: "1451"),
+    Expense(
+        id: "1",
+        name: "Souvenirs",
+        tripId: "192381",
+        cost: 15.09,
+        description: "We ate at Mcdonalds",
+        membersIds: ["13", "14"],
+        payerId: "1451"),
+    Expense(
+        id: "1",
+        name: "Disney World",
         tripId: "192381",
         cost: 15.09,
         description: "We ate at Mcdonalds",
         membersIds: ["13", "14"],
         payerId: "1451"),
   ];
-
+  // Same as comment ^
   List<User> members = [
     User(id: "123", name: "Bob", email: "bob@email.com", trips: ["123", "123"]),
     User(
@@ -599,6 +614,7 @@ class _ViewTripPage extends State<ViewTripPage> {
         email: "jack@email.com",
         trips: ["123", "123"]),
   ];
+
   @override
   Widget build(BuildContext context) {
     Trip trip = widget.trip;
@@ -614,14 +630,11 @@ class _ViewTripPage extends State<ViewTripPage> {
             title: Text('${trip.notes}'),
             subtitle: Text('Notes'),
             // List the edit button
-            // TODO: If we only have one button, maybe remove the row widget
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 ElevatedButton(
                     onPressed: () {
-                      // TODO: Bring up overlay to edit the name and description
-                      print("clicked on edit");
                       // Navigate to the name and notes edit page
                       Navigator.push(
                           context,
@@ -654,8 +667,6 @@ class _ViewTripPage extends State<ViewTripPage> {
                 height: 75,
                 child: ElevatedButton(
                   onPressed: () {
-                    print("click on add member");
-                    // TODO: Bring up pop up to add new member to the trip
                     Navigator.push(
                         context,
                         // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
@@ -684,9 +695,6 @@ class _ViewTripPage extends State<ViewTripPage> {
                         height: 100,
                         child: ElevatedButton(
                           onPressed: () {
-                            // TODO: Bring up pop up to display that members information.
-                            // Optionally, if the user is the leader of this trip, then give option to remove from trip
-                            print("click on ${member.name}");
                             Navigator.push(
                                 context,
                                 // Display the information of the member that was clicked on
@@ -713,9 +721,35 @@ class _ViewTripPage extends State<ViewTripPage> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
-          // Display a ListView of the expenses associated with the trips
+          // Add a new expense
+          ElevatedButton(
+            onPressed: () {
+              // TODO: Navigate to add expense page. Will probably need to pass the current tripId so we can call the API
+              Navigator.push(
+                  context,
+                  // Add a new expense to the trip
+                  MaterialPageRoute(builder: (context) => AddExpensePage()));
+            },
+            style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30.0),
+              ),
+              padding: EdgeInsets.all(10),
+            ),
+            child: Container(
+              width: double.infinity,
+              height: 35,
+              padding: EdgeInsets.all(10),
+              child: Icon(Icons.add),
+            ),
+          ),
+          // Display a ListView of the expenses associated with the trip
           Expanded(
+              child: SizedBox(
+            width: double.infinity,
+            height: 100,
             child: ListView.builder(
+              scrollDirection: Axis.vertical,
               // Callback to determine how to format each trip in the list
               itemBuilder: (context, index) {
                 Expense expense = expenses[index];
@@ -724,9 +758,6 @@ class _ViewTripPage extends State<ViewTripPage> {
                   subtitle: Text(expense.description),
                   trailing: Text('\$${expense.cost}'),
                   onTap: () {
-                    // Handle onTap event if needed
-                    print('Tapped ${expense.name}');
-                    // TODO: Open the ViewTripPage by passing the trip you click on
                     Navigator.push(
                         context,
                         // Display the information of the member that was clicked on
@@ -737,7 +768,24 @@ class _ViewTripPage extends State<ViewTripPage> {
               },
               itemCount: expenses.length,
             ),
-          ),
+          )),
+          ElevatedButton(
+              onPressed: () {
+                // Pass the list of members & list of expenses to determine total cost and cost amongst members
+                // TODO: Call the API to get the monetary details of the current trip. ie. who owes who what amount of money
+                // Display a page where all this information will reside
+                Navigator.push(
+                    context,
+                    // Generate a receipt for the current trip
+                    MaterialPageRoute(builder: (context) => ReceiptPage()));
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).primaryColor,
+              ),
+              child: Text(
+                "Generate Receipt",
+                style: TextStyle(color: Colors.white),
+              )),
         ],
       ),
     );
@@ -812,10 +860,8 @@ class AddTripsPage extends StatelessWidget {
                   style: TextStyle(color: Colors.white),
                 ),
                 onPressed: () {
-                  print(name.text);
-                  print(notes.text);
-                  print(members.text);
                   // TODO: Call the API to add the trip
+                  // also figure out how to handel reading the emails properly
                 },
               ),
             ),
@@ -826,12 +872,14 @@ class AddTripsPage extends StatelessWidget {
   }
 }
 
+// Profile Page Widget
 class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       // Display the title at the top of the screen
       appBar: AppBar(
+        // TODO: Place actual username here
         title: const Text("Username's Profile"),
         centerTitle: true,
         // We don't need a back button to go to some main page
@@ -842,7 +890,7 @@ class ProfilePage extends StatelessWidget {
           Expanded(
             child: ListView(
               children: [
-                // TODO: Give the user the ability to change their name and password
+                // TODO: Maybe have the ability to chang the user name?? (OPTIONAL)
                 ListTile(
                   title: Text("Your Name"),
                   subtitle: Text("Username"),
@@ -854,7 +902,6 @@ class ProfilePage extends StatelessWidget {
               ],
             ),
           ),
-          // TODO: No material widget found.
           Container(
             height: 55,
             width: 270,
@@ -879,6 +926,7 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
+// Name & Notes Widgets
 class EditNameNotesPage extends StatefulWidget {
   // Each trip has both a name and notes associated with it
   final Trip trip;
@@ -889,6 +937,8 @@ class EditNameNotesPage extends StatefulWidget {
   State<EditNameNotesPage> createState() => _EditNameNotesPage();
 }
 
+// TODO: This is kind of messed up...
+// Could possibly be an overlay??
 class _EditNameNotesPage extends State<EditNameNotesPage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController notesController = TextEditingController();
@@ -904,7 +954,7 @@ class _EditNameNotesPage extends State<EditNameNotesPage> {
     // Build the page
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Trip'),
+        title: Text('Edit Name and Notes'),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -929,10 +979,8 @@ class _EditNameNotesPage extends State<EditNameNotesPage> {
               onPressed: () {
                 // Save the changes and go back to the screen
                 widget.trip.name = nameController.text;
-                print("trip name changed to ${widget.trip.name}");
                 widget.trip.notes = notesController.text;
-                print("trip notes changed to ${widget.trip.notes}");
-                // TODO: Write the changes with the API
+                // TODO: Write the changes with the API and reflect those changes on the page
 
                 // Go back to the last screen
                 Navigator.pop(context);
@@ -955,6 +1003,7 @@ class _EditNameNotesPage extends State<EditNameNotesPage> {
   }
 }
 
+// Member Related Widgets
 class ViewMemberPage extends StatefulWidget {
   // Each trip has both a name and notes associated with it
   final User member;
@@ -965,6 +1014,7 @@ class ViewMemberPage extends StatefulWidget {
   State<ViewMemberPage> createState() => _ViewMemberPage();
 }
 
+// TODO: Could be an overlay??
 class _ViewMemberPage extends State<ViewMemberPage> {
   @override
   Widget build(BuildContext context) {
@@ -974,12 +1024,20 @@ class _ViewMemberPage extends State<ViewMemberPage> {
         centerTitle: true,
       ),
       body: Container(
-        child: Text('${widget.member.email}'),
+        child: Center(
+          child: Text(
+            '${widget.member.email}',
+            style: TextStyle(
+              fontSize: 20,
+            ),
+          ),
+        ),
       ),
     );
   }
 }
 
+// TODO: Could possibly be an overlay??
 class AddMemberToTrip extends StatelessWidget {
   // Get the email of the person that you want to add
   final TextEditingController email = TextEditingController();
@@ -1017,12 +1075,12 @@ class AddMemberToTrip extends StatelessWidget {
                   backgroundColor: Theme.of(context).primaryColor,
                 ),
                 child: const Text(
-                  'Add Trip',
+                  'Add',
                   style: TextStyle(color: Colors.white),
                 ),
                 onPressed: () {
-                  print('Adding ${email.text}');
-                  // TODO: Call the API to add the trip
+                  // TODO: Call the API to add the member to the trip
+                  // Ensure that the changes are reflected on the page
 
                   // Go back to the last screen
                   Navigator.pop(context);
@@ -1036,6 +1094,7 @@ class AddMemberToTrip extends StatelessWidget {
   }
 }
 
+// Expense Related Widgets
 class ViewExpensePage extends StatefulWidget {
   // Each trip has both a name and notes associated with it
   final Expense expense;
@@ -1046,6 +1105,7 @@ class ViewExpensePage extends StatefulWidget {
   State<ViewExpensePage> createState() => _ViewExpensePage();
 }
 
+// TODO: Need to decide how we want to implement the edit functionality here...
 class _ViewExpensePage extends State<ViewExpensePage> {
   @override
   Widget build(BuildContext context) {
@@ -1062,21 +1122,52 @@ class _ViewExpensePage extends State<ViewExpensePage> {
           children: <Widget>[
             // Display notes
             Container(
-              padding: const EdgeInsets.all(10),
-              child: Text("${widget.expense.description}"),
-            ),
+                padding: const EdgeInsets.all(10),
+                child: ListTile(
+                  leading: Text(
+                    "Notes",
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
+                  trailing: Text(
+                    "${widget.expense.description}",
+                    style: TextStyle(fontSize: 15),
+                  ),
+                )),
             // Display cost
             Container(
-              padding: const EdgeInsets.all(10),
-              child: Text("\$${widget.expense.cost}"),
-            ),
+                padding: const EdgeInsets.all(10),
+                child: ListTile(
+                  leading: Text(
+                    "Dollar Amount",
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
+                  trailing: Text(
+                    "\$${widget.expense.cost}",
+                    style: TextStyle(fontSize: 15),
+                  ),
+                )),
             // Display Payer
             Container(
               padding: const EdgeInsets.all(10),
-              child: Text("${widget.expense.payerId} payed"),
+              child: ListTile(
+                leading: Text(
+                  "Who Payed",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+                trailing: Text(
+                  "${widget.expense.payerId} Payed",
+                  style: TextStyle(fontSize: 15),
+                ),
+              ),
             ),
-            ListTile(
-              title: Text("Who Was Apart of This Expense?"),
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: ListTile(
+                leading: Text(
+                  "Who Was Apart of This Expense?",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+              ),
             ),
             // Display Members
             Expanded(
@@ -1085,7 +1176,10 @@ class _ViewExpensePage extends State<ViewExpensePage> {
                 itemBuilder: (context, index) {
                   String member = widget.expense.membersIds[index];
                   return ListTile(
-                    title: Text(member),
+                    title: Text(
+                      member,
+                      style: TextStyle(fontSize: 15),
+                    ),
                   );
                 },
                 itemCount: widget.expense.membersIds.length,
@@ -1104,7 +1198,8 @@ class _ViewExpensePage extends State<ViewExpensePage> {
                   style: TextStyle(color: Colors.white),
                 ),
                 onPressed: () {
-                  // TODO: Call the API to add the trip
+                  // TODO: Call API to update the trip details.
+                  // Again, this will depend on HOW we decide the edit function will work
 
                   // Go back to the last screen
                   Navigator.pop(context);
@@ -1113,6 +1208,129 @@ class _ViewExpensePage extends State<ViewExpensePage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class AddExpensePage extends StatelessWidget {
+  // Grab text that will be entered by the user
+  final TextEditingController name = TextEditingController();
+  final TextEditingController notes = TextEditingController();
+  final TextEditingController cost = TextEditingController();
+  final TextEditingController payer = TextEditingController();
+  final TextEditingController members = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // Display the title at the top of the screen
+      appBar: AppBar(
+        title: const Text("Add an Expense"),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(10),
+        child: ListView(
+          // Have our list of containers that will take in text input
+          children: <Widget>[
+            // Enter Name
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: TextField(
+                controller: name,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Name',
+                ),
+              ),
+            ),
+            // Enter Notes
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: TextField(
+                controller: notes,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Notes',
+                ),
+              ),
+            ),
+            // Enter Members
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: TextField(
+                obscureText: true,
+                controller: cost,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Cost',
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: TextField(
+                obscureText: true,
+                controller: payer,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Payer',
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: TextField(
+                obscureText: true,
+                controller: members,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Members',
+                ),
+              ),
+            ),
+            // Confirm Add Trip
+            Container(
+              height: 50,
+              padding: const EdgeInsets.all(10),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).primaryColor,
+                ),
+                child: const Text(
+                  'Add Expense',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  // TODO: Call the API to add the expense. Add that expense to the current trip
+                  // Figure out best way to map how much each person spent...(HARD PART)
+
+                  // Go back to the last screen
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Generate a receipt for the current trip, which includes all members and expenses up to this point
+// TODO: Need to determine how to lay this out and complete the calculations
+class ReceiptPage extends StatefulWidget {
+  @override
+  State<ReceiptPage> createState() => _ReceiptPage();
+}
+
+class _ReceiptPage extends State<ReceiptPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Generating A Receipt"),
       ),
     );
   }
