@@ -4,6 +4,7 @@ import { createTransport } from "nodemailer";
 import { createToken } from "./createJWT";
 import { EphemeralKeyInfo } from "tls";
 
+//TODO: create zoho email address 
 const transporter = createTransport({
     service: "smtp.zoho.commtp.zoho.eu",
     auth: {
@@ -19,7 +20,10 @@ type mailConfigurations = {
     text: string;
 };
 
-export function createEmail(name: string, email: string, token: string | undefined) {
+export function createEmail(name: string, email: string, token: Object) {
+    if (token == Error){
+        return;
+    }
     const mailConfigurations = {
         // It should be a string of sender/server email
         from: "insert project email here",
@@ -37,8 +41,8 @@ export function createEmail(name: string, email: string, token: string | undefin
                Thanks`,
     };
 
-    transporter.sendMail(mailConfigurations, function (error: Error | null, info) {
-        if (error) throw Error(error);
+    transporter.sendMail(mailConfigurations, function (error, info) {
+        if (error) throw Error();
         console.log("Email Sent Successfully");
         console.log(info);
     });

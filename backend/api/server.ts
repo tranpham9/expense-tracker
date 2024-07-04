@@ -5,6 +5,9 @@ import cors from "cors";
 import { Collection, MongoClient, ObjectId } from "mongodb";
 import { createToken } from "./createJWT";
 import { createEmail } from "./tokenSender";
+import jwt, { JsonWebTokenError } from "jsonwebtoken";
+
+//TODO: make api endpoints more modular
 
 // Heroku will pass the port we must listen on via the environment, otherwise default to 5000.
 const port = process.env.PORT || 5000;
@@ -82,7 +85,6 @@ app.post("/api/registerUser", async (req, res, next) => {
         }
 
         // create JWT for nodemailer
-
         let ret;
         ret = createToken(insertionResult.insertedId, newUser.name, newUser.email);
         createEmail(name, email, ret)
@@ -132,6 +134,20 @@ app.post("/api/login", async (req, res, next) => {
     } else {
         res.status(401).json({ error: "Invalid login credentials" });
     }
+});
+
+//TODO: need to implement error message
+app.get("/api/verify/:token", async (req, res, next) => {
+    const { token } = req.params;
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!, function(err, decoded) {
+        if(err){
+
+        }
+        else {
+            res.send("Email verified successfully");
+        }
+    });
 });
 
 // Serve the static frontend files

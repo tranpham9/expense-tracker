@@ -15,7 +15,7 @@ export function createToken(userId: ObjectId, name: string, email: string) {
 
         ret = { accessToken: accessToken };
     } catch (e) {
-        ret = { error: (e as Error).message };
+        ret = { Error: (e as Error).message };
     }
     return ret;
 }
