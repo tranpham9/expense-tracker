@@ -3,7 +3,8 @@ import express, { json, urlencoded } from "express";
 import { join } from "path";
 import cors from "cors";
 import { Collection, MongoClient, ObjectId } from "mongodb";
-import { createToken } from "./createJWT"
+import { createToken } from "./createJWT";
+import { createEmail } from "./tokenSender";
 
 // Heroku will pass the port we must listen on via the environment, otherwise default to 5000.
 const port = process.env.PORT || 5000;
@@ -80,6 +81,14 @@ app.post("/api/registerUser", async (req, res, next) => {
             return;
         }
 
+        // create JWT for nodemailer
+
+        let ret;
+        ret = createToken(insertionResult.insertedId, newUser.name, newUser.email);
+        createEmail(name, email, ret)
+
+
+
         // if tripId is provided, add user to trip
         if (tripId) {
             // use createFromHexString ( https://github.com/dotansimha/graphql-code-generator/issues/6830#issuecomment-2105266455 )
@@ -115,10 +124,10 @@ app.post("/api/login", async (req, res, next) => {
     if (foundUser && password === foundUser.password) {
         ret = createToken(foundUser._id, foundUser.name, foundUser.email);
         res.status(200).json({
-            "id" : foundUser._id,
-            "name" : foundUser.name,
-            "email" : foundUser.email,
-            ret
+            id: foundUser._id,
+            name: foundUser.name,
+            email: foundUser.email,
+            ret,
         });
     } else {
         res.status(401).json({ error: "Invalid login credentials" });
