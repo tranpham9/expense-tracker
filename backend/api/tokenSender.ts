@@ -4,9 +4,11 @@ import { createTransport } from "nodemailer";
 import { createToken } from "./createJWT";
 import { EphemeralKeyInfo } from "tls";
 
-//TODO: create zoho email address 
+//TODO: create zoho email address
 const transporter = createTransport({
-    service: "smtp.zoho.commtp.zoho.eu",
+    host: "127.0.0.1",
+    port: 1025,
+    secure: false, // upgrade later with STARTTLS
     auth: {
         user: process.env.EMAIL,
         pass: process.env.EMAIL_PASSWORD,
@@ -21,7 +23,7 @@ type mailConfigurations = {
 };
 
 export function createEmail(name: string, email: string, token: Object) {
-    if (token == Error){
+    if (token == Error) {
         return;
     }
     const mailConfigurations = {
