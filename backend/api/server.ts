@@ -142,7 +142,7 @@ app.get("/api/verify/:token", async (req, res, next) => {
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!, function(err, decoded) {
         if(err){
-
+            res.send("Email not verified");
         }
         else {
             res.send("Email verified successfully");
