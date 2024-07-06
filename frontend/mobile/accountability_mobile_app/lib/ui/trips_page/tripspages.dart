@@ -544,23 +544,67 @@ class ProfilePage extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: ListView(
+            child: Column(
               children: [
-                // TODO: Maybe have the ability to chang the user name?? (OPTIONAL)
+                // TODO: Maybe have the ability to change the user name?? (OPTIONAL)
                 ListTile(
                   title: Text("Your Name"),
-                  subtitle: Text("Username"),
+                  subtitle: Text("Name"),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ElevatedButton(
+                          onPressed: () {
+                            // Navigate to the name and notes edit page
+                            // Navigator.push(
+                            //     context,
+                            //     // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
+                            //     MaterialPageRoute(
+                            //         builder: (context) =>
+                            //             ));
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).primaryColor,
+                          ),
+                          child: Text(
+                            "Edit",
+                            style: TextStyle(color: Colors.white),
+                          )),
+                    ],
+                  ),
                 ),
                 ListTile(
                   title: Text("Your Email"),
                   subtitle: Text("Email"),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ElevatedButton(
+                          onPressed: () {
+                            // Navigate to the name and notes edit page
+                            // Navigator.push(
+                            //     context,
+                            //     // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
+                            //     MaterialPageRoute(
+                            //         builder: (context) =>
+                            //             ));
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).primaryColor,
+                          ),
+                          child: Text(
+                            "Edit",
+                            style: TextStyle(color: Colors.white),
+                          )),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
           Container(
-            height: 55,
-            width: 270,
+            height: 50,
+            width: 400,
             padding: const EdgeInsets.all(10),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(

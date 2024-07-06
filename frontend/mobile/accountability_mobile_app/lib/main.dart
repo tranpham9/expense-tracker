@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import './ui/home_page/homepage.dart';
 import './ui/landing_page/login.dart';
+import './ui/landing_page/login.dart';
 // Used for checking the strength of the passwords being entered
 import 'package:password_strength_checker/password_strength_checker.dart';
 // Needed to make API calls
 import 'package:http/http.dart' as http;
+
+// TODO: Implement errorText for all of the errors that can occur here
 
 void main() => runApp(const MainApp());
 
@@ -30,139 +33,6 @@ class MainApp extends StatelessWidget {
           centerTitle: true,
         ),
         body: LoginPage(),
-      ),
-    );
-  }
-}
-
-// User Related Widgets
-class LoginPage extends StatefulWidget {
-  @override
-  State<LoginPage> createState() => _LoginPage();
-}
-
-class _LoginPage extends State<LoginPage> {
-  // Grab text that will be entered by the user
-  final TextEditingController email = TextEditingController();
-  final TextEditingController password = TextEditingController();
-  String? emailError;
-  String? passwordError;
-  // Define how the TextFields will be decorated
-  InputDecoration emailDecoration = InputDecoration(
-    border: OutlineInputBorder(),
-    labelText: 'Email*',
-    enabledBorder: OutlineInputBorder(borderSide: BorderSide()),
-    hintText: 'Enter Your Email',
-  );
-  InputDecoration passwordDecoration = InputDecoration(
-    border: OutlineInputBorder(),
-    labelText: 'Password*',
-    enabledBorder: OutlineInputBorder(borderSide: BorderSide()),
-    hintText: 'Enter Your Password',
-  );
-
-  // Set the main layout of the login page
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10),
-      child: Column(
-        children: <Widget>[
-          Container(
-            alignment: Alignment.center,
-            child: const Text(
-              'Login',
-              style: TextStyle(fontSize: 20),
-            ),
-          ),
-          // Grab the email and password of an existing user
-          LoginCredentials(
-              emailDecoration: emailDecoration,
-              passwordDecoration: passwordDecoration,
-              email: email,
-              password: password),
-          // Confirm Login
-          Container(
-            height: 50,
-            padding: const EdgeInsets.all(10),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
-                fixedSize: Size(400, 50),
-              ),
-              child: const Text('Login', style: TextStyle(color: Colors.white)),
-              onPressed: () {
-                // Ensure a proper email is entered
-                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                        .hasMatch(email.text) ||
-                    email.text == '') {
-                  print("You must enter a valid email");
-                  setState(() {
-                    emailDecoration = emailDecoration.copyWith(
-                      border: OutlineInputBorder(),
-                      labelText: 'Email*',
-                      errorText: "The Email You've Entered Isn't Correct",
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.red, width: 2)),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.red, width: 2)),
-                    );
-                  });
-                  return;
-                }
-                // TODO: Call the API to log the user in
-
-                // If login failed, add some text to let the user know what went wrong
-
-                // If login was successful, route the user to their home page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomePage()),
-                );
-              },
-            ),
-          ),
-          // Forgot Password
-          TextButton(
-            child: const Text(
-              'Forgot Password?',
-              style: TextStyle(
-                fontSize: 16,
-                decoration: TextDecoration.underline,
-                decorationThickness: 1.5,
-              ),
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ForgotPassswordPage()),
-              );
-            },
-          ),
-          // Give a new user ability to register
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Text("Don't Have an Account? It's Free!"),
-              TextButton(
-                child: const Text(
-                  'Register',
-                  style: TextStyle(
-                    fontSize: 16,
-                    decoration: TextDecoration.underline,
-                    decorationThickness: 1.5,
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RegisterPage()),
-                  );
-                },
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -301,6 +171,14 @@ class _RegisterPage extends State<RegisterPage> {
                         _error = "Passwords Must Match";
                       });
                       return;
+                    }
+                    // Password too weak
+                    if (passNotifier.toString().contains('weak')) {
+                      print("password not strong enough");
+                      setState(() {
+                        _error = "Password Not Secure Enough";
+                      });
+                      return;
                     } else {
                       setState(() {
                         _error = null;
@@ -308,7 +186,8 @@ class _RegisterPage extends State<RegisterPage> {
                     }
                     // Incorrect email format
                     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                        .hasMatch(email.text)) {
+                            .hasMatch(email.text) ||
+                        email.text.isEmpty) {
                       setState(() {
                         _emailError = "The Email You've Entered Isn't Correct";
                       });
@@ -318,6 +197,7 @@ class _RegisterPage extends State<RegisterPage> {
                         _emailError = null;
                       });
                     }
+                    print("email and password good");
                     // TODO: Call the API to register the user
                     // Also alert the user that they need to confirm w/ their email
                     // Then, direct them to the login to login
