@@ -4,7 +4,7 @@
 
 Make sure the following are installed inside of the `api` directory:
 
-In order to run on localhost ensure `node.js`, `npm`, `express`, and `mongodb` are installed. To do this run
+In order to run on localhost ensure `node.js`, `npm`, `express`, `mongodb`, and 'typescript' are installed. To do this run
 
 ```bash
 sudo npm install

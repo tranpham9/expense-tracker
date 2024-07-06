@@ -1,7 +1,7 @@
 // Display information about the different trips
 import 'package:flutter/material.dart';
-import '../models/models.dart';
-import 'tripcrud.dart';
+import '../../models/models.dart';
+import './tripcrud.dart';
 
 // Trip Related Widgets
 class TripsPage extends StatelessWidget {
