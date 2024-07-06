@@ -6,6 +6,7 @@ import { Collection, MongoClient, ObjectId } from "mongodb";
 import { createToken } from "./createJWT";
 import { createEmail } from "./tokenSender";
 import jwt, { JsonWebTokenError } from "jsonwebtoken";
+import { router as tripRouter } from "./tripManagementRoute";
 
 //TODO: make api endpoints more modular
 
@@ -41,6 +42,18 @@ type Trip = {
     memberIds: ObjectId[];
     leaderId: ObjectId;
 };
+
+// Verify that the Content-Type header is set the JSON (otherwise the json,
+// middleware won't parse the body). Could help the frontend guys to diagnose
+// errors.
+app.use('/api/', (req, res, next) => {
+    if(req.headers["content-type"] != 'application/json') { // dirty check, could be improved
+        res.statusCode = 400; // 400 Bad Request
+        res.json({error: 'Not a JSON (did you remember to set the "Content-Type: application/json" header?)'});
+        return;
+    }
+    next();
+});
 
 // register
 app.post("/api/registerUser", async (req, res, next) => {
@@ -149,6 +162,9 @@ app.get("/api/verify/:token", async (req, res, next) => {
         }
     });
 });
+
+// All endpoints of the router will be accessible under /api/main/
+app.use('/api/trips', tripRouter);
 
 // Serve the static frontend files
 const FRONTEND_DIST_PATH = join(__dirname, "../../../frontend/web/dist"); // starting from dist folder for server.js (compiled from server.ts)
