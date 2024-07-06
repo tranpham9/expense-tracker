@@ -100,6 +100,19 @@ class _RegisterPage extends State<RegisterPage> {
                     ),
                   ),
                   onPressed: () {
+                    // Incorrect email format
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                            .hasMatch(email.text) ||
+                        email.text.isEmpty) {
+                      setState(() {
+                        _emailError = "The Email You've Entered Isn't Correct";
+                      });
+                      return;
+                    } else {
+                      setState(() {
+                        _emailError = null;
+                      });
+                    }
                     // Passwords don't match
                     if (password.text != confirmPassword.text) {
                       print("password must match");
@@ -127,23 +140,9 @@ class _RegisterPage extends State<RegisterPage> {
                         _passwordError = null;
                       });
                     }
-                    // Incorrect email format
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                            .hasMatch(email.text) ||
-                        email.text.isEmpty) {
-                      setState(() {
-                        _emailError = "The Email You've Entered Isn't Correct";
-                      });
-                      return;
-                    } else {
-                      setState(() {
-                        _emailError = null;
-                      });
-                    }
-                    print("email and password good");
                     // TODO: Call the API to register the user
-                    // Also alert the user that they need to confirm w/ their email
-                    // Then, direct them to the login to login
+
+                    // Look for verification email
                   },
                 ),
               ),

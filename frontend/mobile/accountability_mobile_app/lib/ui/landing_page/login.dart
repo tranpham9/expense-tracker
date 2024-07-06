@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import '../../main.dart';
 import '../home_page/homepage.dart';
+import './register.dart';
 
 // Main login widget
 class LoginPage extends StatefulWidget {
@@ -105,8 +106,7 @@ class _LoginPage extends State<LoginPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => ForgotPassswordPage()),
+                  MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
                 );
               },
             ),
