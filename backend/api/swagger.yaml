@@ -230,7 +230,7 @@ paths:
           description: Malformed request or JSON
           schema:
             $ref: '#/responses/BadRequest'
-  /trips/readExpense:
+  /expenses/readExpense:
     post:
       summary: READ expense endpoint
       description: Read information about an expense
@@ -293,7 +293,7 @@ paths:
           description: Malformed request or JSON
           schema:
             $ref: '#/responses/BadRequest'
-  /trips/deleteExpense:
+  /expenses/deleteExpense:
     post:
       summary: DELETE expense endpoint
       description: Remove an expense and associated data
