@@ -1,6 +1,7 @@
 // homepage.dart is the main UI for the whole app. It allows the User to navigate to the different CRUD operation pages
 import 'package:flutter/material.dart';
-import './TripsPages.dart';
+import '../trips_page/tripcrud.dart';
+import '../trips_page/tripspages.dart';
 
 class HomePage extends StatefulWidget {
   @override

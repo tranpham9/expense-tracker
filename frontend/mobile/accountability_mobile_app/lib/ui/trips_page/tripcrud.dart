@@ -1,6 +1,6 @@
 // Display all of the different pages related to the different CRUD operations for each trip
 import 'package:flutter/material.dart';
-import '../models/models.dart';
+import '../../models/models.dart';
 
 // Name & Notes Widgets
 class EditNameNotesPage extends StatefulWidget {

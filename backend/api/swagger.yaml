@@ -62,6 +62,257 @@ paths:
           description: Unknown error or exception on back-end
           schema:
               $ref: '#/definitions/ErrorInfo'
+  /trips/createTrip:
+    post:
+      summary: CREATE trip endpoint
+      description: Create a new, empty trip
+      parameters:
+      - in: body
+        name: JSON
+        schema:
+          type: object
+          properties:
+            leaderId:
+              type: string
+              description: ID of the user that owns the trip
+            name:
+              type: string
+              description: Title of the trip
+            notes:
+              type: string
+              description: Miscellaneous description for the trip
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              tripId:
+                description: The ID of the created trip
+        "400":
+          description: Malformed request or JSON
+          schema:
+            $ref: '#/responses/BadRequest'
+  /trips/readTrip:
+    post:
+      summary: READ trip endpoint
+      description: Get a trip with its associated users and expenses
+      parameters:
+      - in: body
+        name: JSON
+        schema:
+          type: object
+          properties:
+            tripId:
+              type: string
+              description: ID of the trip to read
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              leaderId:
+                type: string
+                description: ID of the user that owns the trip
+              name:
+                type: string
+                description: Title of the trip
+              notes:
+                type: string
+                description: Miscellaneous description for the trip 
+              allMembers:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    email:
+                      type: string
+              allExpenses:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    cost:
+                      type: number
+        "400":
+          description: Malformed request or JSON
+          schema:
+            $ref: '#/responses/BadRequest'
+  /trips/updateTrip:
+    post:
+      summary: UPDATE trip endpoint
+      description: Modify trip information
+      parameters:
+      - in: body
+        name: JSON
+        schema:
+          type: object
+          properties:
+            tripId:
+              type: string
+              description: ID of the trip to modify
+            name:
+              type: string
+              description: Title of the trip
+            notes:
+              type: string
+              description: Miscellaneous description for the trip
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              tripId:
+                description: Same as input ID
+        "400":
+          description: Malformed request or JSON
+          schema:
+            $ref: '#/responses/BadRequest'
+  /trips/deleteTrip:
+    post:
+      summary: DELETE trip endpoint
+      description: Remove a trip and associated data
+      parameters:
+      - in: body
+        name: JSON
+        schema:
+          type: object
+          properties:
+            tripId:
+              type: string
+              description: ID of the trip to delete
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Malformed request or JSON
+          schema:
+            $ref: '#/responses/BadRequest'
+  /expenses/createExpense:
+    post:
+      summary: CREATE expense endpoint
+      description: Create a new, blank expense
+      parameters:
+      - in: body
+        name: JSON
+        schema:
+          type: object
+          properties:
+            tripId:
+              type: string
+              description: ID of the trip this expense will belong to
+            name:
+              type: string
+            description:
+              type: string
+            cost:
+              type: number
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              expenseId:
+                description: ID of the newly created expense
+                type: string
+        "400":
+          description: Malformed request or JSON
+          schema:
+            $ref: '#/responses/BadRequest'
+  /expenses/readExpense:
+    post:
+      summary: READ expense endpoint
+      description: Read information about an expense
+      parameters:
+      - in: body
+        name: JSON
+        schema:
+          type: object
+          properties:
+            expenseId:
+              type: string
+              description: ID of the expense to delete
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              _id:
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+              cost:
+                type: number
+        "400":
+          description: Malformed request or JSON
+          schema:
+            $ref: '#/responses/BadRequest'
+  /expenses/updateExpense:
+    post:
+      summary: UPDATE expense endpoint
+      description: Modify and expense properties
+      parameters:
+      - in: body
+        name: JSON
+        schema:
+          type: object
+          properties:
+            expenseId:
+              type: string
+              description: ID of the expense to modify
+            name:
+              type: string
+            description:
+              type: string
+            cost:
+              type: number
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              expenseId:
+                description: Same as input ID
+                type: string
+        "400":
+          description: Malformed request or JSON
+          schema:
+            $ref: '#/responses/BadRequest'
+  /expenses/deleteExpense:
+    post:
+      summary: DELETE expense endpoint
+      description: Remove an expense and associated data
+      parameters:
+      - in: body
+        name: JSON
+        schema:
+          type: object
+          properties:
+            expenseId:
+              type: string
+              description: ID of the expense to delete
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Malformed request or JSON
+          schema:
+            $ref: '#/responses/BadRequest'      
 definitions:
     LoginDefinition:
       type: object
