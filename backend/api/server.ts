@@ -35,6 +35,7 @@ type User = {
     email: string;
     password: string;
     trips: ObjectId[];
+    verified: boolean;
 };
 
 type Trip = {
@@ -78,6 +79,7 @@ app.post("/api/registerUser", async (req, res, next) => {
         email: (email.toString() as string).trim().toLocaleLowerCase(), // trimmed and converted to lowercase in order to properly detect whether email already exists
         password: password.toString(),
         trips: [tripId && ObjectId.createFromHexString(tripId.toString())],
+        verified: false,
     };
 
     try {
