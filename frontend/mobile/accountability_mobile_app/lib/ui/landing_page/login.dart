@@ -84,6 +84,8 @@ class _LoginPage extends State<LoginPage> {
                   // User response = await loginUser();
                   print(
                       "Sending ${email.text} and ${password.text} to the API\n\n\n\n\n\n");
+                  // "email":"diesel@email.com",
+                  // "password":"COP4331"
                   loginUser(email.text, password.text).then((response) {
                     // Let the user know the email/password was wrong
                     if (response == null) {
