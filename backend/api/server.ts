@@ -22,6 +22,7 @@ const DB_NAME = "appData";
 const USER_COLLECTION_NAME = "User";
 const TRIP_COLLECTION_NAME = "Trip";
 
+const HOMEPAGE = "https://accountability-190955e8b06f.herokuapp.com"
 // express app
 const app = express();
 
@@ -63,7 +64,7 @@ app.get("/api/verify/:token", async (req, res, next) => {
                 res.status(401).json({ error: "Failed to register user" });
                 return;
             }
-            res.redirect("https://accountability-190955e8b06f.herokuapp.com");
+            res.redirect(HOMEPAGE);
         }
 
         /*// if tripId is provided, add user to trip
