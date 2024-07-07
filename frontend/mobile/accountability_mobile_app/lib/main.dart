@@ -2,11 +2,7 @@ import 'dart:core';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import './ui/home_page/homepage.dart';
 import './ui/landing_page/login.dart';
-import './ui/landing_page/login.dart';
-// Used for checking the strength of the passwords being entered
-import 'package:password_strength_checker/password_strength_checker.dart';
 // Needed to make API calls
 import 'package:http/http.dart' as http;
 

@@ -2,7 +2,9 @@ import 'dart:core';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import '../../api/login_user.dart';
 import '../../main.dart';
+import '../../models/User.dart';
 import '../home_page/homepage.dart';
 import './register.dart';
 
@@ -19,6 +21,10 @@ class _LoginPage extends State<LoginPage> {
   final TextEditingController password = TextEditingController();
   String? emailError;
   String? passwordError;
+
+  Future<User> loginUser(String email, String password) async {
+    return await LoginUser.login(email, password);
+  }
 
   // Set the main layout of the login page
   @override
@@ -73,23 +79,32 @@ class _LoginPage extends State<LoginPage> {
                   } else {
                     passwordError = null;
                   }
+
                   // TODO: Call the API to log the user in
-
-                  // If login failed, add some text to let the user know what went wrong
-
-                  // Reset widgets back to  normal and route to next page
-                  email.text = '';
-                  password.text = '';
-                  // Reset Decorations back to normal
-                  setState(() {
-                    emailError = null;
-                    passwordError = null;
+                  // User response = await loginUser();
+                  print(
+                      "Sending ${email.text} and ${password.text} to the API\n\n\n\n\n\n");
+                  loginUser(email.text, password.text).then((response) {
+                    // Let the user know the email/password was wrong
+                    if (response == null) {
+                      emailError = "Email/Password Combination Incorrect";
+                      passwordError = "Email/Password Combination Incorrect";
+                    }
+                    // Reset widgets back to  normal and route to next page
+                    email.text = '';
+                    password.text = '';
+                    // Reset Decorations back to normal
+                    setState(() {
+                      emailError = null;
+                      passwordError = null;
+                    });
+                    // If login was successful, route the user to their home page
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => HomePage(user: response)),
+                    );
                   });
-                  // If login was successful, route the user to their home page
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
-                  );
                 },
               ),
             ),

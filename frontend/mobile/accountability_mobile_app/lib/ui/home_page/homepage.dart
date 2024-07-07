@@ -1,9 +1,15 @@
 // homepage.dart is the main UI for the whole app. It allows the User to navigate to the different CRUD operation pages
 import 'package:flutter/material.dart';
+import '../../models/Id.dart';
+import '../../models/User.dart';
 import '../trips_page/tripcrud.dart';
 import '../trips_page/tripspages.dart';
 
 class HomePage extends StatefulWidget {
+  final User user;
+  // Create constructor so we can pass information to the widget
+  const HomePage({Key? key, required this.user});
+
   @override
   State<HomePage> createState() => _HomePage();
 }
@@ -16,6 +22,8 @@ class _HomePage extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Grab the user that was passed to us from the Login page
+    User user = widget.user;
     return WillPopScope(
       // Once the user logs in, they can no longer use the default back button on their system
       onWillPop: () async => false,
