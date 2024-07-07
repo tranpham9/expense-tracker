@@ -1,10 +1,12 @@
 import AccountOverlay from "../components/AccountOverlay";
+import Hero from "../components/Hero";
 
 export default function Home() {
+    
     return (
         <>
-            <p>This is the home page.</p>
             <AccountOverlay />
+            <Hero />
         </>
     );
 }
