@@ -2,13 +2,11 @@
 
 import { createTransport } from "nodemailer";
 import { createToken } from "./createJWT";
-import { EphemeralKeyInfo } from "tls";
+import { ObjectId } from "mongodb";
+import { error } from "console";
 
-//TODO: create zoho email address
 const transporter = createTransport({
-    host: "127.0.0.1",
-    port: 1025,
-    secure: false, // upgrade later with STARTTLS
+    service: "Gmail",
     auth: {
         user: process.env.EMAIL,
         pass: process.env.EMAIL_PASSWORD,
@@ -22,13 +20,12 @@ type mailConfigurations = {
     text: string;
 };
 
-export function createEmail(name: string, email: string, token: Object) {
-    if (token == Error) {
-        return;
-    }
+export function createEmail(userId: ObjectId, name: string, email: string) {
+    const token = createToken(userId, name, email);
+
     const mailConfigurations = {
         // It should be a string of sender/server email
-        from: "insert project email here",
+        from: "cop4331.donotreply@gmail.com",
 
         to: email,
 
@@ -39,12 +36,13 @@ export function createEmail(name: string, email: string, token: Object) {
         text: `Hi! There, You have recently visited 
                our website and entered your email.
                Please follow the given link to verify your email
-               https://accountability-190955e8b06f.herokuapp.com/api/verify/${token} 
+               https://accountability-190955e8b06f.herokuapp.com/api/verify/${token}
+               http://localhost:5000/api/verify/${token} 
                Thanks`,
     };
 
     transporter.sendMail(mailConfigurations, function (error, info) {
-        if (error) throw Error();
+        console.error("Error sending email", error)
         console.log("Email Sent Successfully");
         console.log(info);
     });

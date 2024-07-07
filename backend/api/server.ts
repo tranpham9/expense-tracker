@@ -68,13 +68,16 @@ app.post("/api/registerUser", async (req, res, next) => {
 
     try {
         // ensure email doesn't already exist
-        const check = await userCollection.findOne({ email });
+        const check = await userCollection.findOne({ email: email });
+        // console.log(check);
         if (check) {
             console.error("Attempted to register a user with an existing email");
             // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
             res.status(401).json({ error: "Failed to register user" });
             return;
         }
+
+
 
         // insert new user
         const insertionResult = await userCollection.insertOne(newUser);
@@ -84,19 +87,17 @@ app.post("/api/registerUser", async (req, res, next) => {
             return;
         }
 
-        // create JWT for nodemailer
-        let ret;
-        ret = createToken(insertionResult.insertedId, newUser.name, newUser.email);
-        createEmail(name, email, ret)
-
-
-
         // if tripId is provided, add user to trip
         if (tripId) {
             // use createFromHexString ( https://github.com/dotansimha/graphql-code-generator/issues/6830#issuecomment-2105266455 )
             // TODO: might need to handle this failing?  Would need to check .acknowledged boolean
             await tripCollection.updateOne({ _id: ObjectId.createFromHexString(tripId) }, { $push: { memberIds: insertionResult.insertedId } });
         }
+
+        // method that sends an email with the token
+        createEmail(insertionResult.insertedId, newUser.name, newUser.email);
+
+        // TODO: have to remove user document if verification failed.
     } catch (err) {
         console.error("Error registering user:", err);
         res.status(401).json({ error: "Failed to register user" });
@@ -124,6 +125,7 @@ app.post("/api/login", async (req, res, next) => {
 
     const foundUser = await userCollection.findOne({ email: properEmail });
     if (foundUser && password === foundUser.password) {
+        console.log (foundUser.password);
         ret = createToken(foundUser._id, foundUser.name, foundUser.email);
         res.status(200).json({
             id: foundUser._id,
@@ -136,7 +138,6 @@ app.post("/api/login", async (req, res, next) => {
     }
 });
 
-//TODO: need to implement error message
 app.get("/api/verify/:token", async (req, res, next) => {
     const { token } = req.params;
 
