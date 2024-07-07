@@ -6,7 +6,8 @@ import { Collection, MongoClient, ObjectId } from "mongodb";
 import { createToken } from "./createJWT";
 import { createEmail } from "./tokenSender";
 import jwt, { JsonWebTokenError } from "jsonwebtoken";
-import { router as tripRouter } from "./tripManagementRoute";
+import { router as tripCRUDRouter } from "./routes/tripCRUD";
+import { router as expenseCRUDRouter } from "./routes/expenseCRUD";
 
 //TODO: make api endpoints more modular
 
@@ -163,8 +164,11 @@ app.get("/api/verify/:token", async (req, res, next) => {
     });
 });
 
-// All endpoints of the router will be accessible under /api/main/
-app.use('/api/trips', tripRouter);
+// All trip related CRUD endpoints will be accessible under /api/trips/
+app.use('/api/trips', tripCRUDRouter);
+// All expense related CRUD endpoints will be accessible under /api/expenses/
+app.use('/api/expenses', expenseCRUDRouter);
+
 
 // Serve the static frontend files
 const FRONTEND_DIST_PATH = join(__dirname, "../../../frontend/web/dist"); // starting from dist folder for server.js (compiled from server.ts)
