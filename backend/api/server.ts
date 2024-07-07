@@ -5,9 +5,10 @@ import cors from "cors";
 import { Collection, MongoClient, ObjectId } from "mongodb";
 import { createToken } from "./createJWT";
 import { createEmail } from "./tokenSender";
-import jwt, { JsonWebTokenError } from "jsonwebtoken";
+import jwt, { JsonWebTokenError, decode } from "jsonwebtoken";
 import { router as tripCRUDRouter } from "./routes/tripCRUD";
 import { router as expenseCRUDRouter } from "./routes/expenseCRUD";
+import { unverified } from "./tokenSender";
 
 //TODO: make api endpoints more modular
 
@@ -35,7 +36,6 @@ type User = {
     email: string;
     password: string;
     trips: ObjectId[];
-    verified: boolean;
 };
 
 type Trip = {
@@ -45,13 +45,48 @@ type Trip = {
     leaderId: ObjectId;
 };
 
+app.get("/api/verify/:token", async (req, res, next) => {
+    const db = client.db(DB_NAME);
+    const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
+    const tripCollection: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
+
+    // get User document from token
+    const verified = unverified.get(req.params.token);
+    console.log(req.params.token);
+
+    try {
+        if (verified) {
+            // insert new user
+            const insertionResult = await userCollection.insertOne(verified);
+            if (!insertionResult.acknowledged) {
+                console.error("Failed to insert new user");
+                res.status(401).json({ error: "Failed to register user" });
+                return;
+            }
+            res.redirect("https://accountability-190955e8b06f.herokuapp.com");
+        }
+
+        /*// if tripId is provided, add user to trip
+            if (verified?.trips) {
+                // use createFromHexString ( https://github.com/dotansimha/graphql-code-generator/issues/6830#issuecomment-2105266455 )
+                // TODO: might need to handle this failing?  Would need to check .acknowledged boolean
+                await tripCollection.updateOne({ _id: ObjectId.createFromHexString(tripId) }, { $push: { memberIds: insertionResult.insertedId } });
+            }*/
+    } catch (err) {
+        console.error("Error registering user:", err);
+        res.status(401).json({ error: "Failed to register user" });
+        next();
+    }
+});
+
 // Verify that the Content-Type header is set the JSON (otherwise the json,
 // middleware won't parse the body). Could help the frontend guys to diagnose
 // errors.
-app.use('/api/', (req, res, next) => {
-    if(req.headers["content-type"] != 'application/json') { // dirty check, could be improved
+app.use("/api/", (req, res, next) => {
+    if (req.headers["content-type"] != "application/json") {
+        // dirty check, could be improved
         res.statusCode = 400; // 400 Bad Request
-        res.json({error: 'Not a JSON (did you remember to set the "Content-Type: application/json" header?)'});
+        res.json({});
         return;
     }
     next();
@@ -79,46 +114,19 @@ app.post("/api/registerUser", async (req, res, next) => {
         email: (email.toString() as string).trim().toLocaleLowerCase(), // trimmed and converted to lowercase in order to properly detect whether email already exists
         password: password.toString(),
         trips: [tripId && ObjectId.createFromHexString(tripId.toString())],
-        verified: false,
     };
-
-    try {
-        // ensure email doesn't already exist
-        const check = await userCollection.findOne({ email: email });
-        // console.log(check);
-        if (check) {
-            console.error("Attempted to register a user with an existing email");
-            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
-            res.status(401).json({ error: "Failed to register user" });
-            return;
-        }
-
-
-
-        // insert new user
-        const insertionResult = await userCollection.insertOne(newUser);
-        if (!insertionResult.acknowledged) {
-            console.error("Failed to insert new user");
-            res.status(401).json({ error: "Failed to register user" });
-            return;
-        }
-
-        // if tripId is provided, add user to trip
-        if (tripId) {
-            // use createFromHexString ( https://github.com/dotansimha/graphql-code-generator/issues/6830#issuecomment-2105266455 )
-            // TODO: might need to handle this failing?  Would need to check .acknowledged boolean
-            await tripCollection.updateOne({ _id: ObjectId.createFromHexString(tripId) }, { $push: { memberIds: insertionResult.insertedId } });
-        }
-
-        // method that sends an email with the token
-        createEmail(insertionResult.insertedId, newUser.name, newUser.email);
-
-        // TODO: have to remove user document if verification failed.
-    } catch (err) {
-        console.error("Error registering user:", err);
+    // ensure email doesn't already exist
+    const check = await userCollection.findOne({ email: email, verified: true });
+    // console.log(check);
+    if (check) {
+        console.error("Attempted to register a user with an existing email");
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
         res.status(401).json({ error: "Failed to register user" });
         return;
     }
+
+    // method that sends an email with the token
+    await createEmail(newUser);
 
     // console.log("A user was registered successfully");
     res.status(200);
@@ -141,7 +149,7 @@ app.post("/api/login", async (req, res, next) => {
 
     const foundUser = await userCollection.findOne({ email: properEmail });
     if (foundUser && password === foundUser.password) {
-        console.log (foundUser.password);
+        console.log(foundUser.password);
         ret = createToken(foundUser._id, foundUser.name, foundUser.email);
         res.status(200).json({
             id: foundUser._id,
@@ -154,24 +162,10 @@ app.post("/api/login", async (req, res, next) => {
     }
 });
 
-app.get("/api/verify/:token", async (req, res, next) => {
-    const { token } = req.params;
-
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!, function(err, decoded) {
-        if(err){
-            res.send("Email not verified");
-        }
-        else {
-            res.send("Email verified successfully");
-        }
-    });
-});
-
 // All trip related CRUD endpoints will be accessible under /api/trips/
-app.use('/api/trips', tripCRUDRouter);
+app.use("/api/trips", tripCRUDRouter);
 // All expense related CRUD endpoints will be accessible under /api/expenses/
-app.use('/api/expenses', expenseCRUDRouter);
-
+app.use("/api/expenses", expenseCRUDRouter);
 
 // Serve the static frontend files
 const FRONTEND_DIST_PATH = join(__dirname, "../../../frontend/web/dist"); // starting from dist folder for server.js (compiled from server.ts)
