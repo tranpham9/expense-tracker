@@ -1,5 +1,5 @@
+// NOTE: Really only used to see what layout looks like, NOT FOR PROD
 // Data Models for Trips and Expenses
-// TODO: Consider implementing toMap and fromMap to handel JSON
 class Expense {
   // Instance variables for an expense
   String id;
