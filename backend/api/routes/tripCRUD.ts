@@ -21,7 +21,7 @@ router.post('/createTrip', async (req, res, next) => {
         res.json({error: 'leaderId required'});
         return;
     }
-    const leaderId = new ObjectId(req.body.leaderId);
+    const leaderId = ObjectId.createFromHexString(req.body.leaderId);
 
     // Default values for non-required fields
     req.body.name ??= 'Unnamed Trip';
@@ -73,7 +73,7 @@ router.post('/readTrip', async(req, res, next) => {
         res.json({error: 'tripId required'});
         return;
     }
-    const tripId = new ObjectId(req.body.tripId);
+    const tripId = ObjectId.createFromHexString(req.body.tripId);
 
     const client = await getMongoClient();
     try {
@@ -124,7 +124,7 @@ router.post('/updateTrip', async (req, res, next) => {
         res.json({error: 'tripId required'});
         return;
     }
-    const tripId = new ObjectId(req.body.tripId);
+    const tripId = ObjectId.createFromHexString(req.body.tripId);
 
     const client = await getMongoClient();
     try {
@@ -167,7 +167,7 @@ router.post('/deleteTrip', async(req, res, next) => {
         res.json({error: 'tripId required'});
         return;
     }
-    const tripId = new ObjectId(req.body.tripId);
+    const tripId = ObjectId.createFromHexString(req.body.tripId);
 
     const client = await getMongoClient();
     try {
