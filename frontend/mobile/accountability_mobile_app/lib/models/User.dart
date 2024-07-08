@@ -3,40 +3,51 @@
 //     final user = userFromJson(jsonString);
 
 import 'dart:convert';
-import 'Id.dart';
 
 User userFromJson(String str) => User.fromJson(json.decode(str));
 
 String userToJson(User data) => json.encode(data.toJson());
 
 class User {
-  Id id;
+  String id;
   String name;
   String email;
-  String? password;
-  List<Id>? trips;
+  Ret ret;
 
   User({
     required this.id,
     required this.name,
     required this.email,
-    this.password,
-    this.trips,
+    required this.ret,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
-        id: Id.fromJson(json["_id"]),
+        id: json["id"],
         name: json["name"],
         email: json["email"],
-        password: json["password"],
-        trips: List<Id>.from(json["trips"].map((x) => Id.fromJson(x))),
+        ret: Ret.fromJson(json["ret"]),
       );
 
   Map<String, dynamic> toJson() => {
-        "_id": id.toJson(),
+        "id": id,
         "name": name,
         "email": email,
-        "password": password,
-        "trips": List<dynamic>.from(trips!.map((x) => x.toJson())),
+        "ret": ret.toJson(),
+      };
+}
+
+class Ret {
+  String accessToken;
+
+  Ret({
+    required this.accessToken,
+  });
+
+  factory Ret.fromJson(Map<String, dynamic> json) => Ret(
+        accessToken: json["accessToken"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "accessToken": accessToken,
       };
 }

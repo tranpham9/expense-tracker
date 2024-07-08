@@ -1,4 +1,5 @@
 import 'dart:core';
+import 'package:accountability_mobile_app/globals.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -21,8 +22,8 @@ class _LoginPage extends State<LoginPage> {
   final TextEditingController password = TextEditingController();
   String? emailError;
   String? passwordError;
-
-  Future<User> loginUser(String email, String password) async {
+  // Call the API endpoint to log the user in
+  Future<User?> loginUser(String email, String password) async {
     return await LoginUser.login(email, password);
   }
 
@@ -83,16 +84,17 @@ class _LoginPage extends State<LoginPage> {
                   // TODO: Call the API to log the user in
                   // User response = await loginUser();
                   print(
-                      "Sending ${email.text} and ${password.text} to the API\n\n\n\n\n\n");
+                      "Sending ${email.text} and ${password.text} to the API");
+                  // TODO: JUST FOR TESTING
+                  // response = User(
+                  //     id: Id(oid: '1234'),
+                  //     name: 'Jacob',
+                  //     email: 'jacob@email.com');
+                  // ------------
                   // "email":"diesel@email.com",
                   // "password":"COP4331"
-                  loginUser(email.text, password.text).then((response) {
+                  loginUser("diesel@email.com", "COP4331").then((response) {
                     // Let the user know the email/password was wrong
-                    if (response == null) {
-                      emailError = "Email/Password Combination Incorrect";
-                      passwordError = "Email/Password Combination Incorrect";
-                    }
-                    // Reset widgets back to  normal and route to next page
                     email.text = '';
                     password.text = '';
                     // Reset Decorations back to normal
@@ -101,10 +103,12 @@ class _LoginPage extends State<LoginPage> {
                       passwordError = null;
                     });
                     // If login was successful, route the user to their home page
+                    // Set the current user of the app
+                    Globals.user = response;
+                    // Route to the home page
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => HomePage(user: response)),
+                      MaterialPageRoute(builder: (context) => HomePage()),
                     );
                   });
                 },

@@ -2,6 +2,134 @@
 import 'package:flutter/material.dart';
 import '../../models/models.dart';
 
+class AddTripsPage extends StatelessWidget {
+  // Grab text that will be entered by the user
+  final TextEditingController name = TextEditingController();
+  final TextEditingController notes = TextEditingController();
+  final TextEditingController members = TextEditingController();
+  final TextEditingController code = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // Display the title at the top of the screen
+      appBar: AppBar(
+        title: const Text("Add a Trip"),
+        centerTitle: true,
+        // We don't need a back button to go to some main page
+        automaticallyImplyLeading: false,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          // Have our list of containers that will take in text input
+          children: <Widget>[
+            // Enter Name
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: TextField(
+                controller: name,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Name',
+                ),
+              ),
+            ),
+            // Enter Notes
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: TextField(
+                controller: notes,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Notes',
+                ),
+              ),
+            ),
+            // Confirm Add Trip
+            Container(
+              height: 50,
+              padding: const EdgeInsets.all(10),
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).primaryColor,
+                ),
+                child: const Text(
+                  'Add Trip',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  // TODO: Call the API to add the trip
+                  // also figure out how to handel reading the emails properly
+                },
+              ),
+            ),
+            SizedBox(
+              height: 150,
+            ),
+            // Allow others to join a trip by inputting a trip code
+            JoinTrip(code: code),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Input the UUID code for a trip in order to join it
+class JoinTrip extends StatelessWidget {
+  final TextEditingController code;
+
+  const JoinTrip({super.key, required this.code});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            ListTile(
+              title: Center(
+                  child: Text(
+                "Join a Trip",
+                style: TextStyle(fontSize: 20),
+              )),
+            ),
+            TextField(
+              controller: code,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Trip Code',
+              ),
+            ),
+            Container(
+              height: 50,
+              width: double.infinity,
+              padding: const EdgeInsets.all(10),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).primaryColor,
+                ),
+                child: const Text(
+                  'Join Trip',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  // TODO: Add the user to the trip if it exists
+                  // alert the user that they are added to the trip with an overlay notification
+                },
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 // Name & Notes Widgets
 class EditNameNotesPage extends StatefulWidget {
   // Each trip has both a name and notes associated with it

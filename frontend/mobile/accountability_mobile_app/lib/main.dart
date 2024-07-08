@@ -3,8 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import './ui/landing_page/login.dart';
-// Needed to make API calls
-import 'package:http/http.dart' as http;
 
 // TODO: Implement errorText for all of the errors that can occur here
 

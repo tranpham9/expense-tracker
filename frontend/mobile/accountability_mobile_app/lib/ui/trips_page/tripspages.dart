@@ -1,4 +1,5 @@
 // Display information about the different trips
+import 'package:accountability_mobile_app/globals.dart';
 import 'package:flutter/material.dart';
 import '../../models/models.dart';
 import './tripcrud.dart';
@@ -7,7 +8,6 @@ import './tripcrud.dart';
 class TripsPage extends StatelessWidget {
   // Grab the search field when we want to search
   final TextEditingController _searchQuery = TextEditingController();
-
   //FOR TESTING ONLY TODO: Perhaps create a 'model' folder and put models and fake data there
   List<Trip> trips = [
     Trip(
@@ -100,9 +100,9 @@ class TripsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           // TODO: Put actual username here
-          "Username's Trips",
+          "${Globals.user?.name}'s Trips",
         ),
         centerTitle: true,
         // We don't need a back button to go to some main page
@@ -442,184 +442,6 @@ class _ViewTripPage extends State<ViewTripPage> {
                 "Generate Receipt",
                 style: TextStyle(color: Colors.white),
               )),
-        ],
-      ),
-    );
-  }
-}
-
-class AddTripsPage extends StatelessWidget {
-  // Grab text that will be entered by the user
-  final TextEditingController name = TextEditingController();
-  final TextEditingController notes = TextEditingController();
-  final TextEditingController members = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      // Display the title at the top of the screen
-      appBar: AppBar(
-        title: const Text("Add a Trip"),
-        centerTitle: true,
-        // We don't need a back button to go to some main page
-        automaticallyImplyLeading: false,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child: ListView(
-          // Have our list of containers that will take in text input
-          children: <Widget>[
-            // Enter Name
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: TextField(
-                controller: name,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Name',
-                ),
-              ),
-            ),
-            // Enter Notes
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: TextField(
-                controller: notes,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Notes',
-                ),
-              ),
-            ),
-            // Enter Members
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: TextField(
-                obscureText: true,
-                controller: members,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Members',
-                ),
-              ),
-            ),
-            // Confirm Add Trip
-            Container(
-              height: 50,
-              padding: const EdgeInsets.all(10),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                ),
-                child: const Text(
-                  'Add Trip',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () {
-                  // TODO: Call the API to add the trip
-                  // also figure out how to handel reading the emails properly
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Profile Page Widget
-class ProfilePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      // Display the title at the top of the screen
-      appBar: AppBar(
-        // TODO: Place actual username here
-        title: const Text("Username's Profile"),
-        centerTitle: true,
-        // We don't need a back button to go to some main page
-        automaticallyImplyLeading: false,
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Column(
-              children: [
-                // TODO: Maybe have the ability to change the user name?? (OPTIONAL)
-                ListTile(
-                  title: Text("Your Name"),
-                  subtitle: Text("Name"),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ElevatedButton(
-                          onPressed: () {
-                            // Navigate to the name and notes edit page
-                            // Navigator.push(
-                            //     context,
-                            //     // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
-                            //     MaterialPageRoute(
-                            //         builder: (context) =>
-                            //             ));
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColor,
-                          ),
-                          child: Text(
-                            "Edit",
-                            style: TextStyle(color: Colors.white),
-                          )),
-                    ],
-                  ),
-                ),
-                ListTile(
-                  title: Text("Your Email"),
-                  subtitle: Text("Email"),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ElevatedButton(
-                          onPressed: () {
-                            // Navigate to the name and notes edit page
-                            // Navigator.push(
-                            //     context,
-                            //     // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
-                            //     MaterialPageRoute(
-                            //         builder: (context) =>
-                            //             ));
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColor,
-                          ),
-                          child: Text(
-                            "Edit",
-                            style: TextStyle(color: Colors.white),
-                          )),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            height: 50,
-            width: 400,
-            padding: const EdgeInsets.all(10),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
-              ),
-              child: const Text(
-                'Logout',
-                style: TextStyle(color: Colors.white),
-              ),
-              onPressed: () {
-                // TODO: Log the user out
-                Navigator.of(context).popUntil((route) => route.isFirst);
-              },
-            ),
-          ),
         ],
       ),
     );
