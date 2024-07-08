@@ -6,9 +6,7 @@ import Modal from "./Modal";
 import Signup from "./Signup";
 import Login from "./Login";
 
-export default function AccountOverlay() {
-    const [isModalOpen, setIsModalOpen] = useState(true);
-
+export default function AccountOverlay({ shouldShow, setShouldShow }: { shouldShow: boolean; setShouldShow: (newValue: boolean) => void }) {
     const [activeTab, setActiveTab] = useState(0);
     const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
         setActiveTab(newValue);
@@ -16,8 +14,8 @@ export default function AccountOverlay() {
 
     return (
         <Modal
-            isOpen={isModalOpen}
-            setIsOpen={setIsModalOpen}
+            isOpen={shouldShow}
+            setIsOpen={setShouldShow}
         >
             <>
                 <Box sx={{ width: "100%" }}>

@@ -1,4 +1,4 @@
-import { useState, type MouseEvent } from "react";
+import { createContext, useState, type MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 import AppBar from "@mui/material/AppBar";
@@ -14,6 +14,9 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
+import AccountOverlay from "./AccountOverlay";
+
+export const HandleValidLoginContext = createContext(() => {});
 
 type Page = {
     name: string;
@@ -87,166 +90,187 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: bool
         },
     ];
 
+    const [shouldShowAccountOverlay, setShouldShowAccountOverlay] = useState(false);
+
     return (
-        <AppBar position="static">
-            <Container maxWidth="xl">
-                <Toolbar disableGutters>
-                    <AdbIcon
-                        sx={{
-                            display: { xs: "none", md: "flex" },
-                            mr: 1,
-                        }}
-                    />
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="a"
-                        href="https://github.com/tranpham9/expense-tracker/"
-                        target="_blank"
-                        sx={{
-                            mr: 2,
-                            display: { xs: "none", md: "flex" },
-                            fontFamily: "monospace",
-                            fontWeight: 700,
-                            letterSpacing: ".3rem",
-                            color: "inherit",
-                            textDecoration: "none",
-                        }}
-                    >
-                        LOGO
-                    </Typography>
-
-                    <Box
-                        sx={{
-                            flexGrow: 1,
-                            display: { xs: "flex", md: "none" },
-                        }}
-                    >
-                        <IconButton
-                            size="large"
-                            aria-label="account of current user"
-                            aria-controls="menu-appbar"
-                            aria-haspopup="true"
-                            onClick={handleOpenNavMenu}
-                            color="inherit"
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <Menu
-                            id="menu-appbar"
-                            anchorEl={anchorElNav}
-                            anchorOrigin={{
-                                vertical: "bottom",
-                                horizontal: "left",
-                            }}
-                            keepMounted
-                            transformOrigin={{
-                                vertical: "top",
-                                horizontal: "left",
-                            }}
-                            open={Boolean(anchorElNav)}
-                            onClose={handleCloseNavMenu}
+        <HandleValidLoginContext.Provider
+            value={() => {
+                setIsLoggedIn(true);
+                setShouldShowAccountOverlay(false);
+                // TODO: do this the proper way with react router
+                // window.open("/trips");
+            }}
+        >
+            <AppBar position="static">
+                <Container maxWidth="xl">
+                    <Toolbar disableGutters>
+                        <AdbIcon
                             sx={{
-                                display: { xs: "block", md: "none" },
+                                display: { xs: "none", md: "flex" },
+                                mr: 1,
+                            }}
+                        />
+                        <Typography
+                            variant="h6"
+                            noWrap
+                            component="a"
+                            href="https://github.com/tranpham9/expense-tracker/"
+                            target="_blank"
+                            sx={{
+                                mr: 2,
+                                display: { xs: "none", md: "flex" },
+                                fontFamily: "monospace",
+                                fontWeight: 700,
+                                letterSpacing: ".3rem",
+                                color: "inherit",
+                                textDecoration: "none",
                             }}
                         >
-                            {pages.map((page) => (
-                                <MenuItem
-                                    key={page.name}
-                                    onClick={() => navigateToPage(page)}
-                                    disabled={page.requiresLoggedIn && !isLoggedIn}
-                                >
-                                    <Typography textAlign="center">{page.name}</Typography>
-                                </MenuItem>
-                            ))}
-                        </Menu>
-                    </Box>
-                    <AdbIcon
-                        sx={{
-                            display: { xs: "flex", md: "none" },
-                            mr: 1,
-                        }}
-                    />
-                    <Typography
-                        variant="h5"
-                        noWrap
-                        component="a"
-                        href="https://github.com/tranpham9/expense-tracker/"
-                        target="_blank"
-                        sx={{
-                            mr: 2,
-                            display: { xs: "flex", md: "none" },
-                            flexGrow: 1,
-                            fontFamily: "monospace",
-                            fontWeight: 700,
-                            letterSpacing: ".3rem",
-                            color: "inherit",
-                            textDecoration: "none",
-                        }}
-                    >
-                        LOGO
-                    </Typography>
-                    <Box
-                        sx={{
-                            flexGrow: 1,
-                            display: { xs: "none", md: "flex" },
-                        }}
-                    >
-                        {pages.map((page) => (
-                            <Button
-                                key={page.name}
-                                onClick={() => navigateToPage(page)}
-                                disabled={page.requiresLoggedIn && !isLoggedIn}
-                                sx={{ my: 2, color: "white", display: "block" }}
-                            >
-                                {page.name}
-                            </Button>
-                        ))}
-                    </Box>
+                            LOGO
+                        </Typography>
 
-                    {/* Only render if logged in */}
-                    {isLoggedIn && (
-                        <Box sx={{ flexGrow: 0 }}>
-                            <Tooltip title="Open options">
-                                <IconButton
-                                    onClick={handleOpenUserMenu}
-                                    sx={{ p: 0 }}
-                                >
-                                    <Avatar
-                                        alt="Remy Sharp"
-                                        src="/static/images/avatar/2.jpg"
-                                    />
-                                </IconButton>
-                            </Tooltip>
+                        <Box
+                            sx={{
+                                flexGrow: 1,
+                                display: { xs: "flex", md: "none" },
+                            }}
+                        >
+                            <IconButton
+                                size="large"
+                                aria-label="account of current user"
+                                aria-controls="menu-appbar"
+                                aria-haspopup="true"
+                                onClick={handleOpenNavMenu}
+                                color="inherit"
+                            >
+                                <MenuIcon />
+                            </IconButton>
                             <Menu
-                                sx={{ mt: "45px" }}
                                 id="menu-appbar"
-                                anchorEl={anchorElUser}
+                                anchorEl={anchorElNav}
                                 anchorOrigin={{
-                                    vertical: "top",
-                                    horizontal: "right",
+                                    vertical: "bottom",
+                                    horizontal: "left",
                                 }}
                                 keepMounted
                                 transformOrigin={{
                                     vertical: "top",
-                                    horizontal: "right",
+                                    horizontal: "left",
                                 }}
-                                open={Boolean(anchorElUser)}
-                                onClose={handleCloseUserMenu}
+                                open={Boolean(anchorElNav)}
+                                onClose={handleCloseNavMenu}
+                                sx={{
+                                    display: { xs: "block", md: "none" },
+                                }}
                             >
-                                {options.map((option) => (
+                                {pages.map((page) => (
                                     <MenuItem
-                                        key={option.name}
-                                        onClick={() => handleOptionClick(option)}
+                                        key={page.name}
+                                        onClick={() => navigateToPage(page)}
+                                        disabled={page.requiresLoggedIn && !isLoggedIn}
                                     >
-                                        <Typography textAlign="center">{option.name}</Typography>
+                                        <Typography textAlign="center">{page.name}</Typography>
                                     </MenuItem>
                                 ))}
                             </Menu>
                         </Box>
-                    )}
-                </Toolbar>
-            </Container>
-        </AppBar>
+                        <AdbIcon
+                            sx={{
+                                display: { xs: "flex", md: "none" },
+                                mr: 1,
+                            }}
+                        />
+                        <Typography
+                            variant="h5"
+                            noWrap
+                            component="a"
+                            href="https://github.com/tranpham9/expense-tracker/"
+                            target="_blank"
+                            sx={{
+                                mr: 2,
+                                display: { xs: "flex", md: "none" },
+                                flexGrow: 1,
+                                fontFamily: "monospace",
+                                fontWeight: 700,
+                                letterSpacing: ".3rem",
+                                color: "inherit",
+                                textDecoration: "none",
+                            }}
+                        >
+                            LOGO
+                        </Typography>
+                        <Box
+                            sx={{
+                                flexGrow: 1,
+                                display: { xs: "none", md: "flex" },
+                            }}
+                        >
+                            {pages.map((page) => (
+                                <Button
+                                    key={page.name}
+                                    onClick={() => navigateToPage(page)}
+                                    disabled={page.requiresLoggedIn && !isLoggedIn}
+                                    sx={{ my: 2, color: "white", display: "block" }}
+                                >
+                                    {page.name}
+                                </Button>
+                            ))}
+                        </Box>
+
+                        {isLoggedIn ? (
+                            <Box sx={{ flexGrow: 0 }}>
+                                <Tooltip title="Open options">
+                                    <IconButton
+                                        onClick={handleOpenUserMenu}
+                                        sx={{ p: 0 }}
+                                    >
+                                        <Avatar
+                                            alt="Remy Sharp"
+                                            src="/static/images/avatar/2.jpg"
+                                        />
+                                    </IconButton>
+                                </Tooltip>
+                                <Menu
+                                    sx={{ mt: "45px" }}
+                                    id="menu-appbar"
+                                    anchorEl={anchorElUser}
+                                    anchorOrigin={{
+                                        vertical: "top",
+                                        horizontal: "right",
+                                    }}
+                                    keepMounted
+                                    transformOrigin={{
+                                        vertical: "top",
+                                        horizontal: "right",
+                                    }}
+                                    open={Boolean(anchorElUser)}
+                                    onClose={handleCloseUserMenu}
+                                >
+                                    {options.map((option) => (
+                                        <MenuItem
+                                            key={option.name}
+                                            onClick={() => handleOptionClick(option)}
+                                        >
+                                            <Typography textAlign="center">{option.name}</Typography>
+                                        </MenuItem>
+                                    ))}
+                                </Menu>
+                            </Box>
+                        ) : (
+                            <Button
+                                onClick={() => setShouldShowAccountOverlay(true)}
+                                sx={{ my: 2, color: "white", display: "block" }}
+                            >
+                                Login/Signup
+                            </Button>
+                        )}
+                    </Toolbar>
+                </Container>
+            </AppBar>
+            <AccountOverlay
+                shouldShow={shouldShowAccountOverlay}
+                setShouldShow={setShouldShowAccountOverlay}
+            />
+        </HandleValidLoginContext.Provider>
     );
 }

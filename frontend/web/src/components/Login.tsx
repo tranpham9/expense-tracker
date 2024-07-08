@@ -1,17 +1,23 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 
 import { Box, Button } from "@mui/material";
 
 import EmailInput from "./inputs/EmailInput";
 import PasswordInput from "./inputs/PasswordInput";
+import { HandleValidLoginContext } from "./Navbar";
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    const handleValidLogin = useContext(HandleValidLoginContext);
+
     const login = () => {
         console.log(email, password);
         // TODO: impl
+
+        // TODO: temp
+        handleValidLogin();
     };
 
     return (
