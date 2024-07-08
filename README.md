@@ -30,6 +30,6 @@ This is the source code of the large group project for COP 4331C (Processes for 
 
 [Pablo Rodriguez](https://github.com/pa233796)
 
-[John Tran]()
+[John Tran](https://github.com/jtran6796)
 
 [Landon Wright]()
