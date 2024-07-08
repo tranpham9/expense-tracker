@@ -166,6 +166,28 @@ app.post("/api/login", async (req, res, next) => {
     }
 });
 
+app.put("/api/changeName", async (req, res) => {
+    const db = client.db(DB_NAME);
+    const userCollection = db.collection(USER_COLLECTION_NAME);
+    const {userId,newName} = req.body;
+    if(!userId||!newName){
+        res.status(400).json({ error: "Malformed Request" });
+        return;
+    }
+    const result = await userCollection.updateOne(
+        { _id: ObjectId.createFromHexString(userId.toString()) },
+        { $set: { name: newName } }
+    );
+
+    if (result.modifiedCount === 1) {
+        res.status(200).json({ message: "Name updated successfully" });
+    } else {
+        res.status(400).json({ error: "Failed to update name" });
+    }
+
+
+ });
+
 // All trip related CRUD endpoints will be accessible under /api/trips/
 app.use("/api/trips", tripCRUDRouter);
 // All expense related CRUD endpoints will be accessible under /api/expenses/
