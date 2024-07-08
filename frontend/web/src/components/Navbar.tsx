@@ -86,6 +86,7 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: bool
             name: "Logout",
             action: () => {
                 setIsLoggedIn(false);
+                // navigate("/home"); // this is done automatically with a useEffect
             },
         },
     ];
@@ -98,7 +99,7 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: bool
                 setIsLoggedIn(true);
                 setShouldShowAccountOverlay(false);
                 // TODO: do this the proper way with react router
-                // window.open("/trips");
+                navigate("/trips");
             }}
         >
             <AppBar position="static">

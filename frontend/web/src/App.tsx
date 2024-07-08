@@ -25,7 +25,7 @@ export default function App() {
                 />
                 <Route
                     path={"/trips"}
-                    element={<Trips />}
+                    element={<Trips isLoggedIn={isLoggedIn} />}
                 />
             </Routes>
         </BrowserRouter>
