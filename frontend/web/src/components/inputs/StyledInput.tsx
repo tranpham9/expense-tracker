@@ -8,12 +8,14 @@ export default function StyledInput({
     error = "",
     required = true,
     onChange,
+    onEnterKey,
 }: {
     type?: HTMLInputTypeAttribute;
     label?: string;
     error?: string;
     required?: boolean;
     onChange?: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+    onEnterKey?: () => void;
 }) {
     return (
         <TextField
@@ -28,9 +30,17 @@ export default function StyledInput({
             // FIXME: this also shows right at the start, which isn't desired
             // color="success"
             sx={{ width: "90%" }}
+            onKeyDown={(event) => {
+                if (onEnterKey && event.key === "Enter") {
+                    event.preventDefault();
+                    onEnterKey();
+                }
+            }}
             // onKeyUp={onKeyUp}
             // It seems that MUI uses onChange to mean something akin to onKeyDown instead of only triggering when focus is lost/enter is hit
-            onChange={onChange}
+            onChange={(event) => {
+                onChange?.(event);
+            }}
         />
     );
 }

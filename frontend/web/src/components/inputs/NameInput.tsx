@@ -2,7 +2,7 @@ import { ComponentProps, useState } from "react";
 
 import StyledInput from "./StyledInput";
 
-export default function NameInput({ setName }: { setName: (newName: string) => void }) {
+export default function NameInput({ setName, onEnterKey }: { setName: (newName: string) => void; onEnterKey?: () => void }) {
     const [error, setError] = useState("");
     const validate: ComponentProps<typeof StyledInput>["onChange"] = (event) => {
         if (event.target.value.length < 4) {
@@ -26,6 +26,7 @@ export default function NameInput({ setName }: { setName: (newName: string) => v
             label="Name"
             error={error}
             onChange={validate}
+            onEnterKey={onEnterKey}
         />
     );
 }

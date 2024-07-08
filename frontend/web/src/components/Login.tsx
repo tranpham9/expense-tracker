@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { Box, Button } from "@mui/material";
 
@@ -11,13 +11,21 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    const [hasValidLogin, setHasValidLogin] = useState(false);
+    useEffect(() => {
+        setHasValidLogin(![email, password].some((value) => value === ""));
+    }, [email, password]);
+
     const handleValidLogin = useContext(HandleValidLoginContext);
 
-    const login = () => {
+    const attemptLogin = () => {
+        if (!hasValidLogin) {
+            return;
+        }
+
         console.log(email, password);
         // TODO: impl
 
-        // TODO: temp
         handleValidLogin();
     };
 
@@ -28,15 +36,21 @@ export default function Login() {
                 pt: "10px",
             }}
         >
-            <EmailInput setEmail={setEmail} />
+            <EmailInput
+                setEmail={setEmail}
+                onEnterKey={attemptLogin}
+            />
             <br />
-            <PasswordInput setPassword={setPassword} />
+            <PasswordInput
+                setPassword={setPassword}
+                onEnterKey={attemptLogin}
+            />
             <br />
             <Button
                 variant="contained"
-                disabled={[email, password].some((value) => value === "")}
+                disabled={!hasValidLogin}
                 sx={{ m: "10px" }}
-                onClick={login}
+                onClick={attemptLogin}
             >
                 Submit
             </Button>

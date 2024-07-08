@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Box, Button } from "@mui/material";
 
@@ -12,7 +12,16 @@ export default function Signup() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const signup = () => {
+    const [hasValidSignup, setHasValidSignup] = useState(false);
+    useEffect(() => {
+        setHasValidSignup(![name, email, password].some((value) => value === ""));
+    }, [name, email, password]);
+
+    const attemptSignup = () => {
+        if (!hasValidSignup) {
+            return;
+        }
+
         console.log(name, email, password);
         // TODO: impl
     };
@@ -24,17 +33,26 @@ export default function Signup() {
                 pt: "10px",
             }}
         >
-            <NameInput setName={setName} />
+            <NameInput
+                setName={setName}
+                onEnterKey={attemptSignup}
+            />
             <br />
-            <EmailInput setEmail={setEmail} />
+            <EmailInput
+                setEmail={setEmail}
+                onEnterKey={attemptSignup}
+            />
             <br />
-            <PasswordInput setPassword={setPassword} />
+            <PasswordInput
+                setPassword={setPassword}
+                onEnterKey={attemptSignup}
+            />
             <br />
             <Button
                 variant="contained"
-                disabled={[name, email, password].some((value) => value === "")}
+                disabled={!hasValidSignup}
                 sx={{ m: "10px" }}
-                onClick={signup}
+                onClick={attemptSignup}
             >
                 Submit
             </Button>

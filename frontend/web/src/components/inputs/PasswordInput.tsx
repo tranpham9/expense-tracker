@@ -2,7 +2,7 @@ import { ComponentProps, useState } from "react";
 
 import StyledInput from "./StyledInput";
 
-export default function PasswordInput({ setPassword }: { setPassword: (newName: string) => void }) {
+export default function PasswordInput({ setPassword, onEnterKey }: { setPassword: (newName: string) => void; onEnterKey?: () => void }) {
     const [error, setError] = useState("");
     const validate: ComponentProps<typeof StyledInput>["onChange"] = (event) => {
         if (event.target.value.length < 8) {
@@ -45,6 +45,7 @@ export default function PasswordInput({ setPassword }: { setPassword: (newName: 
             label="Password"
             error={error}
             onChange={validate}
+            onEnterKey={onEnterKey}
         />
     );
 }
