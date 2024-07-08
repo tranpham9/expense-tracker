@@ -209,9 +209,10 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: bool
                             {pages.map((page) => (
                                 <Button
                                     key={page.name}
+                                    variant="contained"
                                     onClick={() => navigateToPage(page)}
                                     disabled={page.requiresLoggedIn && !isLoggedIn}
-                                    sx={{ my: 2, color: "white", display: "block" }}
+                                    sx={{ mx: 0.5, my: 2, display: "block" }}
                                 >
                                     {page.name}
                                 </Button>
@@ -259,8 +260,9 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: bool
                             </Box>
                         ) : (
                             <Button
+                                variant="contained"
                                 onClick={() => setShouldShowAccountOverlay(true)}
-                                sx={{ my: 2, color: "white", display: "block" }}
+                                sx={{ mx: 0.5, my: 2, display: "block" }}
                             >
                                 Login/Signup
                             </Button>

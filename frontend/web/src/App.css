@@ -1,3 +1,5 @@
-button:enabled {
+/* Always give an underline to buttons */
+button:enabled,
+button:enabled:hover {
     text-decoration: underline;
 }
