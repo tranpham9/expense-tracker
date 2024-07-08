@@ -6,7 +6,7 @@ import NameInput from "./inputs/NameInput";
 import EmailInput from "./inputs/EmailInput";
 import PasswordInput from "./inputs/PasswordInput";
 
-// TODO: need to make the submit button be disabled if not all fields are valid (it should start disabled since fields don't start as red until the user starts typing in them)
+// TODO: make pressing enter in a field click submit button
 export default function Signup() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");

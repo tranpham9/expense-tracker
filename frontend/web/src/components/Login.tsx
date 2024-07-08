@@ -6,6 +6,7 @@ import EmailInput from "./inputs/EmailInput";
 import PasswordInput from "./inputs/PasswordInput";
 import { HandleValidLoginContext } from "./Navbar";
 
+// TODO: make pressing enter in a field click submit button
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
