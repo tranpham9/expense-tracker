@@ -14,7 +14,7 @@ export default function App() {
 
     useEffect(() => {
         // TODO: store/load relevant JWT
-    });
+    }, [isLoggedIn]);
 
     return (
         <BrowserRouter>
