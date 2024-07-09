@@ -12,38 +12,38 @@ class User {
   String id;
   String name;
   String email;
-  Ret ret;
+  Token token;
 
   User({
     required this.id,
     required this.name,
     required this.email,
-    required this.ret,
+    required this.token,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
         id: json["id"],
         name: json["name"],
         email: json["email"],
-        ret: Ret.fromJson(json["ret"]),
+        token: Token.fromJson(json["token"]),
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
         "email": email,
-        "ret": ret.toJson(),
+        "token": token.toJson(),
       };
 }
 
-class Ret {
+class Token {
   String accessToken;
 
-  Ret({
+  Token({
     required this.accessToken,
   });
 
-  factory Ret.fromJson(Map<String, dynamic> json) => Ret(
+  factory Token.fromJson(Map<String, dynamic> json) => Token(
         accessToken: json["accessToken"],
       );
 
