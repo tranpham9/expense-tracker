@@ -124,14 +124,10 @@ app.post("/api/registerUser", async (req, res, next) => {
         password: password.toString(),
         trips: tripId ? [ObjectId.createFromHexString(tripId.toString())] : [],
     };
-<<<<<<< Updated upstream
+    
     // ensure email doesn't already exist
     const check = await userCollection.findOne({ email: email});
     // console.log(check);
-=======
-
-    const check = await userCollection.findOne({ email: email });
->>>>>>> Stashed changes
     if (check) {
         console.error("Attempted to register a user with an existing email");
         res.status(401).json({ error: "Failed to register user" });
