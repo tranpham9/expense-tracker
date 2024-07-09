@@ -107,10 +107,11 @@ app.post("/api/registerUser", async (req, res, next) => {
         res.status(400).json({ error: "Malformed Request" });
         return;
     }
-    if (!email.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
+    /*if (!email.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
             res.status(406).json("Must be a valid email");
             return;
-    }
+    }*/
+   
     // TODO: need to validate email is in valid form and that nothing is too long
     // TODO: ensure trips should also include non-owning trips (i.e. ones where the user is a part of but not the creater/owner of)
     const newUser: User = {
