@@ -1,15 +1,19 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { LoginContext } from "../App";
 
-export default function Trips({ isLoggedIn }: { isLoggedIn: boolean }) {
+export default function Trips() {
     const navigate = useNavigate();
+
+    const { isLoggedIn } = useContext(LoginContext);
 
     // https://stackoverflow.com/questions/74413650/what-is-difference-between-usenavigate-and-redirect-in-react-route-v6
     useEffect(() => {
         if (!isLoggedIn) {
+            console.log("<not logged in>");
             navigate("/home");
         }
-    }, [isLoggedIn, navigate]);
+    }, [isLoggedIn, navigate]); // always trigger when navigating to here (navigate changes when path changes)
 
     return (
         <>
