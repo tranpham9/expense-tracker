@@ -4,7 +4,7 @@ import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
-export default function Hero() {
+export default function Welcome() {
     return (
         <Box
             id="hero"
