@@ -31,7 +31,7 @@ export function createEmail(user: User) {
 
     unverified.set(uuid, user);
 
-    const url = "http://localhost:5000/api/verify/";
+    const url = "https://accountability-190955e8b06f.herokuapp.com/api/verify/";
 
     const encodedJson = encodeURIComponent(JSON.stringify(uuid));
 
