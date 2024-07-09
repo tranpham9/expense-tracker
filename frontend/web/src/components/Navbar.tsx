@@ -1,4 +1,4 @@
-import { createContext, useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 import AppBar from "@mui/material/AppBar";
@@ -16,8 +16,6 @@ import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import AccountOverlay from "./AccountOverlay";
 
-export const HandleValidLoginContext = createContext(() => {});
-
 type Page = {
     name: string;
     customPath?: string;
@@ -31,6 +29,15 @@ type Option = {
 
 export default function Navbar({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean; setIsLoggedIn: (newValue: boolean) => void }) {
     const navigate = useNavigate();
+
+    const [shouldShowAccountOverlay, setShouldShowAccountOverlay] = useState(false);
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            setShouldShowAccountOverlay(false);
+        }
+        // navigate("/trips");
+    }, [isLoggedIn]); // do not want to depend on navigate (otherwise this reruns whenever page changes)
 
     const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
@@ -91,17 +98,8 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: bool
         },
     ];
 
-    const [shouldShowAccountOverlay, setShouldShowAccountOverlay] = useState(false);
-
     return (
-        <HandleValidLoginContext.Provider
-            value={() => {
-                setIsLoggedIn(true);
-                setShouldShowAccountOverlay(false);
-                // TODO: do this the proper way with react router
-                navigate("/trips");
-            }}
-        >
+        <>
             <AppBar position="static">
                 <Container maxWidth="xl">
                     <Toolbar disableGutters>
@@ -274,6 +272,6 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: bool
                 shouldShow={shouldShowAccountOverlay}
                 setShouldShow={setShouldShowAccountOverlay}
             />
-        </HandleValidLoginContext.Provider>
+        </>
     );
 }

@@ -5,7 +5,9 @@ import Navbar from "./components/Navbar";
 import Trips from "./pages/Trips";
 
 import "./App.css";
-import { useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+
+export const TriggerLoginContext = createContext(() => {});
 
 // TODO: once logging in and JWT is set up, need to handle redirecting from trips to home if not logged in/authenticated
 export default function App() {
@@ -18,10 +20,12 @@ export default function App() {
 
     return (
         <BrowserRouter>
-            <Navbar
-                isLoggedIn={isLoggedIn}
-                setIsLoggedIn={setIsLoggedIn}
-            />
+            <TriggerLoginContext.Provider value={() => setIsLoggedIn(true)}>
+                <Navbar
+                    isLoggedIn={isLoggedIn}
+                    setIsLoggedIn={setIsLoggedIn}
+                />
+            </TriggerLoginContext.Provider>
             <Routes>
                 <Route
                     path={"/home?"}
