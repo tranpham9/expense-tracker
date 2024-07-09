@@ -19,8 +19,9 @@ class LoginUser {
           "Response Code = ${response.statusCode}\nResponse Data:\n${response.data}");
       // If there was an error, return an error
       if (response.statusCode != 200) {
-        throw Exception("Failed to log user in");
+        throw Exception("Failed to Log User in");
       }
+
       // _JsonMap is returned and needs to be converted to map
       print(
           "\nWhat is the type of response? ${Map.from(response.data).runtimeType}");
