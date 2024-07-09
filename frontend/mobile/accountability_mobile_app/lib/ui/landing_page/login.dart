@@ -80,21 +80,20 @@ class _LoginPage extends State<LoginPage> {
                   } else {
                     passwordError = null;
                   }
-
-                  // TODO: Call the API to log the user in
-                  // User response = await loginUser();
                   print(
                       "Sending ${email.text} and ${password.text} to the API");
-                  // TODO: JUST FOR TESTING
-                  // response = User(
-                  //     id: Id(oid: '1234'),
-                  //     name: 'Jacob',
-                  //     email: 'jacob@email.com');
-                  // ------------
-                  // "email":"diesel@email.com",
-                  // "password":"COP4331"
-                  loginUser("diesel@email.com", "COP4331").then((response) {
+                  // Call the login endpoint
+                  loginUser(email.text, password.text).then((response) {
                     // Let the user know the email/password was wrong
+                    if (response == null) {
+                      setState(() {
+                        emailError = "Email/Password Combination Incorrect";
+                        passwordError = "Email/Password Combination Incorrect";
+                      });
+                      return;
+                    }
+
+                    // Login was successful, route the user to their home page
                     email.text = '';
                     password.text = '';
                     // Reset Decorations back to normal
@@ -102,7 +101,6 @@ class _LoginPage extends State<LoginPage> {
                       emailError = null;
                       passwordError = null;
                     });
-                    // If login was successful, route the user to their home page
                     // Set the current user of the app
                     Globals.user = response;
                     // Route to the home page
