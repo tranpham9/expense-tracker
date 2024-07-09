@@ -31,9 +31,8 @@ export function createEmail(user: User) {
 
     unverified.set(uuid, user);
 
-    const url = "https://accountability-190955e8b06f.herokuapp.com/api/verify/";
-
-    const encodedJson = encodeURIComponent(JSON.stringify(uuid));
+    //const url = "https://accountability-190955e8b06f.herokuapp.com/api/verify/";
+    const url = "http://localhost:5000/api/verify/";
 
     //https://accountability-190955e8b06f.herokuapp.com/api/verify/${uuid}
 
@@ -60,6 +59,6 @@ export function createEmail(user: User) {
         }
         console.log("Email Sent Successfully");
         console.log(info);
-        return;
     });
+    return 200;
 }
