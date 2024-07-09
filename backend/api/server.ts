@@ -86,11 +86,12 @@ app.get("/api/verify/:token", async (req, res) => {
     res.status(401).json({ error: "Invalid registration token" });
 });
 
+/* Disabled for now
 // Verify that the Content-Type header is set the JSON (otherwise the json,
 // middleware won't parse the body). Could help the frontend guys to diagnose
 // errors.
 app.use("/api/", (req, res, next) => {
-    if (req.headers["content-type"] != "application/json") {
+    if (req.headers["content-type"].includes("application/json")) {
         // dirty check, could be improved
         res.statusCode = 400; // 400 Bad Request
         res.json({});
@@ -98,6 +99,7 @@ app.use("/api/", (req, res, next) => {
     }
     next();
 });
+*/
 
 // register
 app.post("/api/registerUser", async (req, res, next) => {
@@ -166,7 +168,7 @@ app.post("/api/login", async (req, res, next) => {
             id: foundUser._id,
             name: foundUser.name,
             email: foundUser.email,
-            ret,
+            token: ret,
         });
     } else {
         res.status(401).json({ error: "Invalid login credentials" });
