@@ -10,37 +10,37 @@ import { blue } from "@mui/material/colors";
 
 const developers = [
     {
-        avatar: <Avatar sx={{ bgcolor: blue }}> J </Avatar>,
+        avatar: <Avatar sx={{ bgcolor: blue }}>J</Avatar>,
         name: "Jacob Gadberyy",
-        role: "Frontend - Mobile",
+        role: "Project Manager + Frontend (Mobile)",
     },
     {
-        avatar: <Avatar sx={{ bgcolor: blue }}> J </Avatar>,
+        avatar: <Avatar sx={{ bgcolor: blue }}>J</Avatar>,
         name: "Jason Helman",
-        role: "Frontend - Web",
+        role: "Frontend (Web) + some API",
     },
     {
-        avatar: <Avatar sx={{ bgcolor: blue }}> I </Avatar>,
+        avatar: <Avatar sx={{ bgcolor: blue }}>I</Avatar>,
         name: "Ian Orodonez",
-        role: "Frontend - Mobile",
+        role: "Frontend (Mobile)",
     },
     {
-        avatar: <Avatar sx={{ bgcolor: blue }}> T </Avatar>,
+        avatar: <Avatar sx={{ bgcolor: blue }}>T</Avatar>,
         name: "Tran Pham",
-        role: "Frontend - Web",
+        role: "Frontend (Web)",
     },
     {
-        avatar: <Avatar sx={{ bgcolor: blue }}> J </Avatar>,
+        avatar: <Avatar sx={{ bgcolor: blue }}>J</Avatar>,
         name: "Pablo Rodriguez",
         role: "API",
     },
     {
-        avatar: <Avatar sx={{ bgcolor: blue }}> J </Avatar>,
+        avatar: <Avatar sx={{ bgcolor: blue }}>J</Avatar>,
         name: "John Tran",
         role: "API",
     },
     {
-        avatar: <Avatar sx={{ bgcolor: blue }}> J </Avatar>,
+        avatar: <Avatar sx={{ bgcolor: blue }}>J</Avatar>,
         name: "Landon Wright",
         role: "Database",
     },
