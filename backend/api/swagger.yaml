@@ -23,17 +23,24 @@ paths:
         "200":
           description: Authentication successful
           schema:
-              $ref: '#/definitions/UserFullRow'
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: Id of the user, suitable for other API endpoints
+                name:
+                  type: string
+                email:
+                  type: string
+                token:
+                  type: string
+                  description: Authenticated JWT
         "400":
           description: Malformed request or JSON on front-end
           schema:
                 $ref: '#/definitions/ErrorInfo'
-        "404":
+        "401":
           description: "Authentication failure, either wrong username or password"
-          schema:
-                $ref: '#/definitions/ErrorInfo'
-        "500":
-          description: Unknown error or exception on back-end
           schema:
                 $ref: '#/definitions/ErrorInfo'
   /registerUser:
@@ -47,21 +54,15 @@ paths:
           $ref: '#/definitions/RegisterDefinition'
       responses:
         "200":
-          description: Registration successful
-          schema:
-              $ref: '#/definitions/UserFullRow'
+          description: Registration request successful, e-mail sent.
         "400":
           description: Malformed request or JSON on front-end
           schema:
-              $ref: '#/definitions/ErrorInfo'
-        "409":
-          description: Email already exists
+                $ref: '#/definitions/ErrorInfo'
+        "401":
+          description: "Authentication failure, either wrong username or password"
           schema:
-              $ref: '#/definitions/ErrorInfo'
-        "500":
-          description: Unknown error or exception on back-end
-          schema:
-              $ref: '#/definitions/ErrorInfo'
+                $ref: '#/definitions/ErrorInfo'
   /trips/createTrip:
     post:
       summary: CREATE trip endpoint
@@ -127,6 +128,8 @@ paths:
                   type: object
                   properties:
                     _id:
+                      type: string
+                    name:
                       type: string
                     email:
                       type: string
@@ -198,6 +201,74 @@ paths:
           description: Malformed request or JSON
           schema:
             $ref: '#/responses/BadRequest'
+  /trips/getTripsForUser:
+    post:
+      summary: List trips as member user
+      description: List trips a user is part of, only shows member (non-leader) trips.
+      parameters:
+      - in: body
+        name: JSON
+        schema:
+          type: object
+          properties:
+            userId:
+              type: string
+              description: ID of the user to look for
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                _id:
+                  type: string
+                  description: ID of the trip, suitable for other /trips/ endpoint calls
+                name:
+                  type: string
+                  description: Title of the trip
+                notes:
+                  type: string
+                  description: Miscellaneous description for the trip
+        "400":
+          description: Malformed request or JSON
+          schema:
+            $ref: '#/responses/BadRequest'
+  /trips/getTripsOwnedByUser:
+    post:
+      summary: List trips owned by user
+      description: List trips that belong to a user, only shows owned trips where the user is the Leader.
+      parameters:
+      - in: body
+        name: JSON
+        schema:
+          type: object
+          properties:
+            userId:
+              type: string
+              description: ID of the user to look for
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                _id:
+                  type: string
+                  description: ID of the trip, suitable for other /trips/ endpoint calls
+                name:
+                  type: string
+                  description: Title of the trip
+                notes:
+                  type: string
+                  description: Miscellaneous description for the trip
+        "400":
+          description: Malformed request or JSON
+          schema:
+            $ref: '#/responses/BadRequest'
   /expenses/createExpense:
     post:
       summary: CREATE expense endpoint
@@ -233,7 +304,7 @@ paths:
   /expenses/readExpense:
     post:
       summary: READ expense endpoint
-      description: Read information about an expense
+      description: Read information about an expense. Note that /trips/readTrip can return all the expenses at once.
       parameters:
       - in: body
         name: JSON
@@ -264,7 +335,7 @@ paths:
   /expenses/updateExpense:
     post:
       summary: UPDATE expense endpoint
-      description: Modify and expense properties
+      description: Modify expense properties
       parameters:
       - in: body
         name: JSON

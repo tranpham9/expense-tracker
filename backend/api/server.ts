@@ -46,7 +46,7 @@ type Trip = {
     leaderId: ObjectId;
 };
 
-app.get("/api/verify/:token", async (req, res, next) => {
+app.get("/api/verify/:token", async (req, res) => {
     const db = client.db(DB_NAME);
     const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
     const tripCollection: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
@@ -64,27 +64,34 @@ app.get("/api/verify/:token", async (req, res, next) => {
                 res.status(401).json({ error: "Failed to register user" });
                 return;
             }
-            res.status(308).redirect(HOMEPAGE);
-        }
-
-        /*// if tripId is provided, add user to trip
+            // If we get here, we're sucessfully verified
+            // Remove from unverified list to prevent double registration
+            unverified.delete(req.params.token);
+            // Redirect to the application's homepage (static files root)
+            res.status(308).redirect('/');
+        
+            /*// if tripId is provided, add user to trip
             if (verified?.trips) {
                 // use createFromHexString ( https://github.com/dotansimha/graphql-code-generator/issues/6830#issuecomment-2105266455 )
                 // TODO: might need to handle this failing?  Would need to check .acknowledged boolean
                 await tripCollection.updateOne({ _id: ObjectId.createFromHexString(tripId) }, { $push: { memberIds: insertionResult.insertedId } });
             }*/
+        }
     } catch (err) {
         console.error("Error registering user:", err);
         res.status(401).json({ error: "Failed to register user" });
-        next();
     }
+
+    // We get here if verification wasn't sucessful
+    res.status(401).json({ error: "Invalid registration token" });
 });
 
+/* Disabled for now
 // Verify that the Content-Type header is set the JSON (otherwise the json,
 // middleware won't parse the body). Could help the frontend guys to diagnose
 // errors.
 app.use("/api/", (req, res, next) => {
-    if (req.headers["content-type"] != "application/json") {
+    if (req.headers["content-type"].includes("application/json")) {
         // dirty check, could be improved
         res.statusCode = 400; // 400 Bad Request
         res.json({});
@@ -92,6 +99,7 @@ app.use("/api/", (req, res, next) => {
     }
     next();
 });
+*/
 
 // register
 app.post("/api/registerUser", async (req, res, next) => {
@@ -160,7 +168,7 @@ app.post("/api/login", async (req, res, next) => {
             id: foundUser._id,
             name: foundUser.name,
             email: foundUser.email,
-            ret,
+            token: ret,
         });
     } else {
         res.status(401).json({ error: "Invalid login credentials" });
