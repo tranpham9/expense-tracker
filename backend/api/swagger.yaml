@@ -33,8 +33,12 @@ paths:
                 email:
                   type: string
                 token:
-                  type: string
+                  type: object
                   description: Authenticated JWT
+                  properties:
+                    accessToken:
+                      type: string
+                      description: JWT string
         "400":
           description: Malformed request or JSON on front-end
           schema:
