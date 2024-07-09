@@ -46,7 +46,7 @@ type Trip = {
     leaderId: ObjectId;
 };
 
-app.get("/api/verify/:token", async (req, res, next) => {
+app.get("/api/verify/:token", async (req, res) => {
     const db = client.db(DB_NAME);
     const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
     const tripCollection: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
@@ -64,20 +64,26 @@ app.get("/api/verify/:token", async (req, res, next) => {
                 res.status(401).json({ error: "Failed to register user" });
                 return;
             }
-            res.status(308).redirect(HOMEPAGE);
-        }
-
-        /*// if tripId is provided, add user to trip
+            // If we get here, we're sucessfully verified
+            // Remove from unverified list to prevent double registration
+            unverified.delete(req.params.token);
+            // Redirect to the application's homepage (static files root)
+            res.status(308).redirect('/');
+        
+            /*// if tripId is provided, add user to trip
             if (verified?.trips) {
                 // use createFromHexString ( https://github.com/dotansimha/graphql-code-generator/issues/6830#issuecomment-2105266455 )
                 // TODO: might need to handle this failing?  Would need to check .acknowledged boolean
                 await tripCollection.updateOne({ _id: ObjectId.createFromHexString(tripId) }, { $push: { memberIds: insertionResult.insertedId } });
             }*/
+        }
     } catch (err) {
         console.error("Error registering user:", err);
         res.status(401).json({ error: "Failed to register user" });
-        next();
     }
+
+    // We get here if verification wasn't sucessful
+    res.status(401).json({ error: "Invalid registration token" });
 });
 
 // Verify that the Content-Type header is set the JSON (otherwise the json,
