@@ -67,8 +67,22 @@ app.get("/api/verify/:token", async (req, res) => {
             // If we get here, we're successfully verified
             // Remove from unverified list to prevent double registration
             unverified.delete(req.params.token);
+            /*
             // Redirect to the application's homepage (static files root)
             res.status(308).redirect('/');
+            */
+            // Show some basic HTML that redirects to homepage after 5 seconds
+            res.status(200).send(`
+                <html>
+                <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <meta http-equiv="refresh" content="5;url=/" />
+                </head>
+                <body>
+                <h3>Verification successful. Please return to your app or main website. Redirecting in 5 seconds.</h3>
+                </body>
+                </html>
+            `);
             return; // Ensure no further code executes
         
             /*// if tripId is provided, add user to trip
