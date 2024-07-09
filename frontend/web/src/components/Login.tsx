@@ -4,10 +4,15 @@ import { Box, Button } from "@mui/material";
 
 import EmailInput from "./inputs/EmailInput";
 import PasswordInput from "./inputs/PasswordInput";
-import { HandleValidLoginContext } from "./Navbar";
+import { LoginContext } from "../App";
+import { useNavigate } from "react-router-dom";
 
 // TODO: make pressing enter in a field click submit button
 export default function Login() {
+    const navigate = useNavigate();
+
+    const { setIsLoggedIn } = useContext(LoginContext);
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -15,8 +20,6 @@ export default function Login() {
     useEffect(() => {
         setHasValidLogin(![email, password].some((value) => value === ""));
     }, [email, password]);
-
-    const handleValidLogin = useContext(HandleValidLoginContext);
 
     const attemptLogin = () => {
         if (!hasValidLogin) {
@@ -26,7 +29,8 @@ export default function Login() {
         console.log(email, password);
         // TODO: impl
 
-        handleValidLogin();
+        setIsLoggedIn(true);
+        navigate("/trips");
     };
 
     return (
