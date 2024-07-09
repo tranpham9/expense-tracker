@@ -42,7 +42,7 @@ class LoginUser {
     final Dio dio = new Dio();
 
     try {
-      var response = await dio.post('${Config.localApiURL}/login',
+      var response = await dio.post('${Config.remoteApiURL}/login',
           data: jsonEncode(
               <String, String>{'email': email, 'password': password}));
       print("${response.statusCode} and ${response.data}");
