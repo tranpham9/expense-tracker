@@ -8,39 +8,34 @@ import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import { blue } from "@mui/material/colors";
 
-const developers = [
+type Developer = { name: string; role: string };
+
+const developers: Developer[] = [
     {
-        avatar: <Avatar sx={{ bgcolor: blue }}>J</Avatar>,
         name: "Jacob Gadberyy",
         role: "Project Manager + Frontend (Mobile)",
     },
     {
-        avatar: <Avatar sx={{ bgcolor: blue }}>J</Avatar>,
         name: "Jason Helman",
         role: "Frontend (Web) + some API",
     },
     {
-        avatar: <Avatar sx={{ bgcolor: blue }}>I</Avatar>,
         name: "Ian Orodonez",
         role: "Frontend (Mobile)",
     },
     {
-        avatar: <Avatar sx={{ bgcolor: blue }}>T</Avatar>,
         name: "Tran Pham",
         role: "Frontend (Web)",
     },
     {
-        avatar: <Avatar sx={{ bgcolor: blue }}>J</Avatar>,
         name: "Pablo Rodriguez",
         role: "API",
     },
     {
-        avatar: <Avatar sx={{ bgcolor: blue }}>J</Avatar>,
         name: "John Tran",
         role: "API",
     },
     {
-        avatar: <Avatar sx={{ bgcolor: blue }}>J</Avatar>,
         name: "Landon Wright",
         role: "Database",
     },
@@ -118,7 +113,15 @@ export default function AboutUs() {
                                 }}
                             >
                                 <CardHeader
-                                    avatar={testimonial.avatar}
+                                    avatar={
+                                        <Avatar sx={{ bgcolor: blue }}>
+                                            {testimonial.name.split(" ").reduce(
+                                                // [wrap]
+                                                (res, word) => res + word.substring(0, 1),
+                                                ""
+                                            )}
+                                        </Avatar>
+                                    }
                                     title={testimonial.name}
                                     subheader={testimonial.role}
                                 />
