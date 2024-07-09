@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:password_strength_checker/password_strength_checker.dart';
 
+import '../../api/register_user.dart';
+
 // Main register widget
 class RegisterPage extends StatefulWidget {
   @override
@@ -23,6 +25,10 @@ class _RegisterPage extends State<RegisterPage> {
   // Give the user a detailed description of what went wrong
   String? _passwordError;
   String? _emailError;
+
+  void registerUser(String name, String email, String password) async {
+    RegisterUser.register(name, email, password);
+  }
 
   // Set the main layout of the login page
   @override
@@ -129,19 +135,19 @@ class _RegisterPage extends State<RegisterPage> {
                       return;
                     }
                     // Password too weak
-                    if (passNotifier.value == PasswordStrength.weak) {
-                      print("password not strong enough");
-                      setState(() {
-                        _passwordError = "Password Not Secure Enough";
-                      });
-                      return;
-                    } else {
-                      setState(() {
-                        _passwordError = null;
-                      });
-                    }
+                    // if (passNotifier.value == PasswordStrength.weak) {
+                    //   print("password not strong enough");
+                    //   setState(() {
+                    //     _passwordError = "Password Not Secure Enough";
+                    //   });
+                    //   return;
+                    // } else {
+                    //   setState(() {
+                    //     _passwordError = null;
+                    //   });
+                    // }
                     // TODO: Call the API to register the user
-
+                    registerUser(name.text, email.text, password.text);
                     // Look for verification email
                   },
                 ),
