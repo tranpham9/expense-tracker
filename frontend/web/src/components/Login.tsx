@@ -6,10 +6,15 @@ import EmailInput from "./inputs/EmailInput";
 import PasswordInput from "./inputs/PasswordInput";
 import { LoginContext } from "../App";
 import { useNavigate } from "react-router-dom";
+import { AccountOverlayContext } from "./Navbar";
+import { request } from "../utility/api/API";
+import { saveJWT } from "../utility/JWT";
 
 // TODO: make pressing enter in a field click submit button
 export default function Login() {
     const navigate = useNavigate();
+
+    const { setIsAccountOverlayVisible } = useContext(AccountOverlayContext);
 
     const { setIsLoggedIn } = useContext(LoginContext);
 
@@ -27,10 +32,23 @@ export default function Login() {
         }
 
         console.log(email, password);
-        // TODO: impl
 
-        setIsLoggedIn(true);
-        navigate("/trips");
+        request(
+            "login",
+            { email, password },
+            (response) => {
+                console.log(response.jwt);
+                saveJWT(response.jwt);
+
+                setIsLoggedIn(true);
+                setIsAccountOverlayVisible(false);
+
+                navigate("/trips");
+            },
+            (errorMessage) => {
+                console.log(errorMessage);
+            }
+        );
     };
 
     return (

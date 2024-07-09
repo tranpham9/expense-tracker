@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, type MouseEvent } from "react";
+import { createContext, useContext, useState, type MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 import AppBar from "@mui/material/AppBar";
@@ -17,6 +17,11 @@ import AdbIcon from "@mui/icons-material/Adb";
 import AccountOverlay from "./AccountOverlay";
 import { LoginContext } from "../App";
 
+export const AccountOverlayContext = createContext<{ isAccountOverlayVisible: boolean; setIsAccountOverlayVisible: (isAccountOverlayVisible: boolean) => void }>({
+    isAccountOverlayVisible: false,
+    setIsAccountOverlayVisible: () => {},
+});
+
 type Page = {
     name: string;
     customPath?: string;
@@ -33,6 +38,9 @@ export default function Navbar() {
 
     const { isLoggedIn, setIsLoggedIn } = useContext(LoginContext);
 
+    const [isAccountOverlayVisible, setIsAccountOverlayVisible] = useState(false);
+
+    /*
     const [shouldShowAccountOverlay, setShouldShowAccountOverlay] = useState(false);
 
     useEffect(() => {
@@ -41,6 +49,7 @@ export default function Navbar() {
         }
         // navigate("/trips");
     }, [isLoggedIn]); // do not want to depend on navigate (otherwise this reruns whenever page changes)
+    */
 
     const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
@@ -262,7 +271,7 @@ export default function Navbar() {
                         ) : (
                             <Button
                                 variant="contained"
-                                onClick={() => setShouldShowAccountOverlay(true)}
+                                onClick={() => setIsAccountOverlayVisible(true)}
                                 sx={{ mx: 0.5, my: 2, display: "block" }}
                             >
                                 Login/Signup
@@ -271,10 +280,9 @@ export default function Navbar() {
                     </Toolbar>
                 </Container>
             </AppBar>
-            <AccountOverlay
-                shouldShow={shouldShowAccountOverlay}
-                setShouldShow={setShouldShowAccountOverlay}
-            />
+            <AccountOverlayContext.Provider value={{ isAccountOverlayVisible, setIsAccountOverlayVisible }}>
+                <AccountOverlay />
+            </AccountOverlayContext.Provider>
         </>
     );
 }
