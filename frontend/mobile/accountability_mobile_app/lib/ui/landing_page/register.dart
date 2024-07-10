@@ -25,9 +25,45 @@ class _RegisterPage extends State<RegisterPage> {
   // Give the user a detailed description of what went wrong
   String? _passwordError;
   String? _emailError;
+  // Show a pop up overlay after a successfulregister
+  OverlayEntry? _overlayEntry;
 
   Future<int?> registerUser(String name, String email, String password) async {
     return RegisterUser.register(name, email, password);
+  }
+
+  // Show a given pop up overlay
+  void _showOverlay(String message) {
+    _overlayEntry = _createOverlayEntry(message);
+    Overlay.of(context)!.insert(_overlayEntry!);
+    Future.delayed(const Duration(seconds: 5), () {
+      _overlayEntry?.remove();
+    });
+  }
+
+  OverlayEntry _createOverlayEntry(String message) {
+    return OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).size.height * 0.4,
+        left: MediaQuery.of(context).size.width * 0.1,
+        width: MediaQuery.of(context).size.width * 0.8,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.8),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              message,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   // Set the main layout of the login page
@@ -150,7 +186,8 @@ class _RegisterPage extends State<RegisterPage> {
                     //Call the register API
                     Future<int?> res =
                         registerUser(name.text, email.text, password.text);
-
+                    // TODO: Future<int?> doesn't actually return an int. need to fix to do an actual comparison
+                    // Failed to register
                     if (res != 200) {
                       // Let the user know what went wrong
                       setState(() {
@@ -164,11 +201,9 @@ class _RegisterPage extends State<RegisterPage> {
                       confirmPassword.text = '';
                       return;
                     }
-                    // Add Overlay to let the user know to check their email to verify
-                    // TODO: Add success overlay
-
-                    return;
-                    // Look for verification email
+                    // Let the user know that the verification email was sent
+                    _showOverlay(
+                        "Registration Was Successful! Check Your Email to Verify Your Account.");
                   },
                 ),
               ),
