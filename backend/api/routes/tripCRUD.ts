@@ -199,3 +199,77 @@ router.post('/deleteTrip', async(req, res, next) => {
     
     next();
 });
+
+/*
+ * List all the trips a user is as a member of (as non-owner only).
+ */
+router.post('/getTripsForUser', async(req, res, next) => {
+
+    // userId is required
+    if(!req.body.userId) {
+        res.statusCode = 400;
+        res.json({error: 'userId required'});
+        return;
+    }
+    const userId = ObjectId.createFromHexString(req.body.userId);
+
+    const client = await getMongoClient();
+    try {
+        const db = client.db(DB_NAME);
+        const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
+        const userCol: Collection<User> = db.collection(USER_COLLECTION_NAME);
+
+        // verify that user exists
+        if(await userCol.findOne({_id: userId}) === null) {
+            res.statusCode = 400;
+            res.json({error: 'user does not exist'});
+            return;
+        }
+
+        // Return a list that this of trip ids (only include id + trip name)
+        res.json(
+            await tripCol.find({memberIds: userId}).project({name: 1, notes: 1}).toArray()
+        );
+    } finally {
+       await client.close();
+    }
+    
+    next();
+});
+
+/*
+ * List all the trips that belong to a user. (As Owner/Leader)
+ */
+router.post('/getTripsOwnedByUser', async(req, res, next) => {
+
+    // userId is required
+    if(!req.body.userId) {
+        res.statusCode = 400;
+        res.json({error: 'userId required'});
+        return;
+    }
+    const userId = ObjectId.createFromHexString(req.body.userId);
+
+    const client = await getMongoClient();
+    try {
+        const db = client.db(DB_NAME);
+        const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
+        const userCol: Collection<User> = db.collection(USER_COLLECTION_NAME);
+
+        // verify that user exists
+        if(await userCol.findOne({_id: userId}) === null) {
+            res.statusCode = 400;
+            res.json({error: 'user does not exist'});
+            return;
+        }
+
+        // Return a list that this of trip ids (only include id + trip name + notes)
+        res.json(
+            await tripCol.find({leaderId: userId}).project({name: 1, notes: 1}).toArray()
+        );
+    } finally {
+       await client.close();
+    }
+    
+    next();
+});

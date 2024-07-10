@@ -1,4 +1,4 @@
-import { createContext, useState, type MouseEvent } from "react";
+import { createContext, useContext, useState, type MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 import AppBar from "@mui/material/AppBar";
@@ -15,8 +15,12 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import AccountOverlay from "./AccountOverlay";
+import { LoginContext } from "../App";
 
-export const HandleValidLoginContext = createContext(() => {});
+export const AccountOverlayContext = createContext<{ isAccountOverlayVisible: boolean; setIsAccountOverlayVisible: (isAccountOverlayVisible: boolean) => void }>({
+    isAccountOverlayVisible: false,
+    setIsAccountOverlayVisible: () => {},
+});
 
 type Page = {
     name: string;
@@ -29,8 +33,23 @@ type Option = {
     action: () => void;
 };
 
-export default function Navbar({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: boolean; setIsLoggedIn: (newValue: boolean) => void }) {
+export default function Navbar() {
     const navigate = useNavigate();
+
+    const { isLoggedIn, setIsLoggedIn } = useContext(LoginContext);
+
+    const [isAccountOverlayVisible, setIsAccountOverlayVisible] = useState(false);
+
+    /*
+    const [shouldShowAccountOverlay, setShouldShowAccountOverlay] = useState(false);
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            setShouldShowAccountOverlay(false);
+        }
+        // navigate("/trips");
+    }, [isLoggedIn]); // do not want to depend on navigate (otherwise this reruns whenever page changes)
+    */
 
     const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
@@ -91,17 +110,8 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: bool
         },
     ];
 
-    const [shouldShowAccountOverlay, setShouldShowAccountOverlay] = useState(false);
-
     return (
-        <HandleValidLoginContext.Provider
-            value={() => {
-                setIsLoggedIn(true);
-                setShouldShowAccountOverlay(false);
-                // TODO: do this the proper way with react router
-                navigate("/trips");
-            }}
-        >
+        <>
             <AppBar position="static">
                 <Container maxWidth="xl">
                     <Toolbar disableGutters>
@@ -261,7 +271,7 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: bool
                         ) : (
                             <Button
                                 variant="contained"
-                                onClick={() => setShouldShowAccountOverlay(true)}
+                                onClick={() => setIsAccountOverlayVisible(true)}
                                 sx={{ mx: 0.5, my: 2, display: "block" }}
                             >
                                 Login/Signup
@@ -270,10 +280,9 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }: { isLoggedIn: bool
                     </Toolbar>
                 </Container>
             </AppBar>
-            <AccountOverlay
-                shouldShow={shouldShowAccountOverlay}
-                setShouldShow={setShouldShowAccountOverlay}
-            />
-        </HandleValidLoginContext.Provider>
+            <AccountOverlayContext.Provider value={{ isAccountOverlayVisible, setIsAccountOverlayVisible }}>
+                <AccountOverlay />
+            </AccountOverlayContext.Provider>
+        </>
     );
 }

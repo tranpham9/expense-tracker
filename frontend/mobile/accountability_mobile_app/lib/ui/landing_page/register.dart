@@ -26,8 +26,8 @@ class _RegisterPage extends State<RegisterPage> {
   String? _passwordError;
   String? _emailError;
 
-  void registerUser(String name, String email, String password) async {
-    RegisterUser.register(name, email, password);
+  Future<int?> registerUser(String name, String email, String password) async {
+    return RegisterUser.register(name, email, password);
   }
 
   // Set the main layout of the login page
@@ -125,7 +125,6 @@ class _RegisterPage extends State<RegisterPage> {
                       setState(() {
                         _passwordError = "Passwords Must Match";
                       });
-                      return;
                     }
                     // TODO: This doesn't detect empty entries for some reason
                     if (password.text.isEmpty || confirmPassword.text.isEmpty) {
@@ -146,8 +145,29 @@ class _RegisterPage extends State<RegisterPage> {
                     //     _passwordError = null;
                     //   });
                     // }
+
                     // TODO: Call the API to register the user
-                    registerUser(name.text, email.text, password.text);
+                    //Call the register API
+                    Future<int?> res =
+                        registerUser(name.text, email.text, password.text);
+
+                    if (res != 200) {
+                      // Let the user know what went wrong
+                      setState(() {
+                        _passwordError = "Error Registering Your Account";
+                        _emailError = "Error Registering Your Account";
+                      });
+
+                      name.text = '';
+                      email.text = '';
+                      password.text = '';
+                      confirmPassword.text = '';
+                      return;
+                    }
+                    // Add Overlay to let the user know to check their email to verify
+                    // TODO: Add success overlay
+
+                    return;
                     // Look for verification email
                   },
                 ),

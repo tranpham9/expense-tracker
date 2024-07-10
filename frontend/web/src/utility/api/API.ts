@@ -1,11 +1,11 @@
 import { Payloads } from "./types/Payloads";
 import { Responses } from "./types/Responses";
 
-const basePath = "https://accountability-190955e8b06f.herokuapp.com/api";
+const BASE_API_PATH = "https://accountability-190955e8b06f.herokuapp.com/api";
 
 export async function request<T extends keyof Payloads>(type: T, payload: Payloads[T], success: (response: Responses[T]) => void, fail: (errorMessage: string) => void) {
     try {
-        const response = await fetch(`${basePath}/${type}`, {
+        const response = await fetch(`${BASE_API_PATH}/${type}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),

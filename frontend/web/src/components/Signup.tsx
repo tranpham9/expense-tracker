@@ -5,6 +5,7 @@ import { Box, Button } from "@mui/material";
 import NameInput from "./inputs/NameInput";
 import EmailInput from "./inputs/EmailInput";
 import PasswordInput from "./inputs/PasswordInput";
+import { request } from "../utility/api/API";
 
 // TODO: make pressing enter in a field click submit button
 export default function Signup() {
@@ -23,7 +24,18 @@ export default function Signup() {
         }
 
         console.log(name, email, password);
-        // TODO: impl
+
+        request(
+            "registerUser",
+            { name, email, password },
+            (response) => {
+                console.log(response.message);
+                // TODO: move to signin tab
+            },
+            (errorMessage) => {
+                console.log(errorMessage);
+            }
+        );
     };
 
     return (

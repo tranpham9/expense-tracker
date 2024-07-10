@@ -8,12 +8,12 @@ export default function Welcome() {
     return (
         <Box
             id="hero"
-            sx={(theme) => ({
+            sx={{
                 width: "100%",
-                backgroundImage: theme.palette.mode === "light" ? "linear-gradient(180deg, #CEE5FD, #FFF)" : `linear-gradient(#02294F, ${alpha("#090E10", 0.0)})`,
+                // backgroundImage: theme.palette.mode === "light" ? "linear-gradient(180deg, #CEE5FD, #FFF)" : `linear-gradient(#02294F, ${alpha("#090E10", 0.0)})`,
                 backgroundSize: "100% 20%",
                 backgroundRepeat: "no-repeat",
-            })}
+            }}
         >
             <Container
                 sx={{
@@ -45,7 +45,7 @@ export default function Welcome() {
                             variant="h1"
                             sx={{
                                 fontSize: "clamp(3rem, 10vw, 4rem)",
-                                color: (theme) => (theme.palette.mode === "light" ? "primary.main" : "primary.light"),
+                                color: "primary.main",
                             }}
                         >
                             Accountability

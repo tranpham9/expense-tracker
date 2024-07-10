@@ -5,11 +5,14 @@ import Navbar from "./components/Navbar";
 import Trips from "./pages/Trips";
 
 import "./App.css";
-import { useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+
+// https://stackoverflow.com/questions/68799234/typescript-pick-only-specific-method-from-overload-to-be-passed-to-parameterst
+// type a = ReturnType<typeof useState<boolean>>;
+export const LoginContext = createContext<{ isLoggedIn: boolean; setIsLoggedIn: (isLoggedIn: boolean) => void }>({ isLoggedIn: false, setIsLoggedIn: () => {} });
 
 // TODO: once logging in and JWT is set up, need to handle redirecting from trips to home if not logged in/authenticated
 export default function App() {
-    // TODO: this should default to false once logging in is set up
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
@@ -18,20 +21,19 @@ export default function App() {
 
     return (
         <BrowserRouter>
-            <Navbar
-                isLoggedIn={isLoggedIn}
-                setIsLoggedIn={setIsLoggedIn}
-            />
-            <Routes>
-                <Route
-                    path={"/home?"}
-                    element={<Home />}
-                />
-                <Route
-                    path={"/trips"}
-                    element={<Trips isLoggedIn={isLoggedIn} />}
-                />
-            </Routes>
+            <LoginContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
+                <Navbar />
+                <Routes>
+                    <Route
+                        path={"/home?"}
+                        element={<Home />}
+                    />
+                    <Route
+                        path={"/trips"}
+                        element={<Trips />}
+                    />
+                </Routes>
+            </LoginContext.Provider>
         </BrowserRouter>
     );
 }

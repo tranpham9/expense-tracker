@@ -64,11 +64,26 @@ app.get("/api/verify/:token", async (req, res) => {
                 res.status(401).json({ error: "Failed to register user" });
                 return;
             }
-            // If we get here, we're sucessfully verified
+            // If we get here, we're successfully verified
             // Remove from unverified list to prevent double registration
             unverified.delete(req.params.token);
+            /*
             // Redirect to the application's homepage (static files root)
             res.status(308).redirect('/');
+            */
+            // Show some basic HTML that redirects to homepage after 5 seconds
+            res.status(200).send(`
+                <html>
+                <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <meta http-equiv="refresh" content="5;url=/" />
+                </head>
+                <body>
+                <h3>Verification successful. Please return to your app or main website. Redirecting in 5 seconds.</h3>
+                </body>
+                </html>
+            `);
+            return; // Ensure no further code executes
         
             /*// if tripId is provided, add user to trip
             if (verified?.trips) {
@@ -79,18 +94,24 @@ app.get("/api/verify/:token", async (req, res) => {
         }
     } catch (err) {
         console.error("Error registering user:", err);
-        res.status(401).json({ error: "Failed to register user" });
+        if (!res.headersSent) {
+            res.status(401).json({ error: "Failed to register user" });
+        }
+        return;
     }
 
-    // We get here if verification wasn't sucessful
-    res.status(401).json({ error: "Invalid registration token" });
+    // We get here if verification wasn't successful
+    if (!res.headersSent) {
+        res.status(401).json({ error: "Invalid registration token" });
+    }
 });
 
+/* Disabled for now
 // Verify that the Content-Type header is set the JSON (otherwise the json,
 // middleware won't parse the body). Could help the frontend guys to diagnose
 // errors.
 app.use("/api/", (req, res, next) => {
-    if (req.headers["content-type"] != "application/json") {
+    if (req.headers["content-type"].includes("application/json")) {
         // dirty check, could be improved
         res.statusCode = 400; // 400 Bad Request
         res.json({});
@@ -98,49 +119,46 @@ app.use("/api/", (req, res, next) => {
     }
     next();
 });
+*/
 
 // register
 app.post("/api/registerUser", async (req, res, next) => {
     const db = client.db(DB_NAME);
     const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
-    const tripCollection: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
-
-    // incoming: name, email, password, tripId? (invitation)
-
+    //remove name field so user can signup without a name
     const { name, email, password, tripId } = req.body;
     if (!name || !email || !password) {
-        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400
         res.status(400).json({ error: "Malformed Request" });
         return;
     }
-    if (!email.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
+    /*if (!email.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
             res.status(406).json("Must be a valid email");
             return;
-    }
+    }*/
    
     // TODO: need to validate email is in valid form and that nothing is too long
     // TODO: ensure trips should also include non-owning trips (i.e. ones where the user is a part of but not the creater/owner of)
     const newUser: User = {
         name: name.toString(),
-        email: (email.toString() as string).trim().toLocaleLowerCase(), // trimmed and converted to lowercase in order to properly detect whether email already exists
+        email: (email.toString() as string).trim().toLocaleLowerCase(),
         password: password.toString(),
-        trips: [tripId && ObjectId.createFromHexString(tripId.toString())],
+        trips: tripId ? [ObjectId.createFromHexString(tripId.toString())] : [],
     };
+    
     // ensure email doesn't already exist
     const check = await userCollection.findOne({ email: email});
     // console.log(check);
     if (check) {
         console.error("Attempted to register a user with an existing email");
-        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
         res.status(401).json({ error: "Failed to register user" });
         return;
     }
 
     // method that sends an email with the token
-    createEmail(newUser);
-    res.end();
+    await createEmail(newUser);
 
     // console.log("A user was registered successfully");
+    res.status(200);
 });
 
 app.post("/api/login", async (req, res, next) => {
@@ -166,7 +184,7 @@ app.post("/api/login", async (req, res, next) => {
             id: foundUser._id,
             name: foundUser.name,
             email: foundUser.email,
-            ret,
+            token: ret,
         });
     } else {
         res.status(401).json({ error: "Invalid login credentials" });

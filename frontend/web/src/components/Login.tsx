@@ -4,10 +4,20 @@ import { Box, Button } from "@mui/material";
 
 import EmailInput from "./inputs/EmailInput";
 import PasswordInput from "./inputs/PasswordInput";
-import { HandleValidLoginContext } from "./Navbar";
+import { LoginContext } from "../App";
+import { useNavigate } from "react-router-dom";
+import { AccountOverlayContext } from "./Navbar";
+import { request } from "../utility/api/API";
+import { saveJWT } from "../utility/JWT";
 
 // TODO: make pressing enter in a field click submit button
 export default function Login() {
+    const navigate = useNavigate();
+
+    const { setIsAccountOverlayVisible } = useContext(AccountOverlayContext);
+
+    const { setIsLoggedIn } = useContext(LoginContext);
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -16,17 +26,29 @@ export default function Login() {
         setHasValidLogin(![email, password].some((value) => value === ""));
     }, [email, password]);
 
-    const handleValidLogin = useContext(HandleValidLoginContext);
-
     const attemptLogin = () => {
         if (!hasValidLogin) {
             return;
         }
 
         console.log(email, password);
-        // TODO: impl
 
-        handleValidLogin();
+        request(
+            "login",
+            { email, password },
+            (response) => {
+                console.log(response.jwt);
+                saveJWT(response.jwt);
+
+                setIsLoggedIn(true);
+                setIsAccountOverlayVisible(false);
+
+                navigate("/trips");
+            },
+            (errorMessage) => {
+                console.log(errorMessage);
+            }
+        );
     };
 
     return (
