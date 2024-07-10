@@ -4,10 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import '../../api/login_user.dart';
-import '../../main.dart';
 import '../../models/User.dart';
 import '../home_page/homepage.dart';
 import './register.dart';
+import './forgot_password.dart';
 
 // Main login widget
 class LoginPage extends StatefulWidget {
@@ -25,6 +25,16 @@ class _LoginPage extends State<LoginPage> {
   // Call the API endpoint to log the user in
   Future<User?> loginUser(String email, String password) async {
     return await LoginUser.login(email, password);
+  }
+
+  // Show forgot password dialog
+  void _showForgotPasswordDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ForgotPasswordDialog();
+      },
+    );
   }
 
   // Set the main layout of the login page
@@ -122,12 +132,7 @@ class _LoginPage extends State<LoginPage> {
                   decorationThickness: 1.5,
                 ),
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
-                );
-              },
+              onPressed: () => _showForgotPasswordDialog(context),
             ),
             // Give a new user ability to register
             Row(
