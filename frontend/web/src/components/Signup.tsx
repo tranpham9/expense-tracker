@@ -70,7 +70,15 @@ export default function Signup({ onSuccessfulSignup = () => {} }) {
                 onEnterKey={attemptSignup}
             />
             <br />
-            {errorMessage && <Typography variant="body1" mt={1} color="error.main">{errorMessage}</Typography>}
+            {errorMessage && (
+                <Typography
+                    variant="body1"
+                    mt={1}
+                    color="error.main"
+                >
+                    {errorMessage}
+                </Typography>
+            )}
             <Button
                 variant="contained"
                 disabled={!hasValidSignup || isProcessing}
