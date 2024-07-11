@@ -1,5 +1,5 @@
 import { alpha, createTheme } from "@mui/material";
-import { blue, common, grey, orange } from "@mui/material/colors";
+import { blue, common, grey, orange, red } from "@mui/material/colors";
 
 const baseTheme = createTheme({
     palette: {
@@ -16,6 +16,11 @@ const baseTheme = createTheme({
         text: {
             primary: common["white"],
             secondary: grey[400],
+        },
+        error: {
+            // This is the default error color for MUI (I added it to the palette so that it can be easily accessed/used in normal text as well)
+            // main: "#f44336"
+            main: red[500],
         },
     },
 });
