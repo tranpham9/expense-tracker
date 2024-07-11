@@ -62,7 +62,7 @@ export default function Trips() {
                     >
                         <Grid
                             container
-                            m={2}
+                            p={2}
                             spacing={2}
                         >
                             <Grid
