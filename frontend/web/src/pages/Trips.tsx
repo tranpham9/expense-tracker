@@ -1,6 +1,8 @@
 import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { LoginContext } from "../Contexts/Account";
+import SearchBar from "../components/inputs/SearchBar";
+import { Box } from "@mui/material";
 
 export default function Trips() {
     const navigate = useNavigate();
@@ -17,7 +19,16 @@ export default function Trips() {
 
     return (
         <>
-            <p>This is the trips page.</p>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    mt: 2,
+                }}
+            >
+                <SearchBar />
+            </Box>
         </>
     );
 }
