@@ -24,14 +24,14 @@ export default function Trips() {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    my: 2,
+                    mt: 2,
                 }}
             >
                 <SearchBar />
             </Box>
             <Stack sx={{ textAlign: "center" }}>
                 {[...Array(10).keys()].map((i) => (
-                    <Paper key={i} sx={{ m: 2, display: "flex", justifyContent: "center", alignItems: "center" }}>
+                    <Paper key={i} sx={{ m: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
                         <Grid
                             container
                             m={2}
