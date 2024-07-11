@@ -6,6 +6,7 @@ export type LoginResponse = {
     id: string;
     name: string;
     email: string;
+    // FIXME: this is currently the wrong type for the jwt; for whatever reason, the api is sending it in a nested object...
     jwt: string;
 };
 

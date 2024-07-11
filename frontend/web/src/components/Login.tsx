@@ -37,7 +37,7 @@ export default function Login() {
             "login",
             { email, password },
             (response) => {
-                console.log(response.jwt);
+                console.log(response);
                 saveJWT(response.jwt);
 
                 setIsLoggedIn(true);
