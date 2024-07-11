@@ -29,6 +29,7 @@ type Option = {
     action: () => void;
 };
 
+// TODO: make all navbar buttons (when in the widest layout) the same width
 export default function Navbar() {
     const navigate = useNavigate();
 

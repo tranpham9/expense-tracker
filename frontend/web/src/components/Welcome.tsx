@@ -24,7 +24,7 @@ export default function Welcome() {
                     Accountability
                 </Box>
             </Typography>
-            <Box m={2} />
+            <br />
             <Typography
                 align="center"
                 color={"text.secondary"}

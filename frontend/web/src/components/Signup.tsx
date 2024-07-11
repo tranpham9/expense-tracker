@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 
-import { Box, Button } from "@mui/material";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
 
 import NameInput from "./inputs/NameInput";
 import EmailInput from "./inputs/EmailInput";
 import PasswordInput from "./inputs/PasswordInput";
 import { request } from "../utility/api/API";
 
-// TODO: make pressing enter in a field click submit button
-export default function Signup() {
+export default function Signup({ onSuccessfulSignup = () => {} }) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -18,6 +17,8 @@ export default function Signup() {
         setHasValidSignup(![name, email, password].some((value) => value === ""));
     }, [name, email, password]);
 
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
     const attemptSignup = () => {
         if (!hasValidSignup) {
             return;
@@ -25,15 +26,24 @@ export default function Signup() {
 
         console.log(name, email, password);
 
+        setIsProcessing(true);
+
         request(
             "registerUser",
             { name, email, password },
             (response) => {
                 console.log(response.message);
-                // TODO: move to signin tab
+                setIsProcessing(false);
+
+                onSuccessfulSignup();
             },
             (errorMessage) => {
                 console.log(errorMessage);
+                setIsProcessing(false);
+
+                // FIXME: the api needs to give a bit better of an error than just "ERROR"
+                // setErrorMessage(errorMessage);
+                setErrorMessage("Unable to Create Account");
             }
         );
     };
@@ -60,13 +70,14 @@ export default function Signup() {
                 onEnterKey={attemptSignup}
             />
             <br />
+            {errorMessage && <Typography variant="body1" mt={1} color="error.main">{errorMessage}</Typography>}
             <Button
                 variant="contained"
-                disabled={!hasValidSignup}
+                disabled={!hasValidSignup || isProcessing}
                 sx={{ m: "10px" }}
                 onClick={attemptSignup}
             >
-                Submit
+                {isProcessing ? <CircularProgress size={24} /> : "Submit"}
             </Button>
         </Box>
     );

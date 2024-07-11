@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 
-import { Box, CssBaseline, Tab, Tabs } from "@mui/material";
+import { Box, Tab, Tabs } from "@mui/material";
 
 import Modal from "./Modal";
 import Signup from "./Signup";
@@ -21,11 +21,7 @@ export default function AccountOverlay() {
             setIsOpen={setIsAccountOverlayVisible}
         >
             <>
-            <CssBaseline/>
-                <Box
-                    width="100%"
-                    // bgcolor="background.default"
-                >
+                <Box width="100%">
                     <Tabs
                         value={activeTab}
                         onChange={handleTabChange}
@@ -35,7 +31,7 @@ export default function AccountOverlay() {
                         <Tab label="Signup" />
                     </Tabs>
                 </Box>
-                {activeTab ? <Signup /> : <Login />}
+                {activeTab ? <Signup onSuccessfulSignup={() => setActiveTab(0)} /> : <Login />}
             </>
         </Modal>
     );
