@@ -6,7 +6,6 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
-import { blue } from "@mui/material/colors";
 import { getInitials } from "../utility/Manipulation";
 import { Divider } from "@mui/material";
 
@@ -102,7 +101,7 @@ export default function AboutUs() {
                         >
                             <Box>
                                 <CardHeader
-                                    avatar={<Avatar sx={{ bgcolor: blue }}>{getInitials(developer.name)}</Avatar>}
+                                    avatar={<Avatar>{getInitials(developer.name)}</Avatar>}
                                     title={developer.name}
                                     subheader={developer.role}
                                 />

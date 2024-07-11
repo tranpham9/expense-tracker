@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 
-import { Box, Tab, Tabs } from "@mui/material";
+import { Box, CssBaseline, Tab, Tabs } from "@mui/material";
 
 import Modal from "./Modal";
 import Signup from "./Signup";
@@ -21,7 +21,11 @@ export default function AccountOverlay() {
             setIsOpen={setIsAccountOverlayVisible}
         >
             <>
-                <Box sx={{ width: "100%" }}>
+            <CssBaseline/>
+                <Box
+                    width="100%"
+                    // bgcolor="background.default"
+                >
                     <Tabs
                         value={activeTab}
                         onChange={handleTabChange}
