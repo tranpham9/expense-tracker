@@ -56,7 +56,7 @@ export default function Welcome() {
                         color="text.secondary"
                         sx={{ alignSelf: "center", width: { sm: "100%", md: "80%" } }}
                     >
-                        Track shared expenses with your friends.
+                        Track and calculate shared trip expenses with your friends.
                     </Typography>
                     <Stack
                         direction={{ xs: "column", sm: "row" }}
