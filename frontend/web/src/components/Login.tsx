@@ -6,7 +6,7 @@ import EmailInput from "./inputs/EmailInput";
 import PasswordInput from "./inputs/PasswordInput";
 import { useNavigate } from "react-router-dom";
 import { request } from "../utility/api/API";
-import { saveJWT } from "../utility/JWT";
+import { saveJWT } from "../utility/Persist";
 import { AccountContext, AccountOverlayContext, LoginContext } from "../Contexts/Account";
 
 // TODO: make pressing enter in a field click submit button
