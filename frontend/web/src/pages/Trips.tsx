@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { LoginContext } from "../App";
+import { LoginContext } from "../Contexts/Account";
 
 export default function Trips() {
     const navigate = useNavigate();

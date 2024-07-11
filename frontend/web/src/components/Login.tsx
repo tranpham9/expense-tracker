@@ -4,11 +4,10 @@ import { Box, Button } from "@mui/material";
 
 import EmailInput from "./inputs/EmailInput";
 import PasswordInput from "./inputs/PasswordInput";
-import { LoginContext } from "../App";
 import { useNavigate } from "react-router-dom";
-import { AccountOverlayContext } from "./Navbar";
 import { request } from "../utility/api/API";
 import { saveJWT } from "../utility/JWT";
+import { AccountOverlayContext, LoginContext } from "../Contexts/Account";
 
 // TODO: make pressing enter in a field click submit button
 export default function Login() {

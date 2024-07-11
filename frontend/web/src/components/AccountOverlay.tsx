@@ -5,7 +5,7 @@ import { Box, Tab, Tabs } from "@mui/material";
 import Modal from "./Modal";
 import Signup from "./Signup";
 import Login from "./Login";
-import { AccountOverlayContext } from "./Navbar";
+import { AccountOverlayContext } from "../Contexts/Account";
 
 export default function AccountOverlay() {
     const { isAccountOverlayVisible, setIsAccountOverlayVisible } = useContext(AccountOverlayContext);

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type MouseEvent } from "react";
+import { useContext, useState, type MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 import AppBar from "@mui/material/AppBar";
@@ -15,12 +15,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import AccountOverlay from "./AccountOverlay";
-import { LoginContext } from "../App";
-
-export const AccountOverlayContext = createContext<{ isAccountOverlayVisible: boolean; setIsAccountOverlayVisible: (isAccountOverlayVisible: boolean) => void }>({
-    isAccountOverlayVisible: false,
-    setIsAccountOverlayVisible: () => {},
-});
+import { AccountOverlayContext, LoginContext } from "../Contexts/Account";
 
 type Page = {
     name: string;
@@ -37,8 +32,7 @@ export default function Navbar() {
     const navigate = useNavigate();
 
     const { isLoggedIn, setIsLoggedIn } = useContext(LoginContext);
-
-    const [isAccountOverlayVisible, setIsAccountOverlayVisible] = useState(false);
+    const { setIsAccountOverlayVisible } = useContext(AccountOverlayContext);
 
     /*
     const [shouldShowAccountOverlay, setShouldShowAccountOverlay] = useState(false);
@@ -73,7 +67,7 @@ export default function Navbar() {
     };
 
     const navigateToPage = (page: Page) => {
-        console.log("navigating to", page);
+        console.log("navigating to", page.name);
         handleCloseNavMenu();
         navigate(`/${page.customPath ?? page.name.toLowerCase()}`);
     };
@@ -280,9 +274,7 @@ export default function Navbar() {
                     </Toolbar>
                 </Container>
             </AppBar>
-            <AccountOverlayContext.Provider value={{ isAccountOverlayVisible, setIsAccountOverlayVisible }}>
-                <AccountOverlay />
-            </AccountOverlayContext.Provider>
+            <AccountOverlay />
         </>
     );
 }
