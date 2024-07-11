@@ -7,6 +7,7 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import { blue } from "@mui/material/colors";
+import { getInitials } from "../utility/Manipulation";
 
 type Developer = { name: string; role: string };
 
@@ -113,15 +114,7 @@ export default function AboutUs() {
                                 }}
                             >
                                 <CardHeader
-                                    avatar={
-                                        <Avatar sx={{ bgcolor: blue }}>
-                                            {testimonial.name.split(" ").reduce(
-                                                // [wrap]
-                                                (res, word) => res + word.substring(0, 1),
-                                                ""
-                                            )}
-                                        </Avatar>
-                                    }
+                                    avatar={<Avatar sx={{ bgcolor: blue }}>{getInitials(testimonial.name)}</Avatar>}
                                     title={testimonial.name}
                                     subheader={testimonial.role}
                                 />

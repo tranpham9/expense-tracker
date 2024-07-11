@@ -1,8 +1,11 @@
-// FIXME: the API shouldn't return anything once email auth is set up
 type RegisterUserResponse = {
     message: string;
 };
-type LoginResponse = {
+export type LoginResponse = {
+    // FIXME: the server shouldn't really be sending id as its own field since it's part of the jwt (and the jwt probably shouldn't have name included within it)
+    id: string;
+    name: string;
+    email: string;
     jwt: string;
 };
 

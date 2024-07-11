@@ -5,9 +5,8 @@ import Navbar from "./components/Navbar";
 import Trips from "./pages/Trips";
 
 import "./App.css";
-import { AccountOverlayContextProvider, LoginContextProvider } from "./Contexts/Account";
+import { AccountContextProvider, AccountOverlayContextProvider, LoginContextProvider } from "./Contexts/Account";
 
-// TODO: once logging in and JWT is set up, need to handle redirecting from trips to home if not logged in/authenticated
 export default function App() {
     /*
     useEffect(() => {
@@ -18,19 +17,21 @@ export default function App() {
     return (
         <BrowserRouter>
             <LoginContextProvider>
-                <AccountOverlayContextProvider>
-                    <Navbar />
-                </AccountOverlayContextProvider>
-                <Routes>
-                    <Route
-                        path={"/home?"}
-                        element={<Home />}
-                    />
-                    <Route
-                        path={"/trips"}
-                        element={<Trips />}
-                    />
-                </Routes>
+                <AccountContextProvider>
+                    <AccountOverlayContextProvider>
+                        <Navbar />
+                    </AccountOverlayContextProvider>
+                    <Routes>
+                        <Route
+                            path={"/home?"}
+                            element={<Home />}
+                        />
+                        <Route
+                            path={"/trips"}
+                            element={<Trips />}
+                        />
+                    </Routes>
+                </AccountContextProvider>
             </LoginContextProvider>
         </BrowserRouter>
     );

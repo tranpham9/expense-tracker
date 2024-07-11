@@ -7,13 +7,14 @@ import PasswordInput from "./inputs/PasswordInput";
 import { useNavigate } from "react-router-dom";
 import { request } from "../utility/api/API";
 import { saveJWT } from "../utility/JWT";
-import { AccountOverlayContext, LoginContext } from "../Contexts/Account";
+import { AccountContext, AccountOverlayContext, LoginContext } from "../Contexts/Account";
 
 // TODO: make pressing enter in a field click submit button
 export default function Login() {
     const navigate = useNavigate();
 
     const { setIsAccountOverlayVisible } = useContext(AccountOverlayContext);
+    const { setAccount } = useContext(AccountContext);
 
     const { setIsLoggedIn } = useContext(LoginContext);
 
@@ -40,6 +41,7 @@ export default function Login() {
                 saveJWT(response.jwt);
 
                 setIsLoggedIn(true);
+                setAccount(response);
                 setIsAccountOverlayVisible(false);
 
                 navigate("/trips");

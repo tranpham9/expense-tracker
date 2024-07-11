@@ -15,7 +15,8 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import AccountOverlay from "./AccountOverlay";
-import { AccountOverlayContext, LoginContext } from "../Contexts/Account";
+import { AccountContext, AccountOverlayContext, LoginContext } from "../Contexts/Account";
+import { getInitials } from "../utility/Manipulation";
 
 type Page = {
     name: string;
@@ -33,6 +34,7 @@ export default function Navbar() {
 
     const { isLoggedIn, setIsLoggedIn } = useContext(LoginContext);
     const { setIsAccountOverlayVisible } = useContext(AccountOverlayContext);
+    const { account } = useContext(AccountContext);
 
     /*
     const [shouldShowAccountOverlay, setShouldShowAccountOverlay] = useState(false);
@@ -230,10 +232,7 @@ export default function Navbar() {
                                         onClick={handleOpenUserMenu}
                                         sx={{ p: 0 }}
                                     >
-                                        <Avatar
-                                            alt="Remy Sharp"
-                                            src="/static/images/avatar/2.jpg"
-                                        />
+                                        <Avatar alt="Account">{account && getInitials(account.name)}</Avatar>
                                     </IconButton>
                                 </Tooltip>
                                 <Menu
