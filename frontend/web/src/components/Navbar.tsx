@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type MouseEvent } from "react";
+import { useContext, useState, type MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 import AppBar from "@mui/material/AppBar";
@@ -15,12 +15,9 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import AccountOverlay from "./AccountOverlay";
-import { LoginContext } from "../App";
-
-export const AccountOverlayContext = createContext<{ isAccountOverlayVisible: boolean; setIsAccountOverlayVisible: (isAccountOverlayVisible: boolean) => void }>({
-    isAccountOverlayVisible: false,
-    setIsAccountOverlayVisible: () => {},
-});
+import { AccountContext, AccountOverlayContext, LoginContext } from "../Contexts/Account";
+import { getInitials } from "../utility/Manipulation";
+import { clearAccountInfo } from "../utility/Persist";
 
 type Page = {
     name: string;
@@ -33,12 +30,13 @@ type Option = {
     action: () => void;
 };
 
+// TODO: make all navbar buttons (when in the widest layout) the same width
 export default function Navbar() {
     const navigate = useNavigate();
 
     const { isLoggedIn, setIsLoggedIn } = useContext(LoginContext);
-
-    const [isAccountOverlayVisible, setIsAccountOverlayVisible] = useState(false);
+    const { setIsAccountOverlayVisible } = useContext(AccountOverlayContext);
+    const { account } = useContext(AccountContext);
 
     /*
     const [shouldShowAccountOverlay, setShouldShowAccountOverlay] = useState(false);
@@ -73,7 +71,7 @@ export default function Navbar() {
     };
 
     const navigateToPage = (page: Page) => {
-        console.log("navigating to", page);
+        console.log("navigating to", page.name);
         handleCloseNavMenu();
         navigate(`/${page.customPath ?? page.name.toLowerCase()}`);
     };
@@ -104,6 +102,7 @@ export default function Navbar() {
         {
             name: "Logout",
             action: () => {
+                clearAccountInfo();
                 setIsLoggedIn(false);
                 // navigate("/home"); // this is done automatically with a useEffect
             },
@@ -112,7 +111,10 @@ export default function Navbar() {
 
     return (
         <>
-            <AppBar position="static">
+            <AppBar
+                position="sticky"
+                elevation={10}
+            >
                 <Container maxWidth="xl">
                     <Toolbar disableGutters>
                         <AdbIcon
@@ -236,10 +238,7 @@ export default function Navbar() {
                                         onClick={handleOpenUserMenu}
                                         sx={{ p: 0 }}
                                     >
-                                        <Avatar
-                                            alt="Remy Sharp"
-                                            src="/static/images/avatar/2.jpg"
-                                        />
+                                        <Avatar alt="Account">{account && getInitials(account.name)}</Avatar>
                                     </IconButton>
                                 </Tooltip>
                                 <Menu
@@ -280,9 +279,7 @@ export default function Navbar() {
                     </Toolbar>
                 </Container>
             </AppBar>
-            <AccountOverlayContext.Provider value={{ isAccountOverlayVisible, setIsAccountOverlayVisible }}>
-                <AccountOverlay />
-            </AccountOverlayContext.Provider>
+            <AccountOverlay />
         </>
     );
 }

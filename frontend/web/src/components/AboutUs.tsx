@@ -6,38 +6,47 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
-import { blue } from "@mui/material/colors";
+import { getInitials } from "../utility/Manipulation";
+import { Divider } from "@mui/material";
 
-type Developer = { name: string; role: string };
+type Developer = { name: string; role: string; about: string[] };
 
+// TODO: add github link (and potentially linkedin) for everyone; maybe also make profile avatar link to it (either github or linkedin).
 const developers: Developer[] = [
     {
-        name: "Jacob Gadberyy",
+        name: "Jacob Gadberry",
         role: "Project Manager + Frontend (Mobile)",
+        about: ["sample item 1", "sample item 2"],
     },
     {
         name: "Jason Helman",
         role: "Frontend (Web) + some API",
+        about: ["sample item 1", "sample item 2"],
     },
     {
-        name: "Ian Orodonez",
+        name: "Ian Ordonez",
         role: "Frontend (Mobile)",
+        about: ["sample item 1", "sample item 2"],
     },
     {
         name: "Tran Pham",
         role: "Frontend (Web)",
+        about: ["sample item 1", "sample item 2"],
     },
     {
         name: "Pablo Rodriguez",
         role: "API",
+        about: ["sample item 1", "sample item 2"],
     },
     {
         name: "John Tran",
         role: "API",
+        about: ["sample item 1", "sample item 2"],
     },
     {
         name: "Landon Wright",
         role: "Database",
+        about: ["sample item 1", "sample item 2"],
     },
 ];
 
@@ -68,17 +77,12 @@ export default function AboutUs() {
                 >
                     About Us
                 </Typography>
-                {/* <Typography variant="body1" color="text.secondary">
-            See what our customers love about our products. Discover how we excel in
-            efficiency, durability, and satisfaction. Join us for quality, innovation,
-            and reliable support.
-        </Typography> */}
             </Box>
             <Grid
                 container
                 spacing={2}
             >
-                {developers.map((testimonial, index) => (
+                {developers.map((developer, index) => (
                     <Grid
                         item
                         xs={12}
@@ -88,6 +92,7 @@ export default function AboutUs() {
                         sx={{ display: "flex" }}
                     >
                         <Card
+                            elevation={5}
                             sx={{
                                 display: "flex",
                                 flexDirection: "column",
@@ -96,36 +101,32 @@ export default function AboutUs() {
                                 p: 1,
                             }}
                         >
+                            <Box>
+                                <CardHeader
+                                    avatar={<Avatar>{getInitials(developer.name)}</Avatar>}
+                                    title={developer.name}
+                                    subheader={developer.role}
+                                />
+                            </Box>
+                            <Divider />
                             <CardContent>
                                 <Typography
                                     variant="body2"
+                                    component="div"
                                     color="text.secondary"
                                 >
-                                    {testimonial.role + " Add Extra info if needed, else, delete div"}
+                                    <ul>
+                                        {developer.about.map((entry, i) => (
+                                            <li
+                                                key={i}
+                                                style={{ margin: 5 }}
+                                            >
+                                                {entry}
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </Typography>
                             </CardContent>
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    flexDirection: "row",
-                                    justifyContent: "space-between",
-                                    pr: 2,
-                                }}
-                            >
-                                <CardHeader
-                                    avatar={
-                                        <Avatar sx={{ bgcolor: blue }}>
-                                            {testimonial.name.split(" ").reduce(
-                                                // [wrap]
-                                                (res, word) => res + word.substring(0, 1),
-                                                ""
-                                            )}
-                                        </Avatar>
-                                    }
-                                    title={testimonial.name}
-                                    subheader={testimonial.role}
-                                />
-                            </Box>
                         </Card>
                     </Grid>
                 ))}

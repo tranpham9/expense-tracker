@@ -5,7 +5,7 @@ import { Box, Tab, Tabs } from "@mui/material";
 import Modal from "./Modal";
 import Signup from "./Signup";
 import Login from "./Login";
-import { AccountOverlayContext } from "./Navbar";
+import { AccountOverlayContext } from "../Contexts/Account";
 
 export default function AccountOverlay() {
     const { isAccountOverlayVisible, setIsAccountOverlayVisible } = useContext(AccountOverlayContext);
@@ -21,7 +21,7 @@ export default function AccountOverlay() {
             setIsOpen={setIsAccountOverlayVisible}
         >
             <>
-                <Box sx={{ width: "100%" }}>
+                <Box width="100%">
                     <Tabs
                         value={activeTab}
                         onChange={handleTabChange}
@@ -31,7 +31,7 @@ export default function AccountOverlay() {
                         <Tab label="Signup" />
                     </Tabs>
                 </Box>
-                {activeTab ? <Signup /> : <Login />}
+                {activeTab ? <Signup onSuccessfulSignup={() => setActiveTab(0)} /> : <Login />}
             </>
         </Modal>
     );
