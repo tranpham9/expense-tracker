@@ -1,8 +1,7 @@
-// import { alpha } from "@mui/material";
+import { alpha } from "@mui/material";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
-import ImageCarousel from "./ImageCarousel";
 
 export default function Welcome() {
     return (
@@ -33,7 +32,7 @@ export default function Welcome() {
                 Track and calculate shared trip expenses with your friends.
             </Typography>
             {/* FIXME: what is this supposed to be?  This image doesn't exist. */}
-            {/* <Box
+            <Box
                 id="image"
                 sx={(theme) => ({
                     mt: { xs: 8, sm: 10 },
@@ -48,17 +47,7 @@ export default function Welcome() {
                     outlineColor: theme.palette.mode === "light" ? alpha("#BFCCD9", 0.5) : alpha("#9CCCFC", 0.1),
                     boxShadow: theme.palette.mode === "light" ? `0 0 12px 8px ${alpha("#9CCCFC", 0.2)}` : `0 0 24px 12px ${alpha("#033363", 0.2)}`,
                 })}
-            /> */}
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    mt: 10
-                }}
-            >
-                <ImageCarousel />
-            </Box>
+            />
         </Container>
     );
 }
