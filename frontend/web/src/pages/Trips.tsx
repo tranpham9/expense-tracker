@@ -2,7 +2,7 @@ import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { LoginContext } from "../Contexts/Account";
 import SearchBar from "../components/inputs/SearchBar";
-import { Box } from "@mui/material";
+import { Box, Grid, Paper, Skeleton, Stack } from "@mui/material";
 
 export default function Trips() {
     const navigate = useNavigate();
@@ -24,11 +24,44 @@ export default function Trips() {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    mt: 2,
+                    my: 2,
                 }}
             >
                 <SearchBar />
             </Box>
+            <Stack sx={{ textAlign: "center" }}>
+                {[...Array(10).keys()].map((i) => (
+                    <Paper key={i} sx={{ m: 2, display: "flex", justifyContent: "center", alignItems: "center" }}>
+                        <Grid
+                            container
+                            m={2}
+                            spacing={2}
+                        >
+                            <Grid
+                                item
+                                xs={2}
+                            >
+                                <Skeleton width="100%" />
+                                <Skeleton width="100%" />
+                            </Grid>
+                            <Grid
+                                item
+                                xs={8}
+                            >
+                                <Skeleton width="100%" />
+                                <Skeleton width="100%" />
+                            </Grid>
+                            <Grid
+                                item
+                                xs={2}
+                            >
+                                <Skeleton width="100%" />
+                                <Skeleton width="100%" />
+                            </Grid>
+                        </Grid>
+                    </Paper>
+                ))}
+            </Stack>
         </>
     );
 }
