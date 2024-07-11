@@ -19,7 +19,7 @@ export default function Welcome() {
                 Welcome to{" "}
                 <Box
                     component="span"
-                    // color="primary.main"
+                    color="primary.main"
                 >
                     Accountability
                 </Box>
