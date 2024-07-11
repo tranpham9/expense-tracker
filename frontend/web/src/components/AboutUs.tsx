@@ -91,6 +91,7 @@ export default function AboutUs() {
                         sx={{ display: "flex" }}
                     >
                         <Card
+                            elevation={5}
                             sx={{
                                 display: "flex",
                                 flexDirection: "column",

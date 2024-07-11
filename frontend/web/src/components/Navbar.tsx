@@ -108,7 +108,7 @@ export default function Navbar() {
 
     return (
         <>
-            <AppBar position="static">
+            <AppBar position="static" elevation={10}>
                 <Container maxWidth="xl">
                     <Toolbar disableGutters>
                         <AdbIcon

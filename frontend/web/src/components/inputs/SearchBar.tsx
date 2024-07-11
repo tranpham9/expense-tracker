@@ -5,8 +5,10 @@ import SearchIcon from "@mui/icons-material/Search";
 
 export default function SearchBar() {
     return (
+        // https://mui.com/material-ui/react-paper/#elevation
         <Paper
             component="form"
+            elevation={10}
             sx={{
                 p: "2px 4px",
                 display: "flex",

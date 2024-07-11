@@ -53,6 +53,7 @@ export default function Trips() {
                 {[...Array(10).keys()].map((i) => (
                     <Paper
                         key={i}
+                        elevation={10}
                         sx={{
                             m: 1,
                             display: "flex",
