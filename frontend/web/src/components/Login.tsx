@@ -6,8 +6,8 @@ import EmailInput from "./inputs/EmailInput";
 import PasswordInput from "./inputs/PasswordInput";
 import { useNavigate } from "react-router-dom";
 import { request } from "../utility/api/API";
-import { saveJWT } from "../utility/Persist";
 import { AccountContext, AccountOverlayContext, LoginContext } from "../Contexts/Account";
+import { saveAccountInfo } from "../utility/Persist";
 
 // TODO: make pressing enter in a field click submit button
 export default function Login() {
@@ -38,10 +38,10 @@ export default function Login() {
             { email, password },
             (response) => {
                 console.log(response);
-                saveJWT(response.jwt);
+                setAccount(response);
+                saveAccountInfo(response);
 
                 setIsLoggedIn(true);
-                setAccount(response);
                 setIsAccountOverlayVisible(false);
 
                 navigate("/trips");

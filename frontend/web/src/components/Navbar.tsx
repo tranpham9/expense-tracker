@@ -17,6 +17,7 @@ import AdbIcon from "@mui/icons-material/Adb";
 import AccountOverlay from "./AccountOverlay";
 import { AccountContext, AccountOverlayContext, LoginContext } from "../Contexts/Account";
 import { getInitials } from "../utility/Manipulation";
+import { clearAccountInfo } from "../utility/Persist";
 
 type Page = {
     name: string;
@@ -101,6 +102,7 @@ export default function Navbar() {
         {
             name: "Logout",
             action: () => {
+                clearAccountInfo();
                 setIsLoggedIn(false);
                 // navigate("/home"); // this is done automatically with a useEffect
             },
