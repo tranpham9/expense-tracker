@@ -11,9 +11,10 @@ import { Divider } from "@mui/material";
 
 type Developer = { name: string; role: string; about: string[] };
 
+// TODO: add github link (and potentially linkedin) for everyone; maybe also make profile avatar link to it (either github or linkedin).
 const developers: Developer[] = [
     {
-        name: "Jacob Gadberyy",
+        name: "Jacob Gadberry",
         role: "Project Manager + Frontend (Mobile)",
         about: ["sample item 1", "sample item 2"],
     },
@@ -23,7 +24,7 @@ const developers: Developer[] = [
         about: ["sample item 1", "sample item 2"],
     },
     {
-        name: "Ian Orodonez",
+        name: "Ian Ordonez",
         role: "Frontend (Mobile)",
         about: ["sample item 1", "sample item 2"],
     },
