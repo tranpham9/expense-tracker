@@ -34,6 +34,13 @@ type Option = {
 export default function Navbar() {
     const navigate = useNavigate();
     const location = useLocation();
+    const isCurrentPage = (page: Page) => {
+        const pageName = page.name.toLowerCase();
+        const currentPage = location.pathname.slice(1);
+
+        // home page is also represented by root path ( / )
+        return (pageName === "home" && !currentPage.length) || pageName === currentPage;
+    };
 
     const { isLoggedIn, setIsLoggedIn } = useContext(LoginContext);
     const { setIsAccountOverlayVisible } = useContext(AccountOverlayContext);
@@ -180,7 +187,7 @@ export default function Navbar() {
                                 {pages.map((page) => (
                                     <MenuItem
                                         key={page.name}
-                                        selected={`/${page.name.toLocaleLowerCase()}` === location.pathname}
+                                        selected={isCurrentPage(page)}
                                         onClick={() => navigateToPage(page)}
                                         disabled={page.requiresLoggedIn && !isLoggedIn}
                                     >
@@ -224,14 +231,13 @@ export default function Navbar() {
                                 <Button
                                     key={page.name}
                                     variant="contained"
-                                    // {`/${page.name.toLocaleLowerCase()}` === location.pathname}
                                     onClick={() => navigateToPage(page)}
                                     disabled={page.requiresLoggedIn && !isLoggedIn}
                                     sx={{
                                         mx: 0.5,
                                         my: 2,
                                         display: "block",
-                                        ...(`/${page.name.toLocaleLowerCase()}` === location.pathname && { outlineColor: "secondary.main", outlineWidth: 2, outlineStyle: "solid" }),
+                                        ...(isCurrentPage(page) && { outlineColor: "secondary.main", outlineWidth: 2, outlineStyle: "solid" }),
                                     }}
                                 >
                                     {page.name}
