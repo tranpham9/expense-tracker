@@ -99,36 +99,42 @@ class _LoginPage extends State<LoginPage> {
                   backgroundColor: Theme.of(context).primaryColor,
                   fixedSize: Size(400, 50),
                 ),
+                // You can press the button if the input requirements are meet
+                onPressed: (disableButton([emailError, passwordError],
+                        [email.text, password.text]))
+                    ? null
+                    : () {
+                        // Call the login endpoint
+                        loginUser(email.text, password.text).then((response) {
+                          // Let the user know the email/password was wrong
+                          if (response == null) {
+                            setState(() {
+                              emailError =
+                                  "Email/Password Combination Incorrect";
+                              passwordError =
+                                  "Email/Password Combination Incorrect";
+                            });
+                            return;
+                          }
+                          // Login was successful, route the user to their home page
+                          email.text = '';
+                          password.text = '';
+                          // Reset Decorations back to normal
+                          setState(() {
+                            emailError = null;
+                            passwordError = null;
+                          });
+                          // Set the current user of the app
+                          Globals.user = response;
+                          // Route to the home page
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => HomePage()),
+                          );
+                        });
+                      },
                 child:
                     const Text('Login', style: TextStyle(color: Colors.white)),
-                onPressed: () {
-                  // Call the login endpoint
-                  loginUser(email.text, password.text).then((response) {
-                    // Let the user know the email/password was wrong
-                    if (response == null) {
-                      setState(() {
-                        emailError = "Email/Password Combination Incorrect";
-                        passwordError = "Email/Password Combination Incorrect";
-                      });
-                      return;
-                    }
-                    // Login was successful, route the user to their home page
-                    email.text = '';
-                    password.text = '';
-                    // Reset Decorations back to normal
-                    setState(() {
-                      emailError = null;
-                      passwordError = null;
-                    });
-                    // Set the current user of the app
-                    Globals.user = response;
-                    // Route to the home page
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomePage()),
-                    );
-                  });
-                },
               ),
             ),
             // Forgot Password
