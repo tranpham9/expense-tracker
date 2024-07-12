@@ -14,9 +14,6 @@ class LoginUser {
           '${Config.remoteApiURL}${Config.loginAPI}',
           data: jsonEncode(
               <String, String>{'email': email, 'password': password}));
-      // Just see what was returned
-      print(
-          "Response Code = ${response.statusCode}\nResponse Data:\n${response.data}");
       // If there was an error, return an error
       if (response.statusCode != 200) {
         throw Exception("Failed to Log User in");

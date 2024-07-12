@@ -1,7 +1,6 @@
 import 'dart:core';
-import 'package:flutter/cupertino.dart';
+import 'package:accountability_mobile_app/utility/helpers.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class ForgotPasswordDialog extends StatefulWidget {
   @override
@@ -13,33 +12,29 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
   String? emailError;
   OverlayEntry? _overlayEntry;
 
-  OverlayEntry _createOverlayEntry(String message) {
-    return OverlayEntry(
-      builder: (context) => Positioned(
-        top: MediaQuery.of(context).size.height * 0.4,
-        left: MediaQuery.of(context).size.width * 0.1,
-        width: MediaQuery.of(context).size.width * 0.8,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.8),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              message,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-      ),
-    );
+  @override
+  void initState() {
+    super.initState();
+
+    recoveryEmail.addListener(validateRecoveryEmail);
   }
 
+  @override
+  void dispose() {
+    recoveryEmail.dispose();
+    super.dispose();
+  }
+
+  // Validate the recovery email entered
+  void validateRecoveryEmail() {
+    setState(() {
+      emailError = validateText("email", recoveryEmail.text);
+    });
+  }
+
+  // Show a given pop up overlay
   void _showOverlay(String message) {
-    _overlayEntry = _createOverlayEntry(message);
+    _overlayEntry = createOverlayEntry(message);
     Overlay.of(context)!.insert(_overlayEntry!);
     Future.delayed(const Duration(seconds: 2), () {
       _overlayEntry?.remove();
@@ -73,21 +68,8 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
         ElevatedButton(
           child: const Text('Send Recovery Email'),
           onPressed: () {
-            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                    .hasMatch(recoveryEmail.text) ||
-                recoveryEmail.text.isEmpty) {
-              setState(() {
-                emailError = "The Email You've Entered Isn't Correct";
-              });
-            } else {
-              setState(() {
-                emailError = null;
-              });
-              // TODO: Call the API to send recovery email to the user
-              // Show overlay
-              _showOverlay("A recovery email has been sent!");
-              Navigator.of(context).pop();
-            }
+            // TODO: Call the API to send recovery code to the email
+            print("Sending Recovery Email");
           },
         ),
       ],

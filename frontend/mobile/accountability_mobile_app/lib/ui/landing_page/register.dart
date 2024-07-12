@@ -1,10 +1,7 @@
 import 'dart:core';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:password_strength_checker/password_strength_checker.dart';
-
 import '../../api/register_user.dart';
+import '../../utility/helpers.dart';
 
 // Main register widget
 class RegisterPage extends StatefulWidget {
@@ -17,17 +14,63 @@ class _RegisterPage extends State<RegisterPage> {
   final TextEditingController name = TextEditingController();
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
-  final TextEditingController confirmPassword = TextEditingController();
-  // Grab the password being entered
-  final passNotifier = ValueNotifier<PasswordStrength?>(null);
-  // Give user the ability to see or hide the text
-  bool _obscureText = true;
   // Give the user a detailed description of what went wrong
-  String? _passwordError;
-  String? _emailError;
+  String? passwordError;
+  String? emailError;
+  String? nameError;
+  // Show a pop up overlay after a successful registration
+  OverlayEntry? _overlayEntry;
 
+  @override
+  void initState() {
+    super.initState();
+
+    name.addListener(validateName);
+    email.addListener(validateEmail);
+    password.addListener(validatePassword);
+  }
+
+  @override
+  void dispose() {
+    name.dispose();
+    email.dispose();
+    password.dispose();
+    super.dispose();
+  }
+
+  // Call the API endpoint
   Future<int?> registerUser(String name, String email, String password) async {
-    return RegisterUser.register(name, email, password);
+    return await RegisterUser.register(name, email, password);
+  }
+
+  // Listen and ensure that the email field follows an email regex
+  void validateEmail() {
+    setState(() {
+      emailError = validateText("email", email.text);
+    });
+  }
+
+  // Listen and ensure that the password follows the proper requirements
+  void validatePassword() {
+    setState(() {
+      passwordError = validateText("password", password.text);
+    });
+  }
+
+  // List and ensure a proper name is entered
+  void validateName() {
+    setState(() {
+      nameError = validateText("name", name.text);
+    });
+  }
+
+  // Show a given pop up overlay
+  void _showOverlay(String message) {
+    _overlayEntry = createOverlayEntry(message);
+    Overlay.of(context)!.insert(_overlayEntry!);
+    Future.delayed(const Duration(seconds: 5), () {
+      _overlayEntry?.remove();
+    });
   }
 
   // Set the main layout of the login page
@@ -46,50 +89,13 @@ class _RegisterPage extends State<RegisterPage> {
             children: <Widget>[
               // Name and email are independent of the state
               RegisterCredentials(
-                  name: name, email: email, emailError: _emailError),
-              // Enter Password
-              Container(
-                padding: const EdgeInsets.all(10),
-                child: TextField(
-                  obscureText: _obscureText,
-                  controller: password,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    labelText: 'Password*',
-                    errorText: _passwordError,
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _obscureText = !_obscureText;
-                        });
-                      },
-                      icon: Icon(_obscureText
-                          ? Icons.visibility_off
-                          : Icons.visibility),
-                    ),
-                  ),
-                  // Check the strength of the password being entered
-                  onChanged: (value) {
-                    passNotifier.value =
-                        PasswordStrength.calculate(text: value);
-                  },
-                ),
+                name: name,
+                email: email,
+                password: password,
+                nameError: nameError,
+                emailError: emailError,
+                passwordError: passwordError,
               ),
-              // Enter Confirm Password
-              Container(
-                padding: const EdgeInsets.all(10),
-                child: TextField(
-                  obscureText: _obscureText,
-                  controller: confirmPassword,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    labelText: 'Confirm Password*',
-                    errorText: _passwordError,
-                  ),
-                ),
-              ),
-              // Check the password strength
-              PasswordStrengthChecker(strength: passNotifier),
               // Confirm Register
               Container(
                 height: 50,
@@ -106,69 +112,29 @@ class _RegisterPage extends State<RegisterPage> {
                     ),
                   ),
                   onPressed: () {
-                    // Incorrect email format
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                            .hasMatch(email.text) ||
-                        email.text.isEmpty) {
-                      setState(() {
-                        _emailError = "The Email You've Entered Isn't Correct";
-                      });
-                      return;
-                    } else {
-                      setState(() {
-                        _emailError = null;
-                      });
-                    }
-                    // Passwords don't match
-                    if (password.text != confirmPassword.text) {
-                      print("password must match");
-                      setState(() {
-                        _passwordError = "Passwords Must Match";
-                      });
-                    }
-                    // TODO: This doesn't detect empty entries for some reason
-                    if (password.text.isEmpty || confirmPassword.text.isEmpty) {
-                      setState(() {
-                        _passwordError = "Please Enter Your Password";
-                      });
-                      return;
-                    }
-                    // Password too weak
-                    // if (passNotifier.value == PasswordStrength.weak) {
-                    //   print("password not strong enough");
-                    //   setState(() {
-                    //     _passwordError = "Password Not Secure Enough";
-                    //   });
-                    //   return;
-                    // } else {
-                    //   setState(() {
-                    //     _passwordError = null;
-                    //   });
-                    // }
-
-                    // TODO: Call the API to register the user
                     //Call the register API
-                    Future<int?> res =
-                        registerUser(name.text, email.text, password.text);
-
-                    if (res != 200) {
-                      // Let the user know what went wrong
-                      setState(() {
-                        _passwordError = "Error Registering Your Account";
-                        _emailError = "Error Registering Your Account";
-                      });
-
-                      name.text = '';
-                      email.text = '';
-                      password.text = '';
-                      confirmPassword.text = '';
-                      return;
-                    }
-                    // Add Overlay to let the user know to check their email to verify
-                    // TODO: Add success overlay
-
-                    return;
-                    // Look for verification email
+                    registerUser(name.text, email.text, password.text)
+                        .then((res) {
+                      // Failed to register
+                      if (res == 400) {
+                        // Let the user know what went wrong
+                        setState(() {
+                          passwordError = "Error Registering Your Account";
+                          emailError = "Error Registering Your Account";
+                        });
+                        return;
+                      } else if (res == 401) {
+                        // Let the user know what went wrong
+                        setState(() {
+                          emailError = "That Email is Already Being Used";
+                        });
+                        return;
+                      } else {
+                        // Let the user know that the verification email was sent
+                        _showOverlay(
+                            "Registration Was Successful! Check Your Email to Verify Your Account.");
+                      }
+                    });
                   },
                 ),
               ),
@@ -185,14 +151,20 @@ class RegisterCredentials extends StatelessWidget {
   // Grab text that will be entered by the user
   final TextEditingController name;
   final TextEditingController email;
+  final TextEditingController password;
   // Give the user a detailed description of what went wrong
   final String? emailError;
+  final String? nameError;
+  final String? passwordError;
 
   const RegisterCredentials(
       {super.key,
       required this.name,
       required this.email,
-      required this.emailError});
+      required this.password,
+      required this.nameError,
+      required this.emailError,
+      required this.passwordError});
 
   @override
   Widget build(BuildContext context) {
@@ -203,15 +175,12 @@ class RegisterCredentials extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           child: TextField(
             controller: name,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               border: OutlineInputBorder(),
-              labelText: 'Name',
+              labelText: 'Name*',
+              errorText: nameError,
             ),
           ),
-        ),
-        Container(
-          padding: const EdgeInsets.all(10),
-          child: Text("A Proper Email Follows the Form 'name@email.com"),
         ),
         // Enter Email
         Container(
@@ -225,11 +194,18 @@ class RegisterCredentials extends StatelessWidget {
             ),
           ),
         ),
-        // Strong password description
+        // Enter Password
         Container(
           padding: const EdgeInsets.all(10),
-          child: Text(
-              "Minimum Password Requirements:\n.At least 8 letters\n.1 lower case\n.1 upper case\n.At least 1 digit\n.At least 1 special character"),
+          child: TextField(
+            obscureText: true,
+            controller: password,
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              labelText: 'Password*',
+              errorText: passwordError,
+            ),
+          ),
         ),
       ],
     );

@@ -7,10 +7,10 @@ class RegisterUser {
   static Future<int?> register(
       String name, String email, String password) async {
     final Dio dio = new Dio();
-    int? statusCode = 0;
+    Response? response;
     // Attempt to register with the info
     try {
-      Response response = await dio.post(
+      response = await dio.post(
         '${Config.remoteApiURL}${Config.registerAPI}',
         data: jsonEncode(<String, String>{
           "name": name,
@@ -18,20 +18,20 @@ class RegisterUser {
           "password": password
         }),
       );
-      // Display the response code and body
-      print(
-          "Response Code = ${response.statusCode}\nResponse Data:\n${response.data}");
       // If the response isn't 200, set the status code to the error
       if (response.statusCode != 200) {
-        statusCode = response.statusCode;
         throw Exception("Failed to Register User");
       }
-      // response was successful
-      statusCode = 200;
-      return statusCode;
+
+      // Response was successful
+      return response.statusCode;
+    } on DioException catch (e) {
+      // Either malformed request or email is already taken
+      print("Error $e");
+      if (e.response?.statusCode == 401) return 401;
     } catch (e) {
       print("Error $e");
-      return statusCode;
+      return response?.statusCode;
     }
   }
 }

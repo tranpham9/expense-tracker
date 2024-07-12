@@ -4,17 +4,17 @@ import { Box, Button } from "@mui/material";
 
 import EmailInput from "./inputs/EmailInput";
 import PasswordInput from "./inputs/PasswordInput";
-import { LoginContext } from "../App";
 import { useNavigate } from "react-router-dom";
-import { AccountOverlayContext } from "./Navbar";
 import { request } from "../utility/api/API";
-import { saveJWT } from "../utility/JWT";
+import { AccountContext, AccountOverlayContext, LoginContext } from "../Contexts/Account";
+import { saveAccountInfo } from "../utility/Persist";
 
 // TODO: make pressing enter in a field click submit button
 export default function Login() {
     const navigate = useNavigate();
 
     const { setIsAccountOverlayVisible } = useContext(AccountOverlayContext);
+    const { setAccount } = useContext(AccountContext);
 
     const { setIsLoggedIn } = useContext(LoginContext);
 
@@ -37,8 +37,9 @@ export default function Login() {
             "login",
             { email, password },
             (response) => {
-                console.log(response.jwt);
-                saveJWT(response.jwt);
+                console.log(response);
+                setAccount(response);
+                saveAccountInfo(response);
 
                 setIsLoggedIn(true);
                 setIsAccountOverlayVisible(false);
