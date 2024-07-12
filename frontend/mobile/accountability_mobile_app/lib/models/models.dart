@@ -33,7 +33,8 @@ class Trip {
       required this.name,
       required this.notes,
       required this.membersIds,
-      required this.leaderId});
+      required this.leaderId,
+      required});
 }
 
 class User {

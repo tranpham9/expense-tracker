@@ -1,107 +1,26 @@
 // Display information about the different trips
+import 'package:accountability_mobile_app/api/trip_crud.dart';
 import 'package:accountability_mobile_app/globals.dart';
 import 'package:flutter/material.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../../models/models.dart';
-import './tripcrud.dart';
 
 // Trip Related Widgets
-class TripsPage extends StatelessWidget {
+// TODO: Fix this so a loading animation occurs while data is being fetched
+class TripsPage extends StatefulWidget {
+  @override
+  State<TripsPage> createState() => _TripsPageState();
+}
+
+class _TripsPageState extends State<TripsPage> {
   // Grab the search field when we want to search
   final TextEditingController _searchQuery = TextEditingController();
-  //FOR TESTING ONLY TODO: Perhaps create a 'model' folder and put models and fake data there
-  List<Trip> trips = [
-    Trip(
-        id: "t1id1",
-        name: "Hawaii '24",
-        notes: "A fun trip to Hawaii",
-        membersIds: ["m1", "m2"],
-        leaderId: "t1"),
-    Trip(
-        id: "t2id1",
-        name: "Orlando '24",
-        notes: "A fun trip to Orlando",
-        membersIds: ["m3", "m4"],
-        leaderId: "t3"),
-    Trip(
-        id: "t3id1",
-        name: "Indianapolis '24",
-        notes: "A fun trip to Indy",
-        membersIds: ["m6", "m4"],
-        leaderId: "t4"),
-    Trip(
-        id: "t3id1",
-        name: "New York '24",
-        notes: "A fun trip to NYC",
-        membersIds: ["m6", "m4"],
-        leaderId: "t4"),
-    Trip(
-        id: "t3id1",
-        name: "Los Angeles '24",
-        notes: "A fun trip to LA",
-        membersIds: ["m6", "m4"],
-        leaderId: "t4"),
-    Trip(
-        id: "t3id1",
-        name: "Seattle '24",
-        notes: "A fun trip to Seattle",
-        membersIds: ["m6", "m4"],
-        leaderId: "t4"),
-    Trip(
-        id: "t3id1",
-        name: "Seattle '24",
-        notes: "A fun trip to Seattle",
-        membersIds: ["m6", "m4"],
-        leaderId: "t4"),
-    Trip(
-        id: "t3id1",
-        name: "Seattle 24",
-        notes: "A fun trip to Seattle",
-        membersIds: ["m6", "m4"],
-        leaderId: "t4"),
-    Trip(
-        id: "t3id1",
-        name: "Seattle 24",
-        notes: "A fun trip to Seattle",
-        membersIds: ["m6", "m4"],
-        leaderId: "t4"),
-    Trip(
-        id: "t3id1",
-        name: "Seattle 24",
-        notes: "A fun trip to Seattle",
-        membersIds: ["m6", "m4"],
-        leaderId: "t4"),
-    Trip(
-        id: "t3id1",
-        name: "Seattle 24",
-        notes: "A fun trip to Seattle",
-        membersIds: ["m6", "m4"],
-        leaderId: "t4"),
-    Trip(
-        id: "t3id1",
-        name: "Seattle 24",
-        notes: "A fun trip to Seattle",
-        membersIds: ["m6", "m4"],
-        leaderId: "t4"),
-    Trip(
-        id: "t3id1",
-        name: "Seattle 24",
-        notes: "A fun trip to Seattle",
-        membersIds: ["m6", "m4"],
-        leaderId: "t4"),
-    Trip(
-        id: "t3id1",
-        name: "Seattle 24",
-        notes: "A fun trip to Seattle",
-        membersIds: ["m6", "m4"],
-        leaderId: "t4"),
-  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          // TODO: Put actual username here
           "${Globals.user?.name}'s Trips",
         ),
         centerTitle: true,
@@ -136,30 +55,42 @@ class TripsPage extends StatelessWidget {
               ),
             ),
             // List of Trips
-            Expanded(
-              // Useful for building lists of unknown length
-              child: ListView.builder(
-                itemCount: trips.length,
-                // Callback to determine how to format each trip in the list
-                itemBuilder: (context, index) {
-                  // Grab the trip object from the list
-                  Trip trip = trips[index];
-                  return ListTile(
-                    title: Text(trip.name),
-                    subtitle: Text(trip.notes),
-                    trailing: Text('${trip.membersIds.length}'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
-                        MaterialPageRoute(
-                            builder: (context) => ViewTripPage(trip)),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
+            FutureBuilder(
+                future: TripCRUD.getTrips(Globals.user!.id),
+                builder: (context, snapshot) {
+                  // Display the loading skeleton for the trips
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Expanded(
+                      child: ListView.separated(
+                          itemBuilder: (context, index) => TripsSkeleton(),
+                          separatorBuilder: (context, index) => const SizedBox(
+                                height: 16,
+                              ),
+                          itemCount: 10),
+                    );
+                  } else if (snapshot.hasData) {
+                    List<Trip> trips = snapshot.data!;
+                    return Expanded(
+                        child: ListView.builder(
+                      itemBuilder: (context, index) => ListTile(
+                        title: Text(trips[index].name),
+                        subtitle: Text(trips[index].notes),
+                        trailing: Text('${trips[index].membersIds.length}'),
+                        onTap: () {
+                          // Navigator.push(
+                          //   context,
+                          //   // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
+                          //   MaterialPageRoute(
+                          //       builder: (context) =>
+                          //           ViewTripPage(trips[index])),
+                          // );
+                        },
+                      ),
+                      itemCount: trips.length,
+                    ));
+                  }
+                  return Text("");
+                }),
           ],
         ),
       ),
@@ -167,6 +98,22 @@ class TripsPage extends StatelessWidget {
   }
 }
 
+// TODO: Needs to look like the ListTile while loading
+class TripsSkeleton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 16,
+      width: 16,
+      padding: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(.04),
+      ),
+    );
+  }
+}
+
+/*
 class ViewTripPage extends StatefulWidget {
   final Trip trip;
   // Pass the trip that you clicked on to the view page
@@ -178,98 +125,6 @@ class ViewTripPage extends StatefulWidget {
 
 class _ViewTripPage extends State<ViewTripPage> {
   //For Testing Only TODO: Move to another folder for models if we can
-  List<Expense> expenses = [
-    Expense(
-        id: "1",
-        name: "Red Robins",
-        tripId: "192381",
-        cost: 15.09,
-        description: "We ate at Mcdonalds",
-        membersIds: ["13", "14"],
-        payerId: "1451"),
-    Expense(
-        id: "1",
-        name: "Burger King",
-        tripId: "192381",
-        cost: 15.09,
-        description: "We ate at Mcdonalds",
-        membersIds: ["13", "14"],
-        payerId: "1451"),
-    Expense(
-        id: "1",
-        name: "Five Guys",
-        tripId: "192381",
-        cost: 15.09,
-        description: "We ate at Mcdonalds",
-        membersIds: ["13", "14"],
-        payerId: "1451"),
-    Expense(
-        id: "1",
-        name: "Gas",
-        tripId: "192381",
-        cost: 15.09,
-        description: "We ate at Mcdonalds",
-        membersIds: ["13", "14"],
-        payerId: "1451"),
-    Expense(
-        id: "1",
-        name: "Hotel",
-        tripId: "192381",
-        cost: 15.09,
-        description: "We ate at Mcdonalds",
-        membersIds: ["13", "14"],
-        payerId: "1451"),
-    Expense(
-        id: "1",
-        name: "Souvenirs",
-        tripId: "192381",
-        cost: 15.09,
-        description: "We ate at Mcdonalds",
-        membersIds: ["13", "14"],
-        payerId: "1451"),
-    Expense(
-        id: "1",
-        name: "Disney World",
-        tripId: "192381",
-        cost: 15.09,
-        description: "We ate at Mcdonalds",
-        membersIds: ["13", "14"],
-        payerId: "1451"),
-  ];
-  // Same as comment ^
-  List<User> members = [
-    User(id: "123", name: "Bob", email: "bob@email.com", trips: ["123", "123"]),
-    User(
-        id: "123",
-        name: "Alice",
-        email: "alice@email.com",
-        trips: ["123", "123"]),
-    User(
-        id: "123",
-        name: "John",
-        email: "john@email.com",
-        trips: ["123", "123"]),
-    User(
-        id: "123",
-        name: "Abigail",
-        email: "abijail@email.com",
-        trips: ["123", "123"]),
-    User(
-        id: "123",
-        name: "Jack",
-        email: "jack@email.com",
-        trips: ["123", "123"]),
-    User(
-        id: "123",
-        name: "Eddy",
-        email: "jack@email.com",
-        trips: ["123", "123"]),
-    User(
-        id: "123",
-        name: "Tony",
-        email: "jack@email.com",
-        trips: ["123", "123"]),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -465,3 +320,4 @@ class _ReceiptPage extends State<ReceiptPage> {
     );
   }
 }
+*/

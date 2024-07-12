@@ -9,7 +9,7 @@ class ForgotPasswordDialog extends StatefulWidget {
 
 class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
   final TextEditingController recoveryEmail = TextEditingController();
-  String? emailError;
+  String? recoveryEmailError;
   OverlayEntry? _overlayEntry;
 
   @override
@@ -28,7 +28,7 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
   // Validate the recovery email entered
   void validateRecoveryEmail() {
     setState(() {
-      emailError = validateText("email", recoveryEmail.text);
+      recoveryEmailError = validateText("email", recoveryEmail.text);
     });
   }
 
@@ -53,7 +53,7 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
             decoration: InputDecoration(
               border: OutlineInputBorder(),
               labelText: 'Your Email',
-              errorText: emailError,
+              errorText: recoveryEmailError,
             ),
           ),
         ],
@@ -66,11 +66,14 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
           },
         ),
         ElevatedButton(
+          onPressed: disableButton([recoveryEmailError], [recoveryEmail.text])
+              ? null
+              : () {
+                  // TODO: Call the API to send recovery code to the email
+                  print("Sending Recovery Email");
+                  _showOverlay("Recovery Code Sent to ${recoveryEmail.text}");
+                },
           child: const Text('Send Recovery Email'),
-          onPressed: () {
-            // TODO: Call the API to send recovery code to the email
-            print("Sending Recovery Email");
-          },
         ),
       ],
     );

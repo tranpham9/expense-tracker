@@ -5,4 +5,5 @@ class Config {
       'https://accountability-190955e8b06f.herokuapp.com/api';
   static const String loginAPI = '/login';
   static const String registerAPI = '/registerUser';
+  static const String getTripsAPI = '/trips/getTripsForUser';
 }
