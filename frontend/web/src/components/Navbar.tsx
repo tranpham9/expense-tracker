@@ -1,5 +1,5 @@
 import { useContext, useState, type MouseEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -33,6 +33,7 @@ type Option = {
 // TODO: make all navbar buttons (when in the widest layout) the same width
 export default function Navbar() {
     const navigate = useNavigate();
+    const location = useLocation();
 
     const { isLoggedIn, setIsLoggedIn } = useContext(LoginContext);
     const { setIsAccountOverlayVisible } = useContext(AccountOverlayContext);
@@ -179,6 +180,7 @@ export default function Navbar() {
                                 {pages.map((page) => (
                                     <MenuItem
                                         key={page.name}
+                                        selected={`/${page.name.toLocaleLowerCase()}` === location.pathname}
                                         onClick={() => navigateToPage(page)}
                                         disabled={page.requiresLoggedIn && !isLoggedIn}
                                     >
@@ -222,9 +224,15 @@ export default function Navbar() {
                                 <Button
                                     key={page.name}
                                     variant="contained"
+                                    // {`/${page.name.toLocaleLowerCase()}` === location.pathname}
                                     onClick={() => navigateToPage(page)}
                                     disabled={page.requiresLoggedIn && !isLoggedIn}
-                                    sx={{ mx: 0.5, my: 2, display: "block" }}
+                                    sx={{
+                                        mx: 0.5,
+                                        my: 2,
+                                        display: "block",
+                                        ...(`/${page.name.toLocaleLowerCase()}` === location.pathname && { outlineColor: "secondary.main", outlineWidth: 2, outlineStyle: "solid" }),
+                                    }}
                                 >
                                     {page.name}
                                 </Button>

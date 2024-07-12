@@ -8,7 +8,8 @@ const baseTheme = createTheme({
             main: blue[700],
         },
         secondary: {
-            main: orange[500],
+            // main: orange[500],
+            main: alpha(orange[500], 0.6),
         },
         background: {
             default: grey[900],
@@ -31,7 +32,8 @@ export const theme = createTheme(
             MuiDivider: {
                 styleOverrides: {
                     root: {
-                        borderColor: alpha(baseTheme.palette.secondary.main, 0.6),
+                        // borderColor: alpha(baseTheme.palette.secondary.main, 0.6),
+                        borderColor: baseTheme.palette.secondary.main,
                     },
                 },
             },
