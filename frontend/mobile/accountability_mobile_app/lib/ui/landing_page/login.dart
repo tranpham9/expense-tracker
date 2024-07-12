@@ -1,10 +1,11 @@
+// TODO: Find a way to make the imports take less space
+// Compress some code that can be factored out
 import 'dart:core';
 import 'package:accountability_mobile_app/globals.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import '../../api/login_user.dart';
 import '../../models/User.dart';
+import '../../utility/helpers.dart';
 import '../home_page/homepage.dart';
 import './register.dart';
 import './forgot_password.dart';
@@ -22,9 +23,39 @@ class _LoginPage extends State<LoginPage> {
   final TextEditingController password = TextEditingController();
   String? emailError;
   String? passwordError;
+
   // Call the API endpoint to log the user in
   Future<User?> loginUser(String email, String password) async {
     return await LoginUser.login(email, password);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    email.addListener(validateEmail);
+    password.addListener(validatePassword);
+  }
+
+  @override
+  void dispose() {
+    email.dispose();
+    password.dispose();
+    super.dispose();
+  }
+
+  // Listen and ensure that the email field follows an email regex
+  void validateEmail() {
+    setState(() {
+      emailError = validateText("email", email.text);
+    });
+  }
+
+  // Listen and ensure that the password follows the proper requirements
+  void validatePassword() {
+    setState(() {
+      passwordError = validateText("password", password.text);
+    });
   }
 
   // Show forgot password dialog
@@ -71,27 +102,6 @@ class _LoginPage extends State<LoginPage> {
                 child:
                     const Text('Login', style: TextStyle(color: Colors.white)),
                 onPressed: () {
-                  // Ensure a proper email is entered
-                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                          .hasMatch(email.text) ||
-                      email.text == '') {
-                    setState(() {
-                      emailError = "You must enter a valid email";
-                    });
-                    return;
-                  } else {
-                    emailError = null;
-                  }
-                  if (password.text.isEmpty) {
-                    setState(() {
-                      passwordError = "Make Sure to Enter a Password";
-                    });
-                    return;
-                  } else {
-                    passwordError = null;
-                  }
-                  print(
-                      "Sending ${email.text} and ${password.text} to the API");
                   // Call the login endpoint
                   loginUser(email.text, password.text).then((response) {
                     // Let the user know the email/password was wrong
@@ -102,7 +112,6 @@ class _LoginPage extends State<LoginPage> {
                       });
                       return;
                     }
-
                     // Login was successful, route the user to their home page
                     email.text = '';
                     password.text = '';
@@ -202,11 +211,12 @@ class LoginCredentials extends StatelessWidget {
           obscureText: true,
           controller: password,
           decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Password*',
-              enabledBorder: OutlineInputBorder(borderSide: BorderSide()),
-              hintText: 'Enter Your Password',
-              errorText: passwordError),
+            border: OutlineInputBorder(),
+            labelText: 'Password*',
+            enabledBorder: OutlineInputBorder(borderSide: BorderSide()),
+            hintText: 'Enter Your Password',
+            errorText: passwordError,
+          ),
         ),
       ),
     ]);
