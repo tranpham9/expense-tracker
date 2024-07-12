@@ -3,7 +3,6 @@ import { sign, verify, decode } from "jsonwebtoken";
 import { ObjectId } from "mongodb";
 
 //Create a token based on the name, email and password
-//TODO: Maybe remove password and just use another field.
 export function createToken(userId: ObjectId, name: string, email: string) {
     let ret;
     try {
@@ -13,7 +12,7 @@ export function createToken(userId: ObjectId, name: string, email: string) {
         // FIXME: I think that the first parameter (user) is supposed to be a string; should it be stringified json?
         const accessToken = sign(user, process.env.ACCESS_TOKEN_SECRET!);
 
-        ret = { accessToken: accessToken };
+        ret = { accessToken };
     } catch (e) {
         ret = { Error: (e as Error).message };
     }
