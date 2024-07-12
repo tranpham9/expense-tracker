@@ -1,7 +1,7 @@
 import express from 'express';
 import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, Trip, TRIP_COLLECTION_NAME, User, USER_COLLECTION_NAME } from './common';
 import { Collection, ObjectId } from 'mongodb';
-
+import {v4 as uuidv4 } from 'uuid';
 export const router = express.Router();
 
 /*
@@ -40,11 +40,14 @@ router.post('/createTrip', async (req, res, next) => {
             return;
         }
 
+        const joinCode = uuidv4();
+
         const result = await tripCol.insertOne({
             name: req.body.name,
             notes: req.body.notes,
             memberIds: [],
-            leaderId: leaderId
+            leaderId: leaderId,
+            joinCode: joinCode
         });
 
         // And update the user object

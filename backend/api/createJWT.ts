@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { sign, verify, decode } from "jsonwebtoken";
 import { ObjectId } from "mongodb";
+import {Request, Response, NextFunction} from "express"
 
 //Create a token based on the name, email and password
 export function createToken(userId: ObjectId, name: string, email: string) {
@@ -41,3 +42,18 @@ export function refresh(token: string) {
 
     return createToken(userId, name, email);
 }
+/*
+export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+        return res.status(401).json({ error: 'No token provided' });
+    }
+
+    try {
+        verify(token, process.env.ACCESS_TOKEN_SECRET!);
+        next();
+    } catch (err) {
+        return res.status(401).json({ error: 'Invalid token' });
+    }
+};
+*/

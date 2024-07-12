@@ -8,8 +8,10 @@ import { createEmail } from "./tokenSender";
 import jwt, { JsonWebTokenError, decode } from "jsonwebtoken";
 import { router as tripCRUDRouter } from "./routes/tripCRUD";
 import { router as expenseCRUDRouter } from "./routes/expenseCRUD";
-import { router as userCRUDRouter} from "./routes/userCRUD";
+//import { router as userCRUDRouter} from "./routes/userCRUD";
 import { unverified } from "./tokenSender";
+//import{verifyToken} from "./createJWT";
+import{ isExpired } from "./createJWT"
 
 //TODO: make api endpoints more modular
 
@@ -182,13 +184,13 @@ app.post("/api/login", async (req, res, next) => {
             id: foundUser._id,
             name: foundUser.name,
             email: foundUser.email,
-            jwt
+            jwt: jwt
         });
     } else {
         res.status(401).json({ error: "Invalid login credentials" });
     }
 });
-
+//Takes ObjectId of User and newName
 app.put("/api/changeName", async (req, res) => {
     const db = client.db(DB_NAME);
     const userCollection = db.collection(USER_COLLECTION_NAME);
@@ -206,8 +208,67 @@ app.put("/api/changeName", async (req, res) => {
     }
 });
 
+app.post("/joinTrip", async(req, res, next) => {
+    const db = client.db(DB_NAME);
+    
+    
+    try{
+        const tripCollection = db.collection(TRIP_COLLECTION_NAME);
+        const userCollection = db.collection(USER_COLLECTION_NAME);
+        const {userId ,joinCode, jwtToken }  = req.body;
+        try
+  	{
+    	if( isExpired(jwtToken) == null )
+    	{
+      	var r = {error:'The JWT is no longer valid', jwtToken: ''};
+      	res.status(200).json(r);
+      	return;
+    	}
+  	}
+  	catch(error)
+  	{
+    	console.error("Error");
+  	}
+
+
+        if(!joinCode||!userId){
+            return res.status(400).json({error:"Malformed Request"})
+        }
+
+        const trip = await tripCollection.findOne({ joinCode : joinCode});
+        if(!trip){
+            return res.status(400).json({error:"Trip not found"})
+        }
+
+        const userObjectId = new ObjectId(userId)
+        if (trip.memberIds.includes(userObjectId)) {
+            return res.status(400).json({ error: 'User is already a member of this trip' });
+        }
+        //Updates trips members list
+        await tripCollection.updateOne(
+            { _id: trip._id },
+            { $addToSet: { memberIds: userObjectId } }
+        );
+        //Updates user trips list
+        await userCollection.updateOne(
+            { _id: userObjectId },
+            { $addToSet: { trips: trip._id } }
+        );
+
+        res.status(200).json({message:"Success"})
+    } catch(error){
+        console.error("error joining trip")
+        res.status(500).json({error: "error"})
+    }
+    finally{
+        await client.close();
+    }
+    next();
+
+});
+
 // All user related CRUD endpoints will be accessible under /api/
-app.use("/api/users", userCRUDRouter);
+//app.use("/api/users", userCRUDRouter);
 // All trip related CRUD endpoints will be accessible under /api/trips/
 app.use("/api/trips", tripCRUDRouter);
 // All expense related CRUD endpoints will be accessible under /api/expenses/
