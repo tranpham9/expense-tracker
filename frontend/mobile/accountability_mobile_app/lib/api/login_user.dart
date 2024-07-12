@@ -19,13 +19,7 @@ class LoginUser {
         throw Exception("Failed to Log User in");
       }
 
-      // _JsonMap is returned and needs to be converted to map
-      print(
-          "\nWhat is the type of response? ${Map.from(response.data).runtimeType}");
-      // Return a user TODO: This is causing an error
       String jsonMap = jsonEncode(response.data);
-      // Try to de-string-ify manually and plug the values in
-      // "TypeError: Instance of '_JsonMap': type '_JsonMap' is not a subtype of type 'String'"
       return userFromJson(jsonMap);
     } on DioException catch (e) {
       print('Error: $e');

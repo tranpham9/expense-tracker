@@ -1,5 +1,4 @@
 // Contains all helper functions that would be need to complete common tasks throughout the application
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // Input which type you want to validate, ie. password, email, name
@@ -43,6 +42,19 @@ String? validateText(String validateType, String validateText) {
     default:
       return null;
   }
+}
+
+// Determine if a submit button should be disabled or not
+// The errorText for each field should be null and each field shouldn't be empty
+// Return true if errorTexts isn't null, or, if one of textInputs is empty
+bool disableButton(List<String?> errorTexts, List<String> textInputs) {
+  // Ensure all errorTexts are null
+  for (int i = 0; i < errorTexts.length; i++) {
+    if (errorTexts[i] != null || textInputs[i].isEmpty) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // Create an overlay with the text of 'message'

@@ -105,37 +105,43 @@ class _RegisterPage extends State<RegisterPage> {
                     backgroundColor: Theme.of(context).primaryColor,
                     fixedSize: Size(400, 50),
                   ),
+                  // You can press the button if the input requirements are meet
+                  onPressed: disableButton(
+                          [nameError, emailError, passwordError],
+                          [name.text, email.text, password.text])
+                      ? null
+                      : () {
+                          //Call the register API
+                          registerUser(name.text, email.text, password.text)
+                              .then((res) {
+                            // Failed to register
+                            if (res == 400) {
+                              // Let the user know what went wrong
+                              setState(() {
+                                passwordError =
+                                    "Error Registering Your Account";
+                                emailError = "Error Registering Your Account";
+                              });
+                              return;
+                            } else if (res == 401) {
+                              // Let the user know what went wrong
+                              setState(() {
+                                emailError = "That Email is Already Being Used";
+                              });
+                              return;
+                            } else {
+                              // Let the user know that the verification email was sent
+                              _showOverlay(
+                                  "Registration Was Successful! Check Your Email to Verify Your Account.");
+                            }
+                          });
+                        },
                   child: const Text(
                     'Register',
                     style: TextStyle(
                       color: Colors.white,
                     ),
                   ),
-                  onPressed: () {
-                    //Call the register API
-                    registerUser(name.text, email.text, password.text)
-                        .then((res) {
-                      // Failed to register
-                      if (res == 400) {
-                        // Let the user know what went wrong
-                        setState(() {
-                          passwordError = "Error Registering Your Account";
-                          emailError = "Error Registering Your Account";
-                        });
-                        return;
-                      } else if (res == 401) {
-                        // Let the user know what went wrong
-                        setState(() {
-                          emailError = "That Email is Already Being Used";
-                        });
-                        return;
-                      } else {
-                        // Let the user know that the verification email was sent
-                        _showOverlay(
-                            "Registration Was Successful! Check Your Email to Verify Your Account.");
-                      }
-                    });
-                  },
                 ),
               ),
             ],
