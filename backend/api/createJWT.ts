@@ -10,9 +10,9 @@ export function createToken(userId: ObjectId, name: string, email: string) {
         const user = { name, email, userId };
         //Sign the token based on user credentials
         // FIXME: I think that the first parameter (user) is supposed to be a string; should it be stringified json?
-        const accessToken = sign(user, process.env.ACCESS_TOKEN_SECRET!);
+        //const jwt = sign(user, process.env.ACCESS_TOKEN_SECRET!);
 
-        ret = { accessToken };
+        ret = sign(user, process.env.ACCESS_TOKEN_SECRET!);
     } catch (e) {
         ret = { Error: (e as Error).message };
     }

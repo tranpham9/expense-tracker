@@ -8,6 +8,7 @@ import { createEmail } from "./tokenSender";
 import jwt, { JsonWebTokenError, decode } from "jsonwebtoken";
 import { router as tripCRUDRouter } from "./routes/tripCRUD";
 import { router as expenseCRUDRouter } from "./routes/expenseCRUD";
+import { router as userCRUDRouter} from "./routes/userCRUD";
 import { unverified } from "./tokenSender";
 
 //TODO: make api endpoints more modular
@@ -22,7 +23,7 @@ const DB_NAME = "appData";
 const USER_COLLECTION_NAME = "User";
 const TRIP_COLLECTION_NAME = "Trip";
 
-const HOMEPAGE = "https://accountability-190955e8b06f.herokuapp.com"
+const HOMEPAGE = "https://accountability-190955e8b06f.herokuapp.com";
 // express app
 const app = express();
 
@@ -84,7 +85,7 @@ app.get("/api/verify/:token", async (req, res) => {
                 </html>
             `);
             return; // Ensure no further code executes
-        
+
             /*// if tripId is provided, add user to trip
             if (verified?.trips) {
                 // use createFromHexString ( https://github.com/dotansimha/graphql-code-generator/issues/6830#issuecomment-2105266455 )
@@ -135,7 +136,7 @@ app.post("/api/registerUser", async (req, res, next) => {
             res.status(406).json("Must be a valid email");
             return;
     }*/
-   
+
     // TODO: need to validate email is in valid form and that nothing is too long
     // TODO: ensure trips should also include non-owning trips (i.e. ones where the user is a part of but not the creater/owner of)
     const newUser: User = {
@@ -144,9 +145,9 @@ app.post("/api/registerUser", async (req, res, next) => {
         password: password.toString(),
         trips: tripId ? [ObjectId.createFromHexString(tripId.toString())] : [],
     };
-    
+
     // ensure email doesn't already exist
-    const check = await userCollection.findOne({ email: email});
+    const check = await userCollection.findOne({ email: email });
     // console.log(check);
     if (check) {
         console.error("Attempted to register a user with an existing email");
@@ -174,17 +175,14 @@ app.post("/api/login", async (req, res, next) => {
     // trimmed and converted to lowercase to standardize format of emails
     const properEmail = (email.toString() as string).trim().toLocaleLowerCase();
 
-    var ret;
-
     const foundUser = await userCollection.findOne({ email: properEmail });
     if (foundUser && password === foundUser.password) {
-        console.log(foundUser.password);
-        ret = createToken(foundUser._id, foundUser.name, foundUser.email);
+        const jwt = createToken(foundUser._id, foundUser.name, foundUser.email);
         res.status(200).json({
             id: foundUser._id,
             name: foundUser.name,
             email: foundUser.email,
-            token: ret,
+            jwt
         });
     } else {
         res.status(401).json({ error: "Invalid login credentials" });
@@ -194,25 +192,22 @@ app.post("/api/login", async (req, res, next) => {
 app.put("/api/changeName", async (req, res) => {
     const db = client.db(DB_NAME);
     const userCollection = db.collection(USER_COLLECTION_NAME);
-    const {userId,newName} = req.body;
-    if(!userId||!newName){
+    const { userId, newName } = req.body;
+    if (!userId || !newName) {
         res.status(400).json({ error: "Malformed Request" });
         return;
     }
-    const result = await userCollection.updateOne(
-        { _id: ObjectId.createFromHexString(userId.toString()) },
-        { $set: { name: newName } }
-    );
+    const result = await userCollection.updateOne({ _id: ObjectId.createFromHexString(userId.toString()) }, { $set: { name: newName } });
 
     if (result.modifiedCount === 1) {
         res.status(200).json({ message: "Name updated successfully" });
     } else {
         res.status(400).json({ error: "Failed to update name" });
     }
+});
 
-
- });
-
+// All user related CRUD endpoints will be accessible under /api/
+app.use("/api/users", userCRUDRouter);
 // All trip related CRUD endpoints will be accessible under /api/trips/
 app.use("/api/trips", tripCRUDRouter);
 // All expense related CRUD endpoints will be accessible under /api/expenses/
