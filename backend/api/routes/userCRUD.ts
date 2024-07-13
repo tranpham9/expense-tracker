@@ -2,9 +2,9 @@ import express from "express";
 import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, Trip, TRIP_COLLECTION_NAME, User, USER_COLLECTION_NAME } from "./common";
 import { Collection, ObjectId, UUID } from "mongodb";
 import { createEmail, resetPasswordEmail, resetPasswordMap, unverified } from "../tokenSender";
-import * as createJWT from "../createJWT";
 import { verify } from "jsonwebtoken";
 import md5 from "md5";
+import { createJWT, isExpired, refresh } from "../JWT";
 
 export const router = express.Router();
 
@@ -65,7 +65,7 @@ router.post("/login", async (req, res, next) => {
 
         const foundUser = await userCollection.findOne({ email: properEmail });
         if (foundUser && password === foundUser.password) {
-            const jwt = createJWT.createToken(foundUser._id, foundUser.name, foundUser.email);
+            const jwt = createJWT(foundUser._id, foundUser.name, foundUser.email);
             res.status(200).json({
                 id: foundUser._id,
                 name: foundUser.name,
@@ -86,8 +86,8 @@ router.put("/changeName", async (req, res) => {
         const { userId, newName, jwtToken } = req.body;
 
         // Check if the jwt has expired
-        if (!createJWT.isExpired(jwtToken)) {
-            createJWT.refresh(jwtToken);
+        if (!isExpired(jwtToken)) {
+            refresh(jwtToken);
         }
         if (!userId || !newName) {
             res.status(400).json({ error: "Malformed Request" });

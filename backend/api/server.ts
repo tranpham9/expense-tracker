@@ -3,7 +3,7 @@ import express, { json, urlencoded } from "express";
 import { join } from "path";
 import cors from "cors";
 import { Collection, MongoClient, ObjectId } from "mongodb";
-import { createToken, isExpired, refresh } from "./createJWT";
+import { createJWT, isExpired, refresh } from "./JWT";
 import { createEmail, unverified } from "./tokenSender";
 import jwt, { JsonWebTokenError, decode } from "jsonwebtoken";
 import { router as tripCRUDRouter } from "./routes/tripCRUD";

@@ -3,7 +3,7 @@ import { sign, verify, decode } from "jsonwebtoken";
 import { ObjectId } from "mongodb";
 
 //Create a token based on the name, email and password
-export function createToken(userId: ObjectId, name: string, email: string) {
+export function createJWT(userId: ObjectId, name: string, email: string) {
     let ret;
     let expire = "20m";
     try {
@@ -42,5 +42,5 @@ export function refresh(token: string) {
     // @ts-ignore
     let email = ud.payload.email;
 
-    return createToken(userId, name, email);
+    return createJWT(userId, name, email);
 }

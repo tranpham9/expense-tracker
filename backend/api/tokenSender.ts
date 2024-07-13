@@ -1,7 +1,7 @@
 // filename tokenSender.ts
 
 import { createTransport } from "nodemailer";
-import { createToken } from "./createJWT";
+import { createJWT } from "./JWT";
 import { ObjectId, Collection } from "mongodb";
 import { error } from "console";
 import { DB_NAME, getMongoClient, HOMEPAGE, User, USER_COLLECTION_NAME } from "./routes/common";
