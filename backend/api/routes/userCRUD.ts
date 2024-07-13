@@ -148,6 +148,9 @@ router.post("/joinTrip", async(req, res, next) => {
     next();
     
 });
+
+// FIXME: this is wrong; the user wouldn't be passing in an email and a new password via a GET request.  Instead, this would be a POST request initiated through the UI (accordingly, whatever link for reset password which gets sent to the user is something that frontend routing would need to handle).
+// TODO: once the type of this request is fixed, proper response status codes should be implemented
 router.get("/resetPassword/:token", async (req, res) => {
     // incoming email and new password
     const client = await getMongoClient();
@@ -156,8 +159,9 @@ router.get("/resetPassword/:token", async (req, res) => {
 
     const {email, newPassword} = req.body;
 
-    if (email === resetPasswordMap.get(req.params.token)){
-        const updatedResult = await userCollection.updateOne({email: email}, {password: newPassword});
+    if (email === resetPasswordMap.get(req.params.token)) {
+        resetPasswordMap.delete(req.params.token); // single-use
+        const updatedResult = await userCollection.updateOne({email}, {password: newPassword});
     }
 });
 router.get("/verify/:token", async (req, res) => {
