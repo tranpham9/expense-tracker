@@ -1,12 +1,14 @@
 import express from "express";
 import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, Trip, TRIP_COLLECTION_NAME, User, USER_COLLECTION_NAME } from "./common";
-import { Collection, ObjectId } from "mongodb";
-import { createEmail, resetPasswordEmail, resetPasswordMap ,unverified} from "../tokenSender";
+import { Collection, ObjectId, UUID } from "mongodb";
+import { createEmail, resetPasswordEmail, resetPasswordMap, unverified } from "../tokenSender";
 import * as createJWT from "../createJWT";
+import { verify } from "jsonwebtoken";
+import md5 from "md5";
 
 export const router = express.Router();
 
-router.post("/registerUser", async (req, res, next) => {
+router.post("/register", async (req, res, next) => {
     const client = await getMongoClient();
     try {
         const db = client.db(DB_NAME);
@@ -81,10 +83,10 @@ router.put("/changeName", async (req, res) => {
         const db = client.db(DB_NAME);
         const userCollection = db.collection(USER_COLLECTION_NAME);
 
-        const { userId, newName, jwtToken} = req.body;
+        const { userId, newName, jwtToken } = req.body;
 
         // Check if the jwt has expired
-        if(createJWT.isExpired(jwtToken) !== null){
+        if (!createJWT.isExpired(jwtToken)) {
             createJWT.refresh(jwtToken);
         }
         if (!userId || !newName) {
@@ -104,8 +106,15 @@ router.post("/forgotPassword", async (req, res) => {
     // incoming email
     const email = req.body;
 
+    const client = await getMongoClient();
+    const db = client.db(DB_NAME);
+    const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
+
+    const foundEmail = userCollection.findOne({ email });
+    if (!foundEmail) res.status(400).send("No email found in the database.");
+
     await resetPasswordEmail(email);
-    res.status(200).json({message: "Password reset email sent"});
+    res.status(200);
 });
 router.post("/joinTrip", async(req, res, next) => {
     // check incoming params
@@ -155,14 +164,19 @@ router.get("/resetPassword/:token", async (req, res) => {
     // incoming email and new password
     const client = await getMongoClient();
     const db = client.db(DB_NAME);
-    const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME)
+    const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
 
-    const {email, newPassword} = req.body;
+    // call await resetpassword page
+    const { newPassword } = req.body;
+    const token = req.params.token;
 
-    if (email === resetPasswordMap.get(req.params.token)) {
-        resetPasswordMap.delete(req.params.token); // single-use
-        const updatedResult = await userCollection.updateOne({email}, {password: newPassword});
+    let ud = verify(token, process.env.ACCESS_TOKEN_SECRET!, { complete: true });
+    if (!ud) {
+        res.status(401).send("JWT has expired");
     }
+    //@ts-ignore
+    const updatedResult = await userCollection.findOneAndUpdate({ email: ud.payload.email, password: md5(ud.payload.password)}, { password: newPassword });
+    res.status(200).send("Password changed successfully");
 });
 router.get("/verify/:token", async (req, res) => {
     const client = await getMongoClient();

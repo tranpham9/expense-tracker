@@ -2,11 +2,12 @@
 
 import { createTransport } from "nodemailer";
 import { createToken } from "./createJWT";
-import { ObjectId } from "mongodb";
+import { ObjectId, Collection } from "mongodb";
 import { error } from "console";
-import { User } from "./routes/common";
+import { DB_NAME, getMongoClient, HOMEPAGE, User, USER_COLLECTION_NAME } from "./routes/common";
 import { json } from "stream/consumers";
-import { JsonWebTokenError } from "jsonwebtoken";
+import { JsonWebTokenError, sign } from "jsonwebtoken";
+import md5 from "md5";
 
 const transporter = createTransport({
     service: "Gmail",
@@ -32,12 +33,12 @@ export function createEmail(user: User) {
 
     unverified.set(uuid, user);
 
-    //const url = "https://accountability-190955e8b06f.herokuapp.com/api/users/verify/";
-    const url = "http://localhost:5000/api/users/verify/";
+    //const url = HOMEPAGE + "/api/verify/";
+    const url = "http://localhost:5000/api/verify/";
 
     const mailConfigurations = {
         // It should be a string of sender/server email
-        from: "cop4331.donotreply@gmail.com",
+        from: process.env.EMAIL,
 
         to: user.email,
 
@@ -61,17 +62,32 @@ export function createEmail(user: User) {
     });
     return 200;
 }
-export function resetPasswordEmail(email: string){
-    let uuid = crypto.randomUUID();
 
-    resetPasswordMap.set(uuid, email);
+export async function resetPasswordEmail(email: string) {
+    const client = await getMongoClient();
+    const db = client.db(DB_NAME);
+    const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
 
-    //const url = "https://accountability-190955e8b06f.herokuapp.com/api/users/verify/";
-    const url = "http://localhost:5000/api/users/resetPassword/";
+    // standardize the format of emails
+    const properEmail = (email.toString() as string).trim().toLocaleLowerCase();
+
+    // acquire the user information to create a jwt
+    const result = await userCollection.findOne({ email });
+    const expire = "5m";
+    const jwt="";
+
+    if(result){
+        const {_id, name, email} = result; 
+        const hashPass = md5(result.password);
+        const jwt = sign({_id, name, email, hashPass}, process.env.ACCESS_TOKEN_SECRET!, {expiresIn: expire});
+    }
+    
+    const url = HOMEPAGE + "/resetPassword";
+    //const url = "http://localhost:5000/resetPassword";
 
     const mailConfigurations = {
         // It should be a string of sender/server email
-        from: "cop4331.donotreply@gmail.com",
+        from: process.env.EMAIL,
 
         to: email,
 
@@ -81,8 +97,7 @@ export function resetPasswordEmail(email: string){
         // This would be the text of email body
         text: `Hi! There, You have recently visited our website and requested to change your password\n 
         Please follow the given link to change your password\n
-        ${url}${uuid}\n\n
-        \t${uuid}
+        ${url}${jwt}\n\n
         Thanks`,
     };
 
