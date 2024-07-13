@@ -4,7 +4,7 @@ import { Collection, ObjectId } from "mongodb";
 import { createEmail, resetPasswordEmail, unverified } from "../tokenSender";
 import { verify } from "jsonwebtoken";
 import md5 from "md5";
-import { createJWT, isExpired, refresh } from "../JWT";
+import { createJWT, extractUserId, isExpired, refresh } from "../JWT";
 
 export const router = express.Router();
 
@@ -13,7 +13,7 @@ router.post("/register", async (req, res, next) => {
     try {
         const db = client.db(DB_NAME);
         const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
-        //remove name field so user can signup without a name
+        // TODO: I believe we don't need an optional trip id here anymore?
         const { name, email, password, tripId } = req.body;
         if (!name || !email || !password) {
             res.status(400).json({ error: "Malformed Request" });
@@ -48,6 +48,7 @@ router.post("/register", async (req, res, next) => {
         res.status(200);
     } catch (err) {}
 });
+
 router.post("/login", async (req, res, next) => {
     const client = await getMongoClient();
     try {
@@ -65,67 +66,88 @@ router.post("/login", async (req, res, next) => {
 
         const foundUser = await userCollection.findOne({ email: properEmail });
         if (foundUser && password === foundUser.password) {
-            const token = createJWT(foundUser._id, foundUser.name, foundUser.email);
+            const jwt = createJWT(foundUser._id, foundUser.email);
             res.status(200).json({
-                id: foundUser._id,
                 name: foundUser.name,
                 email: foundUser.email,
-                token,
+                jwt,
             });
         } else {
             res.status(401).json({ error: "Invalid login credentials" });
         }
-    } catch (err) {}
+    } catch (err) {
+        res.status(500).json({ error: "Something went wrong" });
+    }
 });
+
 router.put("/changeName", async (req, res) => {
     const client = await getMongoClient();
     try {
         const db = client.db(DB_NAME);
         const userCollection = db.collection(USER_COLLECTION_NAME);
 
-        const { userId, newName, jwtToken } = req.body;
+        let { newName, jwt } = req.body;
 
-        // Check if the jwt has expired
-        if (!isExpired(jwtToken)) {
-            refresh(jwtToken);
-        }
-        if (!userId || !newName) {
+        if (!newName || !jwt) {
             res.status(400).json({ error: "Malformed Request" });
             return;
         }
-        const result = await userCollection.updateOne({ _id: ObjectId.createFromHexString(userId.toString()) }, { $set: { name: newName } });
+
+        // ensure jwt hasn't expired
+        jwt = refresh(jwt);
+        if (!jwt) {
+            res.status(401).json({ error: "Session Expired" });
+            return;
+        }
+
+        const userId = extractUserId(jwt);
+        if (!userId) {
+            res.status(401).json({ error: "Malformed JWT" });
+            return;
+        }
+
+        const result = await userCollection.updateOne({ _id: userId }, { $set: { name: newName } });
 
         if (result.modifiedCount === 1) {
             res.status(200).json({ message: "Name updated successfully" });
         } else {
             res.status(400).json({ error: "Failed to update name" });
         }
-    } catch (err) {}
+    } catch (err) {
+        res.status(500).json({ error: "Something went wrong" });
+    }
 });
+
 router.post("/forgotPassword", async (req, res) => {
-    // incoming email
-    const email = req.body;
+    const { email } = req.body;
 
     const client = await getMongoClient();
     const db = client.db(DB_NAME);
     const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
 
     const foundEmail = userCollection.findOne({ email });
-    if (!foundEmail) res.status(400).send("No email found in the database.");
+    if (!foundEmail) {
+        res.status(400).send("No email found in the database.");
+        return;
+    }
 
     await resetPasswordEmail(email);
     res.status(200);
 });
 router.post("/joinTrip", async (req, res, next) => {
+    const { inviteCode, jwt } = req.body;
+
     // check incoming params
-    if (!req.body.userId || !req.body.inviteCode) {
-        res.statusCode = 400;
-        res.json({ error: "userId + inviteCode required" });
+    if (inviteCode) {
+        res.status(400).json({ error: "inviteCode required" });
         return;
     }
-    // NOTE: in the future, we may extract userId from the JWT
-    // for now, let's pass it manually to verify it works
-    const userId = ObjectId.createFromHexString(req.body.userId);
+
+    const userId = extractUserId(jwt);
+    if (!userId) {
+        res.status(401).json({ error: "Malformed JWT" });
+        return;
+    }
 
     const client = await getMongoClient();
     try {
@@ -134,38 +156,31 @@ router.post("/joinTrip", async (req, res, next) => {
         const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
 
         // query the trip with this invite code (unique per trip)
-        const trip = await tripCol.findOne({ inviteCode: String(req.body.inviteCode) });
-        if (trip === null) {
-            res.statusCode = 400;
-            res.json({ error: "Invalid invite code" });
+        const trip = await tripCol.findOne({ inviteCode });
+        if (!trip) {
+            res.status(400).json({ error: "Invalid invite code" });
             return;
         }
 
         // prevent joining the same trip twice - technically not an error
-        if(trip.memberIds.some(x => x.equals(userId))) { 
-            res.status(200).json({
-                message: 'Success (already a member of the trip)',
-                token: res.locals.refreshedToken
-            });
+        if (trip.memberIds.some((x) => x.equals(userId))) {
+            res.status(200).json({ message: "Success (already a member of the trip)", jwt });
             return;
         }
 
         // if found, add this user to the trip
-        await tripCol.updateOne({_id: trip._id}, { $push: { memberIds: userId }});
-        res.status(200).json({
-            message: 'Successfully joined the trip',
-            token: res.locals.refreshedToken
-        });
-    }
-    finally {
+        await tripCol.updateOne({ _id: trip._id }, { $push: { memberIds: userId } });
+        res.status(200).json({ message: "Successfully joined the trip" });
+    } catch (error) {
+        res.status(500).json({ error: "Something went wrong" });
+    } finally {
         await client.close();
     }
-    next();
 });
 
 // FIXME: this is wrong; the user wouldn't be passing in an email and a new password via a GET request.  Instead, this would be a POST request initiated through the UI (accordingly, whatever link for reset password which gets sent to the user is something that frontend routing would need to handle).
 // TODO: once the type of this request is fixed, proper response status codes should be implemented
-router.get("/resetPassword/:token", async (req, res) => {
+router.post("/resetPassword/:token", async (req, res) => {
     // incoming email and new password
     const client = await getMongoClient();
     const db = client.db(DB_NAME);
@@ -183,6 +198,7 @@ router.get("/resetPassword/:token", async (req, res) => {
     const updatedResult = await userCollection.findOneAndUpdate({ email: ud.payload.email, password: md5(ud.payload.password) }, { password: newPassword });
     res.status(200).send("Password changed successfully");
 });
+
 router.get("/verify/:token", async (req, res) => {
     const client = await getMongoClient();
     const db = client.db(DB_NAME);
@@ -243,3 +259,4 @@ router.get("/verify/:token", async (req, res) => {
         res.status(401).json({ error: "Invalid registration token" });
     }
 });
+
