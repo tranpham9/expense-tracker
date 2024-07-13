@@ -1,13 +1,36 @@
 // Display all of the different pages related to the different CRUD operations for each trip
+import 'package:accountability_mobile_app/api/trip_crud.dart';
 import 'package:flutter/material.dart';
+import '../../globals.dart';
 import '../../models/models.dart';
+import '../../utility/helpers.dart';
 
-class AddTripsPage extends StatelessWidget {
+class AddTripsPage extends StatefulWidget {
+  @override
+  State<AddTripsPage> createState() => _AddTripsPageState();
+}
+
+class _AddTripsPageState extends State<AddTripsPage> {
   // Grab text that will be entered by the user
   final TextEditingController name = TextEditingController();
   final TextEditingController notes = TextEditingController();
-  final TextEditingController members = TextEditingController();
   final TextEditingController code = TextEditingController();
+
+  // Show a pop up overlay after a successful registration
+  OverlayEntry? _overlayEntry;
+
+  Future<int?> createTrip(String leaderId, String name, String notes) async {
+    return await TripCRUD.createTrip(leaderId, name, notes);
+  }
+
+  // Show a given pop up overlay
+  void _showOverlay(String message) {
+    _overlayEntry = createOverlayEntry(message);
+    Overlay.of(context)!.insert(_overlayEntry!);
+    Future.delayed(const Duration(seconds: 5), () {
+      _overlayEntry?.remove();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,14 +83,26 @@ class AddTripsPage extends StatelessWidget {
                   style: TextStyle(color: Colors.white),
                 ),
                 onPressed: () {
-                  // TODO: Call the API to add the trip
-                  // also figure out how to handel reading the emails properly
+                  // Create a trip with the current user as the leader
+                  createTrip(Globals.user!.id, name.text, notes.text)
+                      .then((response) {
+                    // Display an error message to the user
+                    if (response == null) {
+                      _showOverlay(
+                          "There was an error creating your trip. Please try again.");
+                      return;
+                    }
+                    // Display success to the user
+                    _showOverlay("Successfully create ${name.text}!");
+                    return;
+                  });
                 },
               ),
             ),
             SizedBox(
               height: 150,
             ),
+            // TODO: Call the join trip endpoint to add a user to a trip
             // Allow others to join a trip by inputting a trip code
             JoinTrip(code: code),
           ],

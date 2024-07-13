@@ -9,5 +9,9 @@ class Config {
   static const String registerAPI = '/registerUser';
   // Trips
   static const String getTripsAPI = '/trips/getTripsForUser';
+  static const String getTripsOwnedAPI = '/trips/getTripsOwnedByUser';
+  static const String createTrip = '/trips/createTrip';
   // Expenses
+
+  // User
 }

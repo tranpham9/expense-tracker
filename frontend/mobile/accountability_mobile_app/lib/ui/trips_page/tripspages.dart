@@ -72,6 +72,15 @@ class _TripsPageState extends State<TripsPage> {
                       itemBuilder: (context, index) => ListTile(
                         title: Text(trips[index].name),
                         subtitle: Text(trips[index].notes),
+                        onLongPress: () {
+                          Navigator.push(
+                            context,
+                            // TODO: Route to a page displaying information on a trip
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    ViewTripPage(trips[index])),
+                          );
+                        },
                       ),
                       itemCount: trips.length,
                     );
