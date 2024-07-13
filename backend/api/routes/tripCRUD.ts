@@ -271,4 +271,14 @@ router.post("/listOwnerOf", async (req, res, next) => {
     }
 });
 
+// TODO: move from userCRUD
+router.post("/join", async (req, res, next) => {
+    // TODO: impl
+    res.status(200).json({message: "not implemented yet"});
+});
+
+// NOTE: this will need to remove the user from the trip and from all expenses (this might get a bit difficult with the payer field of expenses, so maybe we don't want to allow leaving?)
+router.post("/leave", async (req, res, next) => {
+    // TODO: impl
+    res.status(200).json({message: "not implemented yet"});
 });

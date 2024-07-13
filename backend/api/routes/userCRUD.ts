@@ -135,6 +135,7 @@ router.post("/forgotPassword", async (req, res) => {
     res.status(200);
 });
 
+// TODO: move to tripCRUD
 router.post("/joinTrip", async (req, res, next) => {
     const { inviteCode, jwt } = req.body;
 
