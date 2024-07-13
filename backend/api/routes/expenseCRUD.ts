@@ -62,7 +62,7 @@ router.post("/create", async (req, res, next) => {
  * Read an expense. Note that this can also be done with /trips/readTrip which
  * will return all the expenses for a single trip.
  */
-router.post("/read", async (req, res, next) => {
+router.post("/get", async (req, res, next) => {
     // expenseId is required
     if (!req.body.expenseId) {
         res.statusCode = 400;
