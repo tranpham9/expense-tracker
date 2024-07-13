@@ -62,6 +62,7 @@ export function createEmail(user: User) {
     });
     return 200;
 }
+
 export async function resetPasswordEmail(email: string) {
     const client = await getMongoClient();
     const db = client.db(DB_NAME);

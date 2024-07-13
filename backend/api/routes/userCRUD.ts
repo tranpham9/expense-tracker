@@ -116,7 +116,51 @@ router.post("/forgotPassword", async (req, res) => {
     await resetPasswordEmail(email);
     res.status(200);
 });
-router.put("/resetPassword/:token", async (req, res) => {
+router.post("/joinTrip", async(req, res, next) => {
+    // check incoming params
+    if(!req.body.userId || !req.body.inviteCode) {
+        res.statusCode = 400;
+        res.json({error: 'userId + inviteCode required'});
+        return;
+    }
+    // NOTE: in the future, we may extract userId from the JWT
+    // for now, let's pass it manually to verify it works
+    const userId = ObjectId.createFromHexString(req.body.userId);
+
+    const client = await getMongoClient();
+    try {
+        const db = client.db(DB_NAME);
+        const userCol: Collection<User> = db.collection(USER_COLLECTION_NAME);
+        const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
+
+        // query the trip with this invite code (unique per trip)
+        const trip = await tripCol.findOne({inviteCode: String(req.body.inviteCode)});
+        if(trip === null) {
+            res.statusCode = 400;
+            res.json({error: 'Invalid invite code'});
+            return;
+        }
+
+        // prevent joining the same trip twice - technically not an error
+        if(trip.memberIds.some(x => x.equals(userId))) { 
+            res.status(200).json({'message': 'Success (already a member of the trip)'});
+            return;
+        }
+
+        // if found, add this user to the trip
+        await tripCol.updateOne({_id: trip._id}, { $push: { memberIds: userId }});
+        res.status(200).json({'message': 'Successfully joined the trip'});
+    }
+    finally {
+        await client.close();
+    }
+    next();
+    
+});
+
+// FIXME: this is wrong; the user wouldn't be passing in an email and a new password via a GET request.  Instead, this would be a POST request initiated through the UI (accordingly, whatever link for reset password which gets sent to the user is something that frontend routing would need to handle).
+// TODO: once the type of this request is fixed, proper response status codes should be implemented
+router.get("/resetPassword/:token", async (req, res) => {
     // incoming email and new password
     const client = await getMongoClient();
     const db = client.db(DB_NAME);

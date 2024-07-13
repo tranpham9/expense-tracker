@@ -6,10 +6,11 @@ import 'package:dio/dio.dart';
 class RegisterUser {
   static Future<int?> register(
       String name, String email, String password) async {
+    // Create a connection client
     final Dio dio = new Dio();
     Response? response;
-    // Attempt to register with the info
     try {
+      // Call the API
       response = await dio.post(
         '${Config.remoteApiURL}${Config.registerAPI}',
         data: jsonEncode(<String, String>{
@@ -18,6 +19,7 @@ class RegisterUser {
           "password": password
         }),
       );
+
       // If the response isn't 200, set the status code to the error
       if (response.statusCode != 200) {
         throw Exception("Failed to Register User");

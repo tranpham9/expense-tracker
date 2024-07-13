@@ -1,3 +1,4 @@
+// TODO: Call API here? To fill in the data about the user
 import 'package:accountability_mobile_app/globals.dart';
 import 'package:flutter/material.dart';
 

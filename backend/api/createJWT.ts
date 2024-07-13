@@ -25,6 +25,7 @@ export function isExpired(token: string): boolean {
         return true; // Token has expired
     }
 }
+
 //Each time a valid operation has taken place refresh and get a new JWT
 export function refresh(token: string) {
     let ud = decode(token, { complete: true });
