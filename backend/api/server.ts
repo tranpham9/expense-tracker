@@ -2,8 +2,8 @@ import "dotenv/config";
 import express, { json, urlencoded } from "express";
 import { join } from "path";
 import cors from "cors";
-import { Collection, MongoClient, ObjectId } from "mongodb"
-import { createToken, isExpired, refresh} from "./createJWT";
+import { Collection, MongoClient, ObjectId } from "mongodb";
+import { createToken, isExpired, refresh } from "./createJWT";
 import { createEmail, unverified } from "./tokenSender";
 import jwt, { JsonWebTokenError, decode } from "jsonwebtoken";
 import { router as tripCRUDRouter } from "./routes/tripCRUD";
@@ -23,50 +23,44 @@ app.use(cors());
 app.use(json());
 app.use(urlencoded({ extended: true }));
 
-app.post("/api/refreshJWT", async(req, res)=>{
+app.post("/api/refreshJWT", async (req, res) => {
     const { token } = req.body;
     if (!token) {
-        return res.status(400).json({ error: 'Token is required' });
+        return res.status(400).json({ error: "Token is required" });
     }
 
     try {
         // Check if the token is expired
         const expired = isExpired(token);
         if (expired) {
-            return res.status(401).json({ error: 'Token has expired' });
+            return res.status(401).json({ error: "Token has expired" });
         }
 
         // Refresh the token
         const newToken = refresh(token);
         if (!newToken) {
-            return res.status(400).json({ error: 'Could not refresh token' });
+            return res.status(400).json({ error: "Could not refresh token" });
         }
         return res.status(200).json({ jwt: newToken });
     } catch (error) {
-        return res.status(500).json({ error: 'error' });
+        return res.status(500).json({ error: "error" });
     }
 });
 
-
 // JWT Verification - For any routes declared *below* this one,
 // verification will be enforced with some exceptions.
-app.use('/api/', (req, res, next) => {
-    let exceptions = [
-        '/users/login',
-        '/users/registerUser',
-        '/users/forgotPassword',
-        '/users/resetPassword '
-    ];
-    if(exceptions.some(prefix => req.path.startsWith(prefix))) {
+app.use("/api/", (req, res, next) => {
+    let exceptions = ["/users/login", "/users/registerUser", "/users/forgotPassword", "/users/resetPassword "];
+    if (exceptions.some((prefix) => req.path.startsWith(prefix))) {
         // bypass verification for the paths above
         next();
         return;
     }
 
-    if(!req.body.jwt || isExpired(req.body.jwt)) {
+    if (!req.body.jwt || isExpired(req.body.jwt)) {
         // terminates the response
         res.statusCode = 400;
-        res.json({error: 'JWT token not provided or invalid/expired'});
+        res.json({ error: "JWT token not provided or invalid/expired" });
         return;
     }
 

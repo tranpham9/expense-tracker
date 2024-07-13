@@ -10,7 +10,7 @@ export function createToken(userId: ObjectId, name: string, email: string) {
         const user = { name, email, userId };
         //Sign the token based on user credentials
 
-        ret = sign(user, process.env.ACCESS_TOKEN_SECRET!, {expiresIn: expire});
+        ret = sign(user, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: expire });
     } catch (e) {
         ret = { Error: (e as Error).message };
     }

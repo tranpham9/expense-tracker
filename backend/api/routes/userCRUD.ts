@@ -116,11 +116,11 @@ router.post("/forgotPassword", async (req, res) => {
     await resetPasswordEmail(email);
     res.status(200);
 });
-router.post("/joinTrip", async(req, res, next) => {
+router.post("/joinTrip", async (req, res, next) => {
     // check incoming params
-    if(!req.body.userId || !req.body.inviteCode) {
+    if (!req.body.userId || !req.body.inviteCode) {
         res.statusCode = 400;
-        res.json({error: 'userId + inviteCode required'});
+        res.json({ error: "userId + inviteCode required" });
         return;
     }
     // NOTE: in the future, we may extract userId from the JWT
@@ -134,28 +134,26 @@ router.post("/joinTrip", async(req, res, next) => {
         const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
 
         // query the trip with this invite code (unique per trip)
-        const trip = await tripCol.findOne({inviteCode: String(req.body.inviteCode)});
-        if(trip === null) {
+        const trip = await tripCol.findOne({ inviteCode: String(req.body.inviteCode) });
+        if (trip === null) {
             res.statusCode = 400;
-            res.json({error: 'Invalid invite code'});
+            res.json({ error: "Invalid invite code" });
             return;
         }
 
         // prevent joining the same trip twice - technically not an error
-        if(trip.memberIds.some(x => x.equals(userId))) { 
-            res.status(200).json({'message': 'Success (already a member of the trip)'});
+        if (trip.memberIds.some((x) => x.equals(userId))) {
+            res.status(200).json({ message: "Success (already a member of the trip)" });
             return;
         }
 
         // if found, add this user to the trip
-        await tripCol.updateOne({_id: trip._id}, { $push: { memberIds: userId }});
-        res.status(200).json({'message': 'Successfully joined the trip'});
-    }
-    finally {
+        await tripCol.updateOne({ _id: trip._id }, { $push: { memberIds: userId } });
+        res.status(200).json({ message: "Successfully joined the trip" });
+    } finally {
         await client.close();
     }
     next();
-    
 });
 
 // FIXME: this is wrong; the user wouldn't be passing in an email and a new password via a GET request.  Instead, this would be a POST request initiated through the UI (accordingly, whatever link for reset password which gets sent to the user is something that frontend routing would need to handle).
@@ -175,7 +173,7 @@ router.get("/resetPassword/:token", async (req, res) => {
         res.status(401).send("JWT has expired");
     }
     //@ts-ignore
-    const updatedResult = await userCollection.findOneAndUpdate({ email: ud.payload.email, password: md5(ud.payload.password)}, { password: newPassword });
+    const updatedResult = await userCollection.findOneAndUpdate({ email: ud.payload.email, password: md5(ud.payload.password) }, { password: newPassword });
     res.status(200).send("Password changed successfully");
 });
 router.get("/verify/:token", async (req, res) => {

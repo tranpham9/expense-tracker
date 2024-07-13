@@ -3,12 +3,12 @@
  * Common utilities, types, constants, and functions for the API.
  */
 
-import { Collection, MongoClient, ObjectId } from 'mongodb';
+import { Collection, MongoClient, ObjectId } from "mongodb";
 
-export const DB_NAME = 'appData';
-export const USER_COLLECTION_NAME = 'User';
-export const EXPENSE_COLLECTION_NAME = 'Expense';
-export const TRIP_COLLECTION_NAME = 'Trip';
+export const DB_NAME = "appData";
+export const USER_COLLECTION_NAME = "User";
+export const EXPENSE_COLLECTION_NAME = "Expense";
+export const TRIP_COLLECTION_NAME = "Trip";
 
 /* Homepage constant */
 export const HOMEPAGE = "https://accountability-190955e8b06f.herokuapp.com";
@@ -22,7 +22,7 @@ export async function getMongoClient(): Promise<MongoClient> {
     let uri: string;
 
     uri = process.env.MONGODB_URI!;
-    if(uri === null) {
+    if (uri === null) {
         throw new Error("MONGODB_URI environment variable not defined");
     }
 
@@ -43,13 +43,13 @@ export type User = {
 };
 
 export type Expense = {
-    name: string,
-    tripId: ObjectId,
-    description: string,
-    cost: string,
-    memberIds: ObjectId[],
-    payerId: ObjectId
-}
+    name: string;
+    tripId: ObjectId;
+    description: string;
+    cost: string;
+    memberIds: ObjectId[];
+    payerId: ObjectId;
+};
 
 export type Trip = {
     name: string;

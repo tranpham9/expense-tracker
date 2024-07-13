@@ -42,7 +42,7 @@ router.post("/create", async (req, res, next) => {
         // randomly generated permanent invite code for this trip
         let inviteCode = null;
         // ensure such code does not already exist for another trip (unlikely but might as well check)
-        while(inviteCode == null || tripCol.findOne({inviteCode: inviteCode}) !== null) {
+        while (inviteCode == null || tripCol.findOne({ inviteCode: inviteCode }) !== null) {
             // 000000 to 999999 as string padded with zeroes
             let num = Math.floor(Math.random() * 1000000);
             inviteCode = String(num).padStart(6, "0");
@@ -53,7 +53,7 @@ router.post("/create", async (req, res, next) => {
             notes: req.body.notes,
             memberIds: [],
             leaderId: leaderId,
-            inviteCode: inviteCode
+            inviteCode: inviteCode,
         });
 
         // And update the user object
