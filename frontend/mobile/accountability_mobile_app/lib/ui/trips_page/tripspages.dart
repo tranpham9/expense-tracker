@@ -3,7 +3,8 @@ import 'package:accountability_mobile_app/api/trip_crud.dart';
 import 'package:accountability_mobile_app/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import '../../models/models.dart';
+import '../../models/Trip.dart';
+import 'tripcrud.dart';
 
 // Trip Related Widgets
 // TODO: Fix this so a loading animation occurs while data is being fetched
@@ -15,6 +16,11 @@ class TripsPage extends StatefulWidget {
 class _TripsPageState extends State<TripsPage> {
   // Grab the search field when we want to search
   final TextEditingController _searchQuery = TextEditingController();
+
+  // Get a list of trips a user is apart of
+  Future<List<Trip>?> getTrips(String userId) async {
+    return await TripCRUD.getTrips(Globals.user!.id);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,18 +62,19 @@ class _TripsPageState extends State<TripsPage> {
             ),
             // List of Trips
             FutureBuilder(
-                future: TripCRUD.getTrips(Globals.user!.id),
+                future: getTrips(Globals.user!.id),
                 builder: (context, snapshot) {
                   // Display the loading skeleton for the trips
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Expanded(
-                      child: ListView.separated(
-                          itemBuilder: (context, index) => TripsSkeleton(),
-                          separatorBuilder: (context, index) => const SizedBox(
-                                height: 16,
-                              ),
-                          itemCount: 10),
-                    );
+                    return Skeletonizer(
+                        child: ListView.builder(
+                            itemCount: Globals.fakeTrips.length,
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                title: Text(Globals.fakeTrips[index].name),
+                                subtitle: Text(Globals.fakeTrips[index].notes),
+                              );
+                            }));
                   } else if (snapshot.hasData) {
                     List<Trip> trips = snapshot.data!;
                     return Expanded(
@@ -75,16 +82,15 @@ class _TripsPageState extends State<TripsPage> {
                       itemBuilder: (context, index) => ListTile(
                         title: Text(trips[index].name),
                         subtitle: Text(trips[index].notes),
-                        trailing: Text('${trips[index].membersIds.length}'),
-                        onTap: () {
-                          // Navigator.push(
-                          //   context,
-                          //   // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
-                          //   MaterialPageRoute(
-                          //       builder: (context) =>
-                          //           ViewTripPage(trips[index])),
-                          // );
-                        },
+                        // onTap: () {
+                        //   Navigator.push(
+                        //     context,
+                        //     // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
+                        //     MaterialPageRoute(
+                        //         builder: (context) =>
+                        //             ViewTripPage(trips[index])),
+                        //   );
+                        // },
                       ),
                       itemCount: trips.length,
                     ));
@@ -103,6 +109,7 @@ class TripsSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      child: ListTile(),
       height: 16,
       width: 16,
       padding: EdgeInsets.all(10),
@@ -112,7 +119,6 @@ class TripsSkeleton extends StatelessWidget {
     );
   }
 }
-
 /*
 class ViewTripPage extends StatefulWidget {
   final Trip trip;
@@ -173,6 +179,7 @@ class _ViewTripPage extends State<ViewTripPage> {
           Row(
             children: [
               // Plus button to add a member
+              // TODO: Might delete this since we are using a trip code to allow memebers to join
               SizedBox(
                 width: 75,
                 height: 75,
@@ -192,6 +199,7 @@ class _ViewTripPage extends State<ViewTripPage> {
                 ),
               ),
               // Display the members of the trip in a horizontal scroll format
+              // TODO: Future builder here to get the list of all members within a trip
               Expanded(
                 child: SizedBox(
                   width: 75,
@@ -255,6 +263,7 @@ class _ViewTripPage extends State<ViewTripPage> {
             ),
           ),
           // Display a ListView of the expenses associated with the trip
+          // TODO: FutureBuilder will need to be here 
           Expanded(
               child: SizedBox(
             width: double.infinity,

@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:accountability_mobile_app/api/config.dart';
 import 'package:dio/dio.dart';
-import '../models/models.dart';
+import '../models/Trip.dart';
 
 class TripCRUD {
   // Fetch a list of trips the user is in
@@ -18,9 +18,12 @@ class TripCRUD {
       if (response.statusCode != 200) {
         throw Exception("Failed to Fetch Trips");
       }
-      // Stringify the data
-      String trips = jsonEncode(response.data);
-      return null;
+      // Decode the JSON data
+      List<dynamic> jsonData = response.data;
+      print(jsonData);
+      // Convert the JSON data to a list of Trip objects
+      // return jsonData.map((item) => Trip.fromJson(item)).toList();
+      return tripListFromJson(json.encode(jsonData));
     } on DioException catch (e) {
       print('Error: $e');
       // return nothing
