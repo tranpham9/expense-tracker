@@ -6,7 +6,8 @@ import { ObjectId, Collection } from "mongodb";
 import { error } from "console";
 import { DB_NAME, getMongoClient, HOMEPAGE, User, USER_COLLECTION_NAME } from "./routes/common";
 import { json } from "stream/consumers";
-import { JsonWebTokenError } from "jsonwebtoken";
+import { JsonWebTokenError, sign } from "jsonwebtoken";
+import md5 from "md5";
 
 const transporter = createTransport({
     service: "Gmail",
@@ -71,14 +72,15 @@ export async function resetPasswordEmail(email: string) {
 
     // acquire the user information to create a jwt
     const result = await userCollection.findOne({ email });
-    const expire = "5 minutes";
-    const jwt = "";
+    const expire = "5m";
+    const jwt="";
 
-    // create the jwt
-    if (result) {
-        const jwt = createToken(result._id, result.name, result.email, expire);
+    if(result){
+        const {_id, name, email} = result; 
+        const hashPass = md5(result.password);
+        const jwt = sign({_id, name, email, hashPass}, process.env.ACCESS_TOKEN_SECRET!, {expiresIn: expire});
     }
-
+    
     const url = HOMEPAGE + "/resetPassword";
     //const url = "http://localhost:5000/resetPassword";
 

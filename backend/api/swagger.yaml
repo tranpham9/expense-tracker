@@ -10,7 +10,7 @@ schemes:
   - https
 
 paths:
-  /login:
+  /users/login:
     post:
       summary: Application user login endpoint
       description: Performs user authentication
@@ -47,7 +47,7 @@ paths:
           description: "Authentication failure, either wrong username or password"
           schema:
                 $ref: '#/definitions/ErrorInfo'
-  /registerUser:
+  /users/register:
     post:
       summary: New user registration endpoint
       description: Creates a new application user
@@ -67,6 +67,23 @@ paths:
           description: "Authentication failure, either wrong username or password"
           schema:
                 $ref: '#/definitions/ErrorInfo'
+  /users/forgotPassword:
+    post:
+      summary: Request for password change endpoint.
+      description: Creates a request to tokensender.ts to send an email to the user.
+      parameters:
+      - in: body
+        name: Forgot Password
+        schema:
+          $ref: '#/definitions/ForgotPasswordDefinition'
+  /users/resetPassword:
+    put:
+      summary:
+      description:
+      parameters:
+      - in: body
+        name: Reset Password
+        schema:
   /trips/createTrip:
     post:
       summary: CREATE trip endpoint
@@ -415,6 +432,11 @@ definitions:
           type: string
           description: Authentication password
           example: COP4331
+    ForgotPasswordDefinition:
+      email:
+        type: string
+        description: Email of the user
+        example: sample@example.com
     UserFullRow:
       type: object
       properties:
