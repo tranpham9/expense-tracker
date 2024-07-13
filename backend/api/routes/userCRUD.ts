@@ -1,12 +1,12 @@
 import express from "express";
 import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, Trip, TRIP_COLLECTION_NAME, User, USER_COLLECTION_NAME } from "./common";
 import { Collection, ObjectId } from "mongodb";
-import { createEmail, resetPasswordEmail, resetPasswordMap ,unverified} from "../tokenSender";
+import { createEmail, resetPasswordEmail, resetPasswordMap, unverified } from "../tokenSender";
 import * as createJWT from "../createJWT";
 
 export const router = express.Router();
 
-router.post("/registerUser", async (req, res, next) => {
+router.post("/register", async (req, res, next) => {
     const client = await getMongoClient();
     try {
         const db = client.db(DB_NAME);
@@ -63,7 +63,8 @@ router.post("/login", async (req, res, next) => {
 
         const foundUser = await userCollection.findOne({ email: properEmail });
         if (foundUser && password === foundUser.password) {
-            const jwt = createJWT.createToken(foundUser._id, foundUser.name, foundUser.email);
+            const expire = "20 minutes";
+            const jwt = createJWT.createToken(foundUser._id, foundUser.name, foundUser.email, expire);
             res.status(200).json({
                 id: foundUser._id,
                 name: foundUser.name,
@@ -81,10 +82,10 @@ router.put("/changeName", async (req, res) => {
         const db = client.db(DB_NAME);
         const userCollection = db.collection(USER_COLLECTION_NAME);
 
-        const { userId, newName, jwtToken} = req.body;
+        const { userId, newName, jwtToken } = req.body;
 
         // Check if the jwt has expired
-        if(createJWT.isExpired(jwtToken) !== null){
+        if (createJWT.isExpired(jwtToken) !== null) {
             createJWT.refresh(jwtToken);
         }
         if (!userId || !newName) {
@@ -110,12 +111,13 @@ router.get("/resetPassword/:token", async (req, res) => {
     // incoming email and new password
     const client = await getMongoClient();
     const db = client.db(DB_NAME);
-    const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME)
+    const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
 
-    const {email, newPassword} = req.body;
+    // call await resetpassword page
+    const { email, newPassword } = req.body;
 
-    if (email === resetPasswordMap.get(req.params.token)){
-        const updatedResult = await userCollection.updateOne({email: email}, {password: newPassword});
+    if (email === resetPasswordMap.get(req.params.token)) {
+        const updatedResult = await userCollection.updateOne({ email: email }, { password: newPassword });
     }
 });
 router.get("/verify/:token", async (req, res) => {

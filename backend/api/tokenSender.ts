@@ -2,9 +2,9 @@
 
 import { createTransport } from "nodemailer";
 import { createToken } from "./createJWT";
-import { ObjectId } from "mongodb";
+import { ObjectId, Collection } from "mongodb";
 import { error } from "console";
-import { User } from "./routes/common";
+import { DB_NAME, getMongoClient, HOMEPAGE, User, USER_COLLECTION_NAME } from "./routes/common";
 import { json } from "stream/consumers";
 import { JsonWebTokenError } from "jsonwebtoken";
 
@@ -32,14 +32,12 @@ export function createEmail(user: User) {
 
     unverified.set(uuid, user);
 
-    //const url = "https://accountability-190955e8b06f.herokuapp.com/api/verify/";
+    //const url = HOMEPAGE + "/api/verify/";
     const url = "http://localhost:5000/api/verify/";
-
-    //https://accountability-190955e8b06f.herokuapp.com/api/verify/${uuid}
 
     const mailConfigurations = {
         // It should be a string of sender/server email
-        from: "cop4331.donotreply@gmail.com",
+        from: process.env.EMAIL,
 
         to: user.email,
 
@@ -63,17 +61,30 @@ export function createEmail(user: User) {
     });
     return 200;
 }
-export function resetPasswordEmail(email: string){
-    let uuid = crypto.randomUUID();
+export async function resetPasswordEmail(email: string) {
+    const client = await getMongoClient();
+    const db = client.db(DB_NAME);
+    const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
 
-    resetPasswordMap.set(uuid, email);
+    // standardize the format of emails
+    const properEmail = (email.toString() as string).trim().toLocaleLowerCase();
 
-    //const url = "https://accountability-190955e8b06f.herokuapp.com/api/verify/";
-    const url = "http://localhost:5000/api/resetPassword/";
+    // acquire the user information to create a jwt
+    const result = await userCollection.findOne({ email });
+    const expire = "5 minutes";
+    const jwt = "";
+
+    // create the jwt
+    if (result) {
+        const jwt = createToken(result._id, result.name, result.email, expire);
+    }
+
+    const url = HOMEPAGE + "/resetPassword";
+    //const url = "http://localhost:5000/resetPassword";
 
     const mailConfigurations = {
         // It should be a string of sender/server email
-        from: "cop4331.donotreply@gmail.com",
+        from: process.env.EMAIL,
 
         to: email,
 
@@ -83,8 +94,7 @@ export function resetPasswordEmail(email: string){
         // This would be the text of email body
         text: `Hi! There, You have recently visited our website and requested to change your password\n 
         Please follow the given link to change your password\n
-        ${url}${uuid}\n\n
-        \t${uuid}
+        ${url}${jwt}\n\n
         Thanks`,
     };
 

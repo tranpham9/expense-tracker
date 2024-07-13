@@ -10,6 +10,9 @@ export const USER_COLLECTION_NAME = 'User';
 export const EXPENSE_COLLECTION_NAME = 'Expense';
 export const TRIP_COLLECTION_NAME = 'Trip';
 
+/* Homepage constant */
+export const HOMEPAGE = "https://accountability-190955e8b06f.herokuapp.com";
+
 /*
  * Get an open connection to the Mongo database. The caller should
  * close() the returned MongoClient object.

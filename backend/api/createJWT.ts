@@ -3,16 +3,13 @@ import { sign, verify, decode } from "jsonwebtoken";
 import { ObjectId } from "mongodb";
 
 //Create a token based on the name, email and password
-export function createToken(userId: ObjectId, name: string, email: string) {
+export function createToken(userId: ObjectId, name: string, email: string, expire: string) {
     let ret;
     try {
-        const expiration = new Date();
         const user = { name, email, userId };
         //Sign the token based on user credentials
-        // FIXME: I think that the first parameter (user) is supposed to be a string; should it be stringified json?
-        //const jwt = sign(user, process.env.ACCESS_TOKEN_SECRET!);
 
-        ret = sign(user, process.env.ACCESS_TOKEN_SECRET!);
+        ret = sign(user, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: expire });
     } catch (e) {
         ret = { Error: (e as Error).message };
     }
@@ -26,6 +23,7 @@ export function isExpired(token: string) {
 //Each time a valid operation has taken place refresh and get a new JWT
 export function refresh(token: string) {
     let ud = decode(token, { complete: true });
+    let expire = "20 minutes";
     // TODO: return whatever would be "correct" to return here if the decode fails
     if (!ud) {
         return null;
@@ -39,5 +37,5 @@ export function refresh(token: string) {
     // @ts-ignore
     let email = ud.payload.email;
 
-    return createToken(userId, name, email);
+    return createToken(userId, name, email, expire);
 }
