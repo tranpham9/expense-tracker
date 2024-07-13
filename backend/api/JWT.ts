@@ -41,4 +41,12 @@ export function refresh(jwt: string) {
     let email = decodedJWT.payload.email;
 
     return createJWT(userId, name, email);
+
+export function extractUserId(jwt: string) {
+    const decodedJWT = decode(jwt, { complete: true });
+    if (!decodedJWT) {
+        return null;
+    }
+
+    return ObjectId.createFromHexString((decodedJWT.payload as JwtPayload).userId as string);
 }
