@@ -1,18 +1,19 @@
 import "dotenv/config";
-import { sign, verify, decode } from "jsonwebtoken";
+import { sign, verify, decode, JwtPayload } from "jsonwebtoken";
 import { ObjectId } from "mongodb";
 
-//Create a token based on the name, email and password
-export function createJWT(userId: ObjectId, name: string, email: string) {
+// create a token based on the name, email and password
+export function createJWT(userId: ObjectId, email: string) {
     try {
-        const user = { name, email, userId };
+        const user = { email, userId };
         //Sign the token based on user credentials
         return sign(user, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: "30m" });
     } catch (e) {
-        return { Error: (e as Error).message };
+        // TODO: might want to just return null
+        return { error: (e as Error).message };
     }
 }
-//If the JWT has expired, kick the user off
+
 export function isExpired(token: string): boolean {
     try {
         verify(token, process.env.ACCESS_TOKEN_SECRET!);
@@ -22,7 +23,7 @@ export function isExpired(token: string): boolean {
     }
 }
 
-//Each time a valid operation has taken place refresh and get a new JWT
+// refresh a valid jwt
 export function refresh(jwt: string) {
     if (isExpired(jwt)) {
         return null;
@@ -32,15 +33,17 @@ export function refresh(jwt: string) {
     if (!decodedJWT) {
         return null;
     }
-    //Grab the user information and use it to refresh the token
+
+    // grab the user information and use it to refresh the token
+
+    // TODO: does userId need to be converted to an ObjectId?
     // @ts-ignore
     let userId = decodedJWT.payload.userId;
     // @ts-ignore
-    let name = decodedJWT.payload.name;
-    // @ts-ignore
     let email = decodedJWT.payload.email;
 
-    return createJWT(userId, name, email);
+    return createJWT(userId, email);
+}
 
 export function extractUserId(jwt: string) {
     const decodedJWT = decode(jwt, { complete: true });
