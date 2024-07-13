@@ -63,7 +63,7 @@ router.post("/create", async (req, res, next) => {
 /*
  * Read Information from a Trip, aggregates related expenses and members.
  */
-router.post("/read", async (req, res, next) => {
+router.post("/get", async (req, res, next) => {
     // tripId is required
     if (!req.body.tripId) {
         res.statusCode = 400;
@@ -196,7 +196,7 @@ router.post("/delete", async (req, res, next) => {
 /*
  * List all the trips a user is as a member of (as non-owner only).
  */
-router.post("/readMemberOf", async (req, res, next) => {
+router.post("/listMemberOf", async (req, res, next) => {
     // userId is required
     if (!req.body.userId) {
         res.statusCode = 400;
@@ -230,7 +230,7 @@ router.post("/readMemberOf", async (req, res, next) => {
 /*
  * List all the trips that belong to a user. (As Owner/Leader)
  */
-router.post("/readOwnerOf", async (req, res, next) => {
+router.post("/listOwnerOf", async (req, res, next) => {
     // userId is required
     if (!req.body.userId) {
         res.statusCode = 400;
