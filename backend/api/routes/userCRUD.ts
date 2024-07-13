@@ -125,10 +125,16 @@ router.post("/joinTrip", async(req, res, next) => {
         const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
 
         // query the trip with this invite code (unique per trip)
-        const trip = await tripCol.findOne({inviteCode: req.body.inviteCode});
+        const trip = await tripCol.findOne({inviteCode: String(req.body.inviteCode)});
         if(trip === null) {
             res.statusCode = 400;
             res.json({error: 'Invalid invite code'});
+            return;
+        }
+
+        // prevent joining the same trip twice - technically not an error
+        if(trip.memberIds.some(x => x.equals(userId))) { 
+            res.status(200).json({'message': 'Success (already a member of the trip)'});
             return;
         }
 
