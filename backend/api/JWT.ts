@@ -23,14 +23,16 @@ export function isExpired(token: string): boolean {
 }
 
 //Each time a valid operation has taken place refresh and get a new JWT
-export function refresh(token: string) {
-    let decodedJWT = decode(token, { complete: true });
-    // TODO: return whatever would be "correct" to return here if the decode fails
+export function refresh(jwt: string) {
+    if (isExpired(jwt)) {
+        return null;
+    }
+
+    const decodedJWT = decode(jwt, { complete: true });
     if (!decodedJWT) {
         return null;
     }
     //Grab the user information and use it to refresh the token
-    //TODO:  Change this here to get the fields that we pass
     // @ts-ignore
     let userId = decodedJWT.payload.userId;
     // @ts-ignore
