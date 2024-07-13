@@ -69,8 +69,6 @@ router.post("/create", async (req, res, next) => {
     } finally {
         await client.close();
     }
-
-    next();
 });
 
 /*
@@ -119,8 +117,6 @@ router.post("/get", async (req, res, next) => {
     } finally {
         await client.close();
     }
-
-    next();
 });
 
 /*
@@ -163,8 +159,6 @@ router.post("/update", async (req, res, next) => {
     } finally {
         await client.close();
     }
-
-    next();
 });
 
 /*
@@ -205,8 +199,6 @@ router.post("/delete", async (req, res, next) => {
     } finally {
         await client.close();
     }
-
-    next();
 });
 
 /*
@@ -242,8 +234,6 @@ router.post("/listMemberOf", async (req, res, next) => {
     } finally {
         await client.close();
     }
-
-    next();
 });
 
 /*
@@ -279,6 +269,6 @@ router.post("/listOwnerOf", async (req, res, next) => {
     } finally {
         await client.close();
     }
+});
 
-    next();
 });

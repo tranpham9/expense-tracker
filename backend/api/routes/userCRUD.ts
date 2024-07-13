@@ -134,6 +134,7 @@ router.post("/forgotPassword", async (req, res) => {
     await resetPasswordEmail(email);
     res.status(200);
 });
+
 router.post("/joinTrip", async (req, res, next) => {
     const { inviteCode, jwt } = req.body;
 
