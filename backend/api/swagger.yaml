@@ -10,6 +10,29 @@ schemes:
   - https
 
 paths:
+  /refreshJWT:
+    post:
+      summary: Return a new JWT given an existing, valid JWT
+      parameters:
+      - in: body
+        name: JSON
+        schema:
+          type: object
+          properties:
+            token:
+              type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+        "400":
+          description: Malformed request or JSON on front-end
+          schema:
+            $ref: '#/definitions/ErrorInfo'
   /users/login:
     post:
       summary: Application user login endpoint
@@ -69,7 +92,7 @@ paths:
           description: Malformed request or JSON on front-end
           schema:
                 $ref: '#/definitions/ErrorInfo'
-  /users/registerUser:
+  /users/register:
     post:
       summary: New user registration endpoint
       description: Creates a new application user
@@ -89,24 +112,7 @@ paths:
           description: "Authentication failure, either wrong username or password"
           schema:
                 $ref: '#/definitions/ErrorInfo'
-  /users/forgotPassword:
-    post:
-      summary: Request for password change endpoint.
-      description: Creates a request to tokensender.ts to send an email to the user.
-      parameters:
-      - in: body
-        name: Forgot Password
-        schema:
-          $ref: '#/definitions/ForgotPasswordDefinition'
-  /users/resetPassword:
-    put:
-      summary:
-      description:
-      parameters:
-      - in: body
-        name: Reset Password
-        schema:
-  /trips/createTrip:
+  /trips/create:
     post:
       summary: CREATE trip endpoint
       description: Create a new, empty trip
@@ -133,11 +139,14 @@ paths:
             properties:
               tripId:
                 description: The ID of the created trip
+              token:
+                type: string
+                description: Refreshed JWT
         "400":
           description: Malformed request or JSON
           schema:
             $ref: '#/responses/BadRequest'
-  /trips/readTrip:
+  /trips/get:
     post:
       summary: READ trip endpoint
       description: Get a trip with its associated users and expenses
@@ -156,6 +165,9 @@ paths:
           schema:
             type: object
             properties:
+              token:
+                type: string
+                description: Refreshed JWT
               leaderId:
                 type: string
                 description: ID of the user that owns the trip
@@ -196,7 +208,7 @@ paths:
           description: Malformed request or JSON
           schema:
             $ref: '#/responses/BadRequest'
-  /trips/updateTrip:
+  /trips/update:
     post:
       summary: UPDATE trip endpoint
       description: Modify trip information
@@ -217,11 +229,14 @@ paths:
             properties:
               tripId:
                 description: Same as input ID
+              token:
+                type: string
+                description: Refreshed JWT
         "400":
           description: Malformed request or JSON
           schema:
             $ref: '#/responses/BadRequest'
-  /trips/deleteTrip:
+  /trips/delete:
     post:
       summary: DELETE trip endpoint
       description: Remove a trip and associated data
@@ -237,11 +252,17 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+                description: Refreshed JWT
         "400":
           description: Malformed request or JSON
           schema:
             $ref: '#/responses/BadRequest'
-  /trips/getTripsForUser:
+  /trips/listMemberOf:
     post:
       summary: List trips as member user
       description: List trips a user is part of, only shows member (non-leader) trips.
@@ -258,24 +279,30 @@ paths:
         "200":
           description: OK
           schema:
-            type: array
-            items:
-              type: object
-              properties:
-                _id:
-                  type: string
-                  description: ID of the trip, suitable for other /trips/ endpoint calls
-                name:
-                  type: string
-                  description: Title of the trip
-                notes:
-                  type: string
-                  description: Miscellaneous description for the trip
+            type: object
+            properties:
+              token:
+                type: string
+                description: Refreshed JWT
+              trips:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      description: ID of the trip, suitable for other /trips/ endpoint calls
+                    name:
+                      type: string
+                      description: Title of the trip
+                    notes:
+                      type: string
+                      description: Miscellaneous description for the trip
         "400":
           description: Malformed request or JSON
           schema:
             $ref: '#/responses/BadRequest'
-  /trips/getTripsOwnedByUser:
+  /trips/listOwnerOf:
     post:
       summary: List trips owned by user
       description: List trips that belong to a user, only shows owned trips where the user is the Leader.
@@ -292,24 +319,30 @@ paths:
         "200":
           description: OK
           schema:
-            type: array
-            items:
-              type: object
-              properties:
-                _id:
-                  type: string
-                  description: ID of the trip, suitable for other /trips/ endpoint calls
-                name:
-                  type: string
-                  description: Title of the trip
-                notes:
-                  type: string
-                  description: Miscellaneous description for the trip
+            type: object
+            properties:
+              token:
+                type: string
+                description: Refreshed JWT
+              trips:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      description: ID of the trip, suitable for other /trips/ endpoint calls
+                    name:
+                      type: string
+                      description: Title of the trip
+                    notes:
+                      type: string
+                      description: Miscellaneous description for the trip
         "400":
           description: Malformed request or JSON
           schema:
             $ref: '#/responses/BadRequest'
-  /expenses/createExpense:
+  /expenses/create:
     post:
       summary: CREATE expense endpoint
       description: Create a new, blank expense
@@ -337,14 +370,17 @@ paths:
               expenseId:
                 description: ID of the newly created expense
                 type: string
+              token:
+                type: string
+                description: Refreshed JWT
         "400":
           description: Malformed request or JSON
           schema:
             $ref: '#/responses/BadRequest'
-  /expenses/readExpense:
+  /expenses/get:
     post:
       summary: READ expense endpoint
-      description: Read information about an expense. Note that /trips/readTrip can return all the expenses at once.
+      description: Read information about an expense. Note that /trips/get can return all the expenses at once.
       parameters:
       - in: body
         name: JSON
@@ -368,11 +404,14 @@ paths:
                 type: string
               cost:
                 type: number
+              token:
+                type: string
+                description: Refreshed JWT
         "400":
           description: Malformed request or JSON
           schema:
             $ref: '#/responses/BadRequest'
-  /expenses/updateExpense:
+  /expenses/update:
     post:
       summary: UPDATE expense endpoint
       description: Modify expense properties
@@ -400,11 +439,14 @@ paths:
               expenseId:
                 description: Same as input ID
                 type: string
+              token:
+                type: string
+                description: Refreshed JWT
         "400":
           description: Malformed request or JSON
           schema:
             $ref: '#/responses/BadRequest'
-  /expenses/deleteExpense:
+  /expenses/delete:
     post:
       summary: DELETE expense endpoint
       description: Remove an expense and associated data
@@ -420,6 +462,12 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+                description: Refreshed JWT
         "400":
           description: Malformed request or JSON
           schema:
@@ -451,11 +499,6 @@ definitions:
           type: string
           description: Authentication password
           example: COP4331
-    ForgotPasswordDefinition:
-      email:
-        type: string
-        description: Email of the user
-        example: sample@example.com
     UserFullRow:
       type: object
       properties:

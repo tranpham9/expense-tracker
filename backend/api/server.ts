@@ -37,7 +37,7 @@ app.post("/api/refreshJWT", async (req, res) => {
         if (!newToken) {
             return res.status(400).json({ error: "Could not refresh token" });
         }
-        return res.status(200).json({ jwt: newToken });
+        return res.status(200).json({ token: newToken });
     } catch (error) {
         return res.status(500).json({ error: "error" });
     }
@@ -53,7 +53,7 @@ app.use("/api/", (req, res, next) => {
         return;
     }
 
-    if (!req.body.jwt || isExpired(req.body.jwt)) {
+    if(!req.body.token || isExpired(req.body.token)) {
         // terminates the response
         res.statusCode = 400;
         res.json({ error: "JWT token not provided or invalid/expired" });
@@ -61,12 +61,12 @@ app.use("/api/", (req, res, next) => {
     }
 
     // JWT is good! Generate and keep track of a new token
-    res.locals.refreshedJWT = refresh(req.body.jwt)?.toString();
+    res.locals.refreshedToken = refresh(req.body.token)?.toString();
 
     /* Then only adding this to each route's response is needed:
         req.json({
         ...
-        jwt: res.locals.refreshedJWT
+        token: res.locals.refreshedToken
         });
      */
     next(); // continue processing this request

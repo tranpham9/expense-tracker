@@ -50,7 +50,10 @@ router.post("/create", async (req, res, next) => {
         });
 
         // return the expense id
-        res.json({ expenseId: result.insertedId });
+        res.json({
+            expenseId: result.insertedId,
+            token: res.locals.refreshedToken
+        });
     } finally {
         await client.close();
     }
@@ -75,7 +78,9 @@ router.post("/get", async (req, res, next) => {
     try {
         const db = client.db(DB_NAME);
         const expenseCol: Collection<Expense> = db.collection(EXPENSE_COLLECTION_NAME);
-        res.json(await expenseCol.findOne({ _id: expenseId }));
+        let expense: any = await expenseCol.findOne({ _id: expenseId });
+        expense.token = res.locals.refreshedToken;
+        res.json(expense);
     } finally {
         await client.close();
     }
@@ -93,7 +98,7 @@ router.post("/update", async (req, res, next) => {
         res.json({ error: "expenseId required" });
         return;
     }
-    const expenseId = new ObjectId(req.body.expenseId);
+    const expenseId = ObjectId.createFromHexString(req.body.expenseId);
 
     const client = await getMongoClient();
     try {
@@ -119,7 +124,10 @@ router.post("/update", async (req, res, next) => {
         }
 
         // Return the tripId
-        res.json({ expenseId: expenseId });
+        res.json({
+            expenseId: expenseId,
+            token: res.locals.refreshedToken
+        });
     } finally {
         await client.close();
     }
@@ -154,8 +162,7 @@ router.post("/delete", async (req, res, next) => {
         // Just remove it
         expenseCol.deleteOne({ _id: expenseId });
 
-        // Return empty object
-        res.json({});
+        res.json({token: res.locals.refreshedToken});
     } finally {
         await client.close();
     }

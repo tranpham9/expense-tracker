@@ -62,7 +62,10 @@ router.post("/create", async (req, res, next) => {
         await userCol.updateOne({ _id: leaderId }, { $push: { trips: result.insertedId } });
 
         // Return the tripId
-        res.json({ tripId: result.insertedId });
+        res.json({
+            tripId: result.insertedId,
+            token: res.locals.refreshedToken
+        });
     } finally {
         await client.close();
     }
@@ -111,6 +114,7 @@ router.post("/get", async (req, res, next) => {
         // We can add some "bussiness logic" if we wanted to, like a sum of all the costs
         // or something like that
 
+        trip.token = res.locals.refreshedToken;
         res.json(trip);
     } finally {
         await client.close();
@@ -152,7 +156,10 @@ router.post("/update", async (req, res, next) => {
         }
 
         // Return the tripId
-        res.json({ tripId: tripId });
+        res.json({
+            tripId: tripId,
+            token: res.locals.refreshedToken
+        });
     } finally {
         await client.close();
     }
@@ -194,8 +201,7 @@ router.post("/delete", async (req, res, next) => {
         await tripCol.deleteOne({ _id: tripId });
         await expenseCol.deleteMany({ tripId: tripId });
 
-        // Return empty object
-        res.json({});
+        res.json({token: res.locals.refreshedToken});
     } finally {
         await client.close();
     }
@@ -229,7 +235,10 @@ router.post("/listMemberOf", async (req, res, next) => {
         }
 
         // Return a list that this of trip ids (only include id + trip name)
-        res.json(await tripCol.find({ memberIds: userId }).project({ name: 1, notes: 1 }).toArray());
+        res.json({
+            trips: await tripCol.find({ memberIds: userId }).project({ name: 1, notes: 1 }).toArray(),
+            token: res.locals.refreshedToken
+        });
     } finally {
         await client.close();
     }
@@ -263,7 +272,10 @@ router.post("/listOwnerOf", async (req, res, next) => {
         }
 
         // Return a list that this of trip ids (only include id + trip name + notes)
-        res.json(await tripCol.find({ leaderId: userId }).project({ name: 1, notes: 1 }).toArray());
+        res.json({
+            trips: await tripCol.find({ leaderId: userId }).project({ name: 1, notes: 1 }).toArray(),
+            token: res.locals.refreshedToken
+        });
     } finally {
         await client.close();
     }

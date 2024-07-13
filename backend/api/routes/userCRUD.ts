@@ -65,12 +65,12 @@ router.post("/login", async (req, res, next) => {
 
         const foundUser = await userCollection.findOne({ email: properEmail });
         if (foundUser && password === foundUser.password) {
-            const jwt = createJWT(foundUser._id, foundUser.name, foundUser.email);
+            const token = createJWT(foundUser._id, foundUser.name, foundUser.email);
             res.status(200).json({
                 id: foundUser._id,
                 name: foundUser.name,
                 email: foundUser.email,
-                jwt,
+                token,
             });
         } else {
             res.status(401).json({ error: "Invalid login credentials" });
@@ -142,15 +142,22 @@ router.post("/joinTrip", async (req, res, next) => {
         }
 
         // prevent joining the same trip twice - technically not an error
-        if (trip.memberIds.some((x) => x.equals(userId))) {
-            res.status(200).json({ message: "Success (already a member of the trip)" });
+        if(trip.memberIds.some(x => x.equals(userId))) { 
+            res.status(200).json({
+                message: 'Success (already a member of the trip)',
+                token: res.locals.refreshedToken
+            });
             return;
         }
 
         // if found, add this user to the trip
-        await tripCol.updateOne({ _id: trip._id }, { $push: { memberIds: userId } });
-        res.status(200).json({ message: "Successfully joined the trip" });
-    } finally {
+        await tripCol.updateOne({_id: trip._id}, { $push: { memberIds: userId }});
+        res.status(200).json({
+            message: 'Successfully joined the trip',
+            token: res.locals.refreshedToken
+        });
+    }
+    finally {
         await client.close();
     }
     next();
