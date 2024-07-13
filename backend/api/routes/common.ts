@@ -53,4 +53,5 @@ export type Trip = {
     notes: string;
     memberIds: ObjectId[];
     leaderId: ObjectId;
+    inviteCode: string;
 };

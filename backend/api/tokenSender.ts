@@ -32,10 +32,8 @@ export function createEmail(user: User) {
 
     unverified.set(uuid, user);
 
-    //const url = "https://accountability-190955e8b06f.herokuapp.com/api/verify/";
-    const url = "http://localhost:5000/api/verify/";
-
-    //https://accountability-190955e8b06f.herokuapp.com/api/verify/${uuid}
+    //const url = "https://accountability-190955e8b06f.herokuapp.com/api/users/verify/";
+    const url = "http://localhost:5000/api/users/verify/";
 
     const mailConfigurations = {
         // It should be a string of sender/server email
@@ -68,8 +66,8 @@ export function resetPasswordEmail(email: string){
 
     resetPasswordMap.set(uuid, email);
 
-    //const url = "https://accountability-190955e8b06f.herokuapp.com/api/verify/";
-    const url = "http://localhost:5000/api/resetPassword/";
+    //const url = "https://accountability-190955e8b06f.herokuapp.com/api/users/verify/";
+    const url = "http://localhost:5000/api/users/resetPassword/";
 
     const mailConfigurations = {
         // It should be a string of sender/server email

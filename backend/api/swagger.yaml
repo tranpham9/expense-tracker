@@ -10,7 +10,7 @@ schemes:
   - https
 
 paths:
-  /login:
+  /users/login:
     post:
       summary: Application user login endpoint
       description: Performs user authentication
@@ -43,7 +43,33 @@ paths:
           description: "Authentication failure, either wrong username or password"
           schema:
                 $ref: '#/definitions/ErrorInfo'
-  /registerUser:
+  /users/joinTrip:
+    post:
+      summary: Application user login endpoint
+      description: Performs user authentication
+      parameters:
+      - in: body
+        name: Login
+        schema:
+          type: object
+          properties:
+            inviteCode:
+              type: string
+              description: 6-digit invite Code
+            userId:
+              type: string
+              description: logged in userId
+            token:
+              type: string
+              description: Authenticated JWT
+      responses:
+        "200":
+          description: Successfully joined trip
+        "400":
+          description: Malformed request or JSON on front-end
+          schema:
+                $ref: '#/definitions/ErrorInfo'
+  /users/registerUser:
     post:
       summary: New user registration endpoint
       description: Creates a new application user
@@ -122,6 +148,9 @@ paths:
               notes:
                 type: string
                 description: Miscellaneous description for the trip 
+              inviteCode:
+                type: string
+                description: 6-digit invite code
               allMembers:
                 type: array
                 items:
@@ -163,12 +192,6 @@ paths:
             tripId:
               type: string
               description: ID of the trip to modify
-            name:
-              type: string
-              description: Title of the trip
-            notes:
-              type: string
-              description: Miscellaneous description for the trip
       responses:
         "200":
           description: OK
