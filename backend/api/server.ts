@@ -2,14 +2,14 @@ import "dotenv/config";
 import express, { json, urlencoded } from "express";
 import { join } from "path";
 import cors from "cors";
-import { Collection, MongoClient, ObjectId } from "mongodb";
-import { createToken } from "./createJWT";
+import { Collection, MongoClient, ObjectId } from "mongodb"
+import { createToken, isExpired, refresh} from "./createJWT";
 import { createEmail, unverified } from "./tokenSender";
 import jwt, { JsonWebTokenError, decode } from "jsonwebtoken";
 import { router as tripCRUDRouter } from "./routes/tripCRUD";
 import { router as expenseCRUDRouter } from "./routes/expenseCRUD";
-import { router as userCRUDRouter} from "./routes/userCRUD";
-import {isExpired, refresh} from "./createJWT"
+import { router as userCRUDRouter } from "./routes/userCRUD";
+import { getMongoClient } from "./routes/common";
 
 // Heroku will pass the port we must listen on via the environment, otherwise default to 5000.
 const port = process.env.PORT || 5000;
@@ -81,7 +81,6 @@ app.use('/api/', (req, res, next) => {
      */
     next(); // continue processing this request
 });
-
 
 // All user related CRUD endpoints will be accessible under /api/
 app.use("/api/users", userCRUDRouter);
