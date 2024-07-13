@@ -13,7 +13,7 @@ export const router = express.Router();
 /*
  * Create a new expense, that belongs to a trip.
  */
-router.post("/createExpense", async (req, res, next) => {
+router.post("/create", async (req, res, next) => {
     // tripId is required, it's the trip this new expense will belong to
     if (!req.body.tripId) {
         res.statusCode = 400;
@@ -62,7 +62,7 @@ router.post("/createExpense", async (req, res, next) => {
  * Read an expense. Note that this can also be done with /trips/readTrip which
  * will return all the expenses for a single trip.
  */
-router.post("/readExpense", async (req, res, next) => {
+router.post("/read", async (req, res, next) => {
     // expenseId is required
     if (!req.body.expenseId) {
         res.statusCode = 400;
@@ -86,7 +86,7 @@ router.post("/readExpense", async (req, res, next) => {
 /*
  * Updates the name, notes, cost of an expense
  */
-router.post("/updateExpense", async (req, res, next) => {
+router.post("/update", async (req, res, next) => {
     // expenseId is required
     if (!req.body.expenseId) {
         res.statusCode = 400;
@@ -130,7 +130,7 @@ router.post("/updateExpense", async (req, res, next) => {
 /*
  * Delete an expense
  */
-router.post("/deleteExpense", async (req, res, next) => {
+router.post("/delete", async (req, res, next) => {
     // expenseId is required
     if (!req.body.expenseId) {
         res.statusCode = 400;
