@@ -46,7 +46,7 @@ router.post("/registerUser", async (req, res, next) => {
         res.status(200);
     } catch (err) {}
 });
-router.post("login", async (req, res, next) => {
+router.post("/login", async (req, res, next) => {
     const client = await getMongoClient();
     try {
         const db = client.db(DB_NAME);
