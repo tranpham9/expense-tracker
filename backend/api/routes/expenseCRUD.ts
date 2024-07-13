@@ -1,6 +1,7 @@
 import express from "express";
 import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, Trip, TRIP_COLLECTION_NAME } from "./common";
 import { Collection, ObjectId } from "mongodb";
+import { extractUserId, refresh } from "../JWT";
 
 export const router = express.Router();
 
@@ -10,22 +11,33 @@ export const router = express.Router();
  * ============================
  */
 
+// FIXME: currently, I don't think that the user has any way of getting the trip id
+// FIXME(2): it needs to be verified that the user is a part of the trip they are trying to add expenses to
 /*
  * Create a new expense, that belongs to a trip.
  */
 router.post("/create", async (req, res, next) => {
-    // tripId is required, it's the trip this new expense will belong to
-    if (!req.body.tripId) {
-        res.statusCode = 400;
-        res.json({ error: "tripId required" });
+    let { tripId, name, cost, description, jwt } = req.body;
+    description ??= ""; // description not required
+
+    if (!tripId || !name || !cost || !jwt) {
+        res.status(400).json({ error: "Malformed Request" });
         return;
     }
-    const tripId = new ObjectId(req.body.tripId);
 
-    // Default values for non-required fields
-    req.body.name ??= "Unnamed Expense";
-    req.body.description ??= "No description provided";
-    req.body.cost ??= 0;
+    jwt = refresh(jwt);
+    if (!jwt) {
+        res.status(401).json({ error: "Session Expired" });
+        return;
+    }
+
+    const userId = extractUserId(jwt);
+    if (!userId) {
+        res.status(401).json({ error: "Malformed JWT" });
+        return;
+    }
+
+    tripId = ObjectId.createFromHexString(tripId);
 
     const client = await getMongoClient();
     try {
@@ -41,24 +53,20 @@ router.post("/create", async (req, res, next) => {
         }
 
         const result = await expenseCol.insertOne({
-            name: req.body.name,
-            description: req.body.description,
-            cost: req.body.cost,
-            tripId: tripId,
-            memberIds: [] /* TODO: we'll implement expense splitting later */,
-            payerId: new ObjectId(0),
+            tripId,
+            payerId: userId,
+            /* TODO: we'll implement expense splitting later */
+            memberIds: [],
+            name,
+            cost,
+            description,
         });
 
         // return the expense id
-        res.json({
-            expenseId: result.insertedId,
-            token: res.locals.refreshedToken
-        });
+        res.status(200).json({ expenseId: result.insertedId, jwt });
     } finally {
         await client.close();
     }
-
-    next();
 });
 
 /*
@@ -126,7 +134,7 @@ router.post("/update", async (req, res, next) => {
         // Return the tripId
         res.json({
             expenseId: expenseId,
-            token: res.locals.refreshedToken
+            token: res.locals.refreshedToken,
         });
     } finally {
         await client.close();
@@ -162,7 +170,7 @@ router.post("/delete", async (req, res, next) => {
         // Just remove it
         expenseCol.deleteOne({ _id: expenseId });
 
-        res.json({token: res.locals.refreshedToken});
+        res.json({ token: res.locals.refreshedToken });
     } finally {
         await client.close();
     }
