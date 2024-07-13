@@ -19,10 +19,15 @@ export function createToken(userId: ObjectId, name: string, email: string) {
     return ret;
 }
 //If the JWT has expired, kick the user off
-export function isExpired(token: string) {
-    // TODO: is a custom verify callback even needed here?
-    return verify(token, process.env.ACCESS_TOKEN_SECRET!, (err, verifiedJwt) => !!err);
+export function isExpired(token: string): boolean {
+    try {
+        verify(token, process.env.ACCESS_TOKEN_SECRET!);
+        return false; // Token is valid
+    } catch (TokenExpiredError) {
+        return true; // Token has expired
+    }
 }
+
 //Each time a valid operation has taken place refresh and get a new JWT
 export function refresh(token: string) {
     let ud = decode(token, { complete: true });

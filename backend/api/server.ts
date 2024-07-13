@@ -10,6 +10,8 @@ import { router as tripCRUDRouter } from "./routes/tripCRUD";
 import { router as expenseCRUDRouter } from "./routes/expenseCRUD";
 import { router as userCRUDRouter} from "./routes/userCRUD";
 import { unverified } from "./tokenSender";
+import {refresh} from "./createJWT";
+import{isExpired}from "./createJWT"
 
 //TODO: make api endpoints more modular
 
@@ -205,6 +207,33 @@ app.put("/api/changeName", async (req, res) => {
         res.status(400).json({ error: "Failed to update name" });
     }
 });
+
+app.post("/api/refreshJWT", async(req, res)=>{
+    const { token } = req.body;
+    if (!token) {
+        return res.status(400).json({ error: 'Token is required' });
+    }
+
+    try {
+        // Check if the token is expired
+        const expired = isExpired(token);
+        if (expired) {
+            return res.status(401).json({ error: 'Token has expired' });
+        }
+
+        // Refresh the token
+        const newToken = refresh(token);
+        if (!newToken) {
+            return res.status(400).json({ error: 'Could not refresh token' });
+        }
+        return res.status(200).json({ jwt: newToken });
+    } catch (error) {
+        return res.status(500).json({ error: 'error' });
+    }
+});
+
+
+
 
 // All user related CRUD endpoints will be accessible under /api/
 app.use("/api/users", userCRUDRouter);
