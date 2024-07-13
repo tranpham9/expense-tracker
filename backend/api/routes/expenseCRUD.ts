@@ -1,5 +1,5 @@
 import express from "express";
-import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, Trip, TRIP_COLLECTION_NAME, User, USER_COLLECTION_NAME } from "./common";
+import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, Trip, TRIP_COLLECTION_NAME } from "./common";
 import { Collection, ObjectId } from "mongodb";
 
 export const router = express.Router();

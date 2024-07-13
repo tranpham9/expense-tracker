@@ -2,14 +2,10 @@ import "dotenv/config";
 import express, { json, urlencoded } from "express";
 import { join } from "path";
 import cors from "cors";
-import { Collection, MongoClient, ObjectId } from "mongodb";
-import { createJWT, isExpired, refresh } from "./JWT";
-import { createEmail, unverified } from "./tokenSender";
-import jwt, { JsonWebTokenError, decode } from "jsonwebtoken";
+import { isExpired, refresh } from "./JWT";
 import { router as tripCRUDRouter } from "./routes/tripCRUD";
 import { router as expenseCRUDRouter } from "./routes/expenseCRUD";
 import { router as userCRUDRouter } from "./routes/userCRUD";
-import { getMongoClient } from "./routes/common";
 
 // Heroku will pass the port we must listen on via the environment, otherwise default to 5000.
 const port = process.env.PORT || 5000;

@@ -1,7 +1,7 @@
 import express from "express";
-import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, Trip, TRIP_COLLECTION_NAME, User, USER_COLLECTION_NAME } from "./common";
-import { Collection, ObjectId, UUID } from "mongodb";
-import { createEmail, resetPasswordEmail, resetPasswordMap, unverified } from "../tokenSender";
+import { DB_NAME, getMongoClient, Trip, TRIP_COLLECTION_NAME, User, USER_COLLECTION_NAME } from "./common";
+import { Collection, ObjectId } from "mongodb";
+import { createEmail, resetPasswordEmail, unverified } from "../tokenSender";
 import { verify } from "jsonwebtoken";
 import md5 from "md5";
 import { createJWT, isExpired, refresh } from "../JWT";
