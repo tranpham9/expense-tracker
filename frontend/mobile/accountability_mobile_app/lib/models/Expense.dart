@@ -3,19 +3,18 @@
 //     final expense = expenseFromJson(jsonString);
 
 import 'dart:convert';
-import 'Id.dart';
 
 Expense expenseFromJson(String str) => Expense.fromJson(json.decode(str));
 
 String expenseToJson(Expense data) => json.encode(data.toJson());
 
 class Expense {
-  Id id;
+  String id;
   String name;
-  Id tripId;
+  String tripId;
   String cost;
   String description;
-  List<Id> memberIds;
+  List<String> memberIds;
   String payerId;
 
   Expense({
@@ -29,21 +28,24 @@ class Expense {
   });
 
   factory Expense.fromJson(Map<String, dynamic> json) => Expense(
-        id: Id.fromJson(json["_id"]),
+        id: json["_id"],
         name: json["name"],
-        tripId: Id.fromJson(json["tripId"]),
+        tripId: json["tripId"],
         cost: json["cost"],
         description: json["description"],
-        memberIds: List<Id>.from(json["memberIds"].map((x) => Id.fromJson(x))),
+        // FIXME: Since Id will now be a String
+        memberIds:
+            List<String>.from(json["memberIds"].map((x) => String.fromJson(x))),
         payerId: json["payerId"],
       );
 
   Map<String, dynamic> toJson() => {
-        "_id": id.toJson(),
+        "_id": id,
         "name": name,
-        "tripId": tripId.toJson(),
+        "tripId": tripId,
         "cost": cost,
         "description": description,
+        // FIXME: Id is a string
         "memberIds": List<dynamic>.from(memberIds.map((x) => x.toJson())),
         "payerId": payerId,
       };

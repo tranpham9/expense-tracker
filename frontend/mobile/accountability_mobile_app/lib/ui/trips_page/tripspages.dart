@@ -3,10 +3,8 @@ import 'package:accountability_mobile_app/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../models/Trip.dart';
-import 'tripcrud.dart';
 
 // Trip Related Widgets
-// TODO: Fix this so a loading animation occurs while data is being fetched
 class TripsPage extends StatefulWidget {
   @override
   State<TripsPage> createState() => _TripsPageState();
@@ -95,7 +93,6 @@ class _TripsPageState extends State<TripsPage> {
   }
 }
 
-// TODO: Needs to look like the ListTile while loading
 class TripsSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -134,4 +131,3 @@ class _ReceiptPage extends State<ReceiptPage> {
     );
   }
 }
-

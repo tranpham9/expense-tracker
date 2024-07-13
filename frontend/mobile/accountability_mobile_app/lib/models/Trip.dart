@@ -3,17 +3,16 @@
 //     final trip = tripFromJson(jsonString);
 
 import 'dart:convert';
-import 'Id.dart';
 
 List<Trip> tripListFromJson(String str) =>
-    List<Trip>.from(json.decode(str).map((x) => Trip.fromJson(x)));
+    List<Trip>.from(json.decode(str).map((x) => Trip.fromJson(x)).toList());
 
 Trip tripFromJson(String str) => Trip.fromJson(json.decode(str));
 
 String tripToJson(Trip data) => json.encode(data.toJson());
 
 class Trip {
-  Id id;
+  String id;
   String name;
   String notes;
 
@@ -24,13 +23,14 @@ class Trip {
   });
 
   factory Trip.fromJson(Map<String, dynamic> json) => Trip(
-        id: Id.fromJson(json["_id"]),
+        // id: Id.fromJson(json["_id"]),
+        id: json["_id"],
         name: json["name"],
         notes: json["notes"],
       );
 
   Map<String, dynamic> toJson() => {
-        "_id": id.toJson(),
+        "_id": id,
         "name": name,
         "notes": notes,
       };
