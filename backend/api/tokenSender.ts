@@ -23,6 +23,7 @@ type mailConfigurations = {
     text: string;
 };
 export const unverified = new Map<string, User>();
+export const resetPasswordMap = new Map<string, string>();
 
 export function createEmail(user: User) {
     // const token = createToken(userId, name, email);
@@ -46,10 +47,44 @@ export function createEmail(user: User) {
         subject: "Email Verification",
 
         // This would be the text of email body
-        text: `Hi! There, You have recently visited our website and entered your email. 
-        Please follow the given link to verify your email
+        text: `Hi! There, You have recently visited our website and entered your email.\n 
+        Please follow the given link to verify your email\n
         ${url}${uuid}
         
+        Thanks`,
+    };
+
+    transporter.sendMail(mailConfigurations, function (error, info) {
+        if (error) {
+            console.error("Error sending email", error);
+        }
+        console.log("Email Sent Successfully");
+        console.log(info);
+    });
+    return 200;
+}
+export function resetPasswordEmail(email: string){
+    let uuid = crypto.randomUUID();
+
+    resetPasswordMap.set(uuid, email);
+
+    //const url = "https://accountability-190955e8b06f.herokuapp.com/api/verify/";
+    const url = "http://localhost:5000/api/resetPassword/";
+
+    const mailConfigurations = {
+        // It should be a string of sender/server email
+        from: "cop4331.donotreply@gmail.com",
+
+        to: email,
+
+        // Subject of Email
+        subject: "Reset Password",
+
+        // This would be the text of email body
+        text: `Hi! There, You have recently visited our website and requested to change your password\n 
+        Please follow the given link to change your password\n
+        ${url}${uuid}\n\n
+        \t${uuid}
         Thanks`,
     };
 

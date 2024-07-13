@@ -182,7 +182,7 @@ app.post("/api/login", async (req, res, next) => {
             id: foundUser._id,
             name: foundUser.name,
             email: foundUser.email,
-            jwt
+            token: jwt
         });
     } else {
         res.status(401).json({ error: "Invalid login credentials" });
