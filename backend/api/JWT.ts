@@ -56,7 +56,16 @@ export function extractUserId(jwt: string) {
     return ObjectId.createFromHexString((decodedJWT.payload as JwtPayload).userId as string);
 }
 
-export const authenticationRouteHandler = (req: Request, res: Response, next: NextFunction) => {
+export function extract(property: "email" | "hashedPassword", jwt: string) {
+    const decodedJWT = decode(jwt, { complete: true });
+    if (!decodedJWT) {
+        return null;
+    }
+
+    return (decodedJWT.payload as JwtPayload)[property] as string;
+}
+
+export function authenticationRouteHandler(req: Request, res: Response, next: NextFunction) {
     const { jwt } = req.body;
     if (!jwt) {
         res.status(STATUS_BAD_REQUEST).json({ error: "Authentication (JWT) required" });
@@ -79,4 +88,4 @@ export const authenticationRouteHandler = (req: Request, res: Response, next: Ne
         });
      */
     next(); // continue processing this request
-};
+}
