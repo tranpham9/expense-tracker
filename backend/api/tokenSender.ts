@@ -81,7 +81,6 @@ export async function resetPasswordEmail(email: string) {
         const hashedPassword = md5(result.password);
         const jwt = sign({ _id, name, email, hashedPassword }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: expire });
     }
-    
 
     const url = HOMEPAGE + "/resetPassword";
     //const url = "http://localhost:5000/resetPassword";
@@ -98,7 +97,7 @@ export async function resetPasswordEmail(email: string) {
         // This would be the text of email body
         text: `Hi! There, You have recently visited our website and requested to change your password\n 
         Please follow the given link to change your password\n
-        ${url}${jwt}\n\n
+        ${url}/${jwt}\n\n
         Thanks`,
     };
 
