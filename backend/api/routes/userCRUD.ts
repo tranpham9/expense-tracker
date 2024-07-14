@@ -120,17 +120,23 @@ router.post("/forgotPassword", async (req, res) => {
     const { email } = req.body;
 
     const client = await getMongoClient();
-    const db = client.db(DB_NAME);
-    const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
+    try {
+        const db = client.db(DB_NAME);
+        const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
 
-    const foundEmail = userCollection.findOne({ email });
-    if (!foundEmail) {
-        res.status(STATUS_BAD_REQUEST).send("No email found in the database.");
-        return;
+        const foundEmail = userCollection.findOne({ email });
+        if (!foundEmail) {
+            res.status(STATUS_BAD_REQUEST).send("No email found in the database.");
+            return;
+        }
+
+        await resetPasswordEmail(email);
+        res.status(STATUS_OK);
+    } catch (error) {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
+    } finally {
+        await client.close();
     }
-
-    await resetPasswordEmail(email);
-    res.status(STATUS_OK);
 });
 
 // TODO: move to tripCRUD
