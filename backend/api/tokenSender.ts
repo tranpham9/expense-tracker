@@ -74,14 +74,15 @@ export async function resetPasswordEmail(email: string) {
     // acquire the user information to create a jwt
     const result = await userCollection.findOne({ email });
     const expire = "5m";
-    const jwt="";
+    const jwt = "";
 
-    if(result){
-        const {_id, name, email} = result; 
-        const hashPass = md5(result.password);
-        const jwt = sign({_id, name, email, hashPass}, process.env.ACCESS_TOKEN_SECRET!, {expiresIn: expire});
+    if (result) {
+        const { _id, name, email } = result;
+        const hashedPassword = md5(result.password);
+        const jwt = sign({ _id, name, email, hashedPassword }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: expire });
     }
     
+
     const url = HOMEPAGE + "/resetPassword";
     //const url = "http://localhost:5000/resetPassword";
 
