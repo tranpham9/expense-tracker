@@ -58,7 +58,7 @@ export function extractUserId(jwt: string) {
 export const authenticationRouteHandler = (req: Request, res: Response, next: NextFunction) => {
     const { jwt } = req.body;
     if (!jwt) {
-        res.status(400).json({ error: "Malformed Request" });
+        res.status(400).json({ error: "Authentication required" });
         return;
     }
 

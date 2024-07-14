@@ -91,21 +91,14 @@ router.put("/changeName", async (req, res) => {
         const db = client.db(DB_NAME);
         const userCollection = db.collection(USER_COLLECTION_NAME);
 
-        let { newName, jwt } = req.body;
+        let { newName } = req.body;
 
-        if (!newName || !jwt) {
+        if (!newName) {
             res.status(400).json({ error: "Malformed Request" });
             return;
         }
 
-        // ensure jwt hasn't expired
-        jwt = refresh(jwt);
-        if (!jwt) {
-            res.status(401).json({ error: "Session Expired" });
-            return;
-        }
-
-        const userId = extractUserId(jwt);
+        const userId = extractUserId(res.locals.refreshedJWT);
         if (!userId) {
             res.status(401).json({ error: "Malformed JWT" });
             return;
@@ -114,7 +107,7 @@ router.put("/changeName", async (req, res) => {
         const result = await userCollection.updateOne({ _id: userId }, { $set: { name: newName } });
 
         if (result.modifiedCount === 1) {
-            res.status(200).json({ message: "Name updated successfully" });
+            res.status(200).json({ message: "Name updated successfully", jwt: res.locals.refreshedJWT });
         } else {
             res.status(400).json({ error: "Failed to update name" });
         }
@@ -142,7 +135,7 @@ router.post("/forgotPassword", async (req, res) => {
 
 // TODO: move to tripCRUD
 router.post("/joinTrip", async (req, res, next) => {
-    const { inviteCode, jwt } = req.body;
+    const { inviteCode } = req.body;
 
     // check incoming params
     if (inviteCode) {
@@ -150,7 +143,7 @@ router.post("/joinTrip", async (req, res, next) => {
         return;
     }
 
-    const userId = extractUserId(jwt);
+    const userId = extractUserId(res.locals.refreshedJWT);
     if (!userId) {
         res.status(401).json({ error: "Malformed JWT" });
         return;
@@ -171,7 +164,7 @@ router.post("/joinTrip", async (req, res, next) => {
 
         // prevent joining the same trip twice - technically not an error
         if (trip.memberIds.some((x) => x.equals(userId))) {
-            res.status(200).json({ message: "Success (already a member of the trip)", jwt });
+            res.status(200).json({ message: "Success (already a member of the trip)", jwt: res.locals.refreshedJWT });
             return;
         }
 
