@@ -1,5 +1,5 @@
 import express from "express";
-import { DB_NAME, getMongoClient, Trip, TRIP_COLLECTION_NAME, User, USER_COLLECTION_NAME } from "./common";
+import { DB_NAME, getMongoClient, STATUS_BAD_REQUEST, STATUS_INTERNAL_SERVER_ERROR, STATUS_OK, STATUS_UNAUTHENTICATED, Trip, TRIP_COLLECTION_NAME, User, USER_COLLECTION_NAME } from "./common";
 import { Collection, ObjectId } from "mongodb";
 import { createEmail, resetPasswordEmail, unverified } from "../tokenSender";
 import { verify } from "jsonwebtoken";
@@ -21,7 +21,7 @@ router.post("/register", async (req, res, next) => {
         // TODO: I believe we don't need an optional trip id here anymore?
         const { name, email, password, tripId } = req.body;
         if (!name || !email || !password) {
-            res.status(400).json({ error: "Malformed Request" });
+            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed Request" });
             return;
         }
         /*if (!email.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
@@ -42,7 +42,7 @@ router.post("/register", async (req, res, next) => {
         // console.log(check);
         if (check) {
             console.error("Attempted to register a user with an existing email");
-            res.status(401).json({ error: "Failed to register user" });
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Failed to register user" });
             return;
         }
 
@@ -50,7 +50,7 @@ router.post("/register", async (req, res, next) => {
         await createEmail(newUser);
 
         // console.log("A user was registered successfully");
-        res.status(200);
+        res.status(STATUS_OK);
     } catch (err) {}
 });
 
@@ -62,7 +62,7 @@ router.post("/login", async (req, res, next) => {
 
         const { email, password } = req.body;
         if (!email || !password) {
-            res.status(400).json({ error: "Malformed Request" });
+            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed Request" });
             return;
         }
 
@@ -72,16 +72,16 @@ router.post("/login", async (req, res, next) => {
         const foundUser = await userCollection.findOne({ email: properEmail });
         if (foundUser && password === foundUser.password) {
             const jwt = createJWT(foundUser._id, foundUser.email);
-            res.status(200).json({
+            res.status(STATUS_OK).json({
                 name: foundUser.name,
                 email: foundUser.email,
                 jwt,
             });
         } else {
-            res.status(401).json({ error: "Invalid login credentials" });
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Invalid login credentials" });
         }
     } catch (err) {
-        res.status(500).json({ error: "Something went wrong" });
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     }
 });
 
@@ -94,25 +94,25 @@ router.put("/changeName", async (req, res) => {
         let { newName } = req.body;
 
         if (!newName) {
-            res.status(400).json({ error: "Malformed Request" });
+            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed Request" });
             return;
         }
 
         const userId = extractUserId(res.locals.refreshedJWT);
         if (!userId) {
-            res.status(401).json({ error: "Malformed JWT" });
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
             return;
         }
 
         const result = await userCollection.updateOne({ _id: userId }, { $set: { name: newName } });
 
         if (result.modifiedCount === 1) {
-            res.status(200).json({ message: "Name updated successfully", jwt: res.locals.refreshedJWT });
+            res.status(STATUS_OK).json({ message: "Name updated successfully", jwt: res.locals.refreshedJWT });
         } else {
-            res.status(400).json({ error: "Failed to update name" });
+            res.status(STATUS_BAD_REQUEST).json({ error: "Failed to update name" });
         }
     } catch (err) {
-        res.status(500).json({ error: "Something went wrong" });
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     }
 });
 
@@ -125,12 +125,12 @@ router.post("/forgotPassword", async (req, res) => {
 
     const foundEmail = userCollection.findOne({ email });
     if (!foundEmail) {
-        res.status(400).send("No email found in the database.");
+        res.status(STATUS_BAD_REQUEST).send("No email found in the database.");
         return;
     }
 
     await resetPasswordEmail(email);
-    res.status(200);
+    res.status(STATUS_OK);
 });
 
 // TODO: move to tripCRUD
@@ -139,13 +139,13 @@ router.post("/joinTrip", async (req, res, next) => {
 
     // check incoming params
     if (inviteCode) {
-        res.status(400).json({ error: "inviteCode required" });
+        res.status(STATUS_BAD_REQUEST).json({ error: "inviteCode required" });
         return;
     }
 
     const userId = extractUserId(res.locals.refreshedJWT);
     if (!userId) {
-        res.status(401).json({ error: "Malformed JWT" });
+        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
         return;
     }
 
@@ -158,21 +158,21 @@ router.post("/joinTrip", async (req, res, next) => {
         // query the trip with this invite code (unique per trip)
         const trip = await tripCol.findOne({ inviteCode });
         if (!trip) {
-            res.status(400).json({ error: "Invalid invite code" });
+            res.status(STATUS_BAD_REQUEST).json({ error: "Invalid invite code" });
             return;
         }
 
         // prevent joining the same trip twice - technically not an error
         if (trip.memberIds.some((x) => x.equals(userId))) {
-            res.status(200).json({ message: "Success (already a member of the trip)", jwt: res.locals.refreshedJWT });
+            res.status(STATUS_OK).json({ message: "Success (already a member of the trip)", jwt: res.locals.refreshedJWT });
             return;
         }
 
         // if found, add this user to the trip
         await tripCol.updateOne({ _id: trip._id }, { $push: { memberIds: userId } });
-        res.status(200).json({ message: "Successfully joined the trip" });
+        res.status(STATUS_OK).json({ message: "Successfully joined the trip" });
     } catch (error) {
-        res.status(500).json({ error: "Something went wrong" });
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client.close();
     }
@@ -192,11 +192,11 @@ router.post("/resetPassword/:token", async (req, res) => {
 
     let ud = verify(token, process.env.ACCESS_TOKEN_SECRET!, { complete: true });
     if (!ud) {
-        res.status(401).send("JWT has expired");
+        res.status(STATUS_UNAUTHENTICATED).send("JWT has expired");
     }
     //@ts-ignore
     const updatedResult = await userCollection.findOneAndUpdate({ email: ud.payload.email, password: md5(ud.payload.password) }, { password: newPassword });
-    res.status(200).send("Password changed successfully");
+    res.status(STATUS_OK).send("Password changed successfully");
 });
 
 router.get("/verify/:token", async (req, res) => {
@@ -215,7 +215,7 @@ router.get("/verify/:token", async (req, res) => {
             const insertionResult = await userCollection.insertOne(verified);
             if (!insertionResult.acknowledged) {
                 console.error("Failed to insert new user");
-                res.status(401).json({ error: "Failed to register user" });
+                res.status(STATUS_UNAUTHENTICATED).json({ error: "Failed to register user" });
                 return;
             }
             // If we get here, we're successfully verified
@@ -226,7 +226,7 @@ router.get("/verify/:token", async (req, res) => {
             res.status(308).redirect('/');
             */
             // Show some basic HTML that redirects to homepage after 5 seconds
-            res.status(200).send(`
+            res.status(STATUS_OK).send(`
                 <html>
                 <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -249,13 +249,13 @@ router.get("/verify/:token", async (req, res) => {
     } catch (err) {
         console.error("Error registering user:", err);
         if (!res.headersSent) {
-            res.status(401).json({ error: "Failed to register user" });
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Failed to register user" });
         }
         return;
     }
 
     // We get here if verification wasn't successful
     if (!res.headersSent) {
-        res.status(401).json({ error: "Invalid registration token" });
+        res.status(STATUS_UNAUTHENTICATED).json({ error: "Invalid registration token" });
     }
 });

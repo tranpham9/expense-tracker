@@ -1,5 +1,5 @@
 import express from "express";
-import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, Trip, TRIP_COLLECTION_NAME } from "./common";
+import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, STATUS_BAD_REQUEST, STATUS_OK, STATUS_UNAUTHENTICATED, Trip, TRIP_COLLECTION_NAME } from "./common";
 import { Collection, ObjectId } from "mongodb";
 import { extractUserId, refresh } from "../JWT";
 
@@ -21,19 +21,19 @@ router.post("/create", async (req, res, next) => {
     description ??= ""; // description not required
 
     if (!tripId || !name || !cost || !jwt) {
-        res.status(400).json({ error: "Malformed Request" });
+        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed Request" });
         return;
     }
 
     jwt = refresh(jwt);
     if (!jwt) {
-        res.status(401).json({ error: "Session Expired" });
+        res.status(STATUS_UNAUTHENTICATED).json({ error: "Session Expired" });
         return;
     }
 
     const userId = extractUserId(jwt);
     if (!userId) {
-        res.status(401).json({ error: "Malformed JWT" });
+        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
         return;
     }
 
@@ -47,7 +47,7 @@ router.post("/create", async (req, res, next) => {
 
         // verify that trip exists
         if ((await tripCol.findOne({ _id: tripId })) === null) {
-            res.statusCode = 400;
+            res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "trip does not exist" });
             return;
         }
@@ -63,7 +63,7 @@ router.post("/create", async (req, res, next) => {
         });
 
         // return the expense id
-        res.status(200).json({ expenseId: result.insertedId, jwt });
+        res.status(STATUS_OK).json({ expenseId: result.insertedId, jwt });
     } finally {
         await client.close();
     }
@@ -76,7 +76,7 @@ router.post("/create", async (req, res, next) => {
 router.post("/get", async (req, res, next) => {
     // expenseId is required
     if (!req.body.expenseId) {
-        res.statusCode = 400;
+        res.statusCode = STATUS_BAD_REQUEST;
         res.json({ error: "expenseId required" });
         return;
     }
@@ -102,7 +102,7 @@ router.post("/get", async (req, res, next) => {
 router.post("/update", async (req, res, next) => {
     // expenseId is required
     if (!req.body.expenseId) {
-        res.statusCode = 400;
+        res.statusCode = STATUS_BAD_REQUEST;
         res.json({ error: "expenseId required" });
         return;
     }
@@ -115,7 +115,7 @@ router.post("/update", async (req, res, next) => {
 
         // verify that expense exists
         if ((await expenseCol.findOne({ _id: expenseId })) === null) {
-            res.statusCode = 400;
+            res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "expense does not exist" });
             return;
         }
@@ -149,7 +149,7 @@ router.post("/update", async (req, res, next) => {
 router.post("/delete", async (req, res, next) => {
     // expenseId is required
     if (!req.body.expenseId) {
-        res.statusCode = 400;
+        res.statusCode = STATUS_BAD_REQUEST;
         res.json({ error: "expenseId required" });
         return;
     }
@@ -162,7 +162,7 @@ router.post("/delete", async (req, res, next) => {
 
         // verify that expense exists
         if ((await expenseCol.findOne({ _id: expenseId })) === null) {
-            res.statusCode = 400;
+            res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "expense does not exist" });
             return;
         }

@@ -13,6 +13,31 @@ export const TRIP_COLLECTION_NAME = "Trip";
 /* Homepage constant */
 export const HOMEPAGE = "https://accountability-190955e8b06f.herokuapp.com";
 
+// status codes
+// references: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+/** everything went as planned
+ *
+ * https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200 */
+export const STATUS_OK = 200;
+/** malformed json body/etc.
+ *
+ * https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400 */
+export const STATUS_BAD_REQUEST = 400;
+/** user isn't properly logged in/authenticated; could be equivalently named STATUS_UNAUTHORIZED
+ *
+ * https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401 */
+export const STATUS_UNAUTHENTICATED = 401;
+/** invalid endpoint
+ *
+ * https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404
+ */
+export const STATUS_NOT_FOUND = 404;
+/** internal error/issue which couldn't be handled
+ *
+ * https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
+ */
+export const STATUS_INTERNAL_SERVER_ERROR = 500;
+
 /*
  * Get an open connection to the Mongo database. The caller should
  * close() the returned MongoClient object.

@@ -6,6 +6,7 @@ import { isExpired, refresh } from "./JWT";
 import { router as tripCRUDRouter } from "./routes/tripCRUD";
 import { router as expenseCRUDRouter } from "./routes/expenseCRUD";
 import { router as userCRUDRouter } from "./routes/userCRUD";
+import { STATUS_BAD_REQUEST, STATUS_INTERNAL_SERVER_ERROR, STATUS_NOT_FOUND, STATUS_OK, STATUS_UNAUTHENTICATED } from "./routes/common";
 
 // Heroku will pass the port we must listen on via the environment, otherwise default to 5000.
 const port = process.env.PORT || 5000;
@@ -22,24 +23,24 @@ app.use(urlencoded({ extended: true }));
 app.post("/api/refreshJWT", async (req, res) => {
     const { token } = req.body;
     if (!token) {
-        return res.status(400).json({ error: "Token is required" });
+        return res.status(STATUS_BAD_REQUEST).json({ error: "Token is required" });
     }
 
     try {
         // Check if the token is expired
         const expired = isExpired(token);
         if (expired) {
-            return res.status(401).json({ error: "Token has expired" });
+            return res.status(STATUS_UNAUTHENTICATED).json({ error: "Token has expired" });
         }
 
         // Refresh the token
         const newToken = refresh(token);
         if (!newToken) {
-            return res.status(400).json({ error: "Could not refresh token" });
+            return res.status(STATUS_BAD_REQUEST).json({ error: "Could not refresh token" });
         }
-        return res.status(200).json({ token: newToken });
+        return res.status(STATUS_OK).json({ token: newToken });
     } catch (error) {
-        return res.status(500).json({ error: "error" });
+        return res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "error" });
     }
 });
 
@@ -49,6 +50,10 @@ app.use("/api/users", userCRUDRouter);
 app.use("/api/trips", tripCRUDRouter);
 // All expense related CRUD endpoints will be accessible under /api/expenses/
 app.use("/api/expenses", expenseCRUDRouter);
+
+app.post("*", (req, res, next) => {
+    res.status(STATUS_NOT_FOUND).json({ message: "Invalid endpoint" });
+});
 
 // Serve the static frontend files
 const FRONTEND_DIST_PATH = join(__dirname, "../../../frontend/web/dist"); // starting from dist folder for server.js (compiled from server.ts)

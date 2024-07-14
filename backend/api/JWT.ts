@@ -2,6 +2,7 @@ import "dotenv/config";
 import { NextFunction, Request, Response } from "express";
 import { sign, verify, decode, JwtPayload } from "jsonwebtoken";
 import { ObjectId } from "mongodb";
+import { STATUS_BAD_REQUEST, STATUS_NOT_FOUND, STATUS_UNAUTHENTICATED } from "./routes/common";
 
 // create a token based on the name, email and password
 export function createJWT(userId: ObjectId, email: string) {
@@ -58,13 +59,13 @@ export function extractUserId(jwt: string) {
 export const authenticationRouteHandler = (req: Request, res: Response, next: NextFunction) => {
     const { jwt } = req.body;
     if (!jwt) {
-        res.status(400).json({ error: "Authentication required" });
+        res.status(STATUS_BAD_REQUEST).json({ error: "Authentication (JWT) required" });
         return;
     }
 
     const refreshedJWT = refresh(jwt);
     if (!refreshedJWT) {
-        res.status(401).json({ error: "Session Expired" });
+        res.status(STATUS_UNAUTHENTICATED).json({ error: "Session Expired" });
         return;
     }
 

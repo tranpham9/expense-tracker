@@ -1,5 +1,5 @@
 import express from "express";
-import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, Trip, TRIP_COLLECTION_NAME, User, USER_COLLECTION_NAME } from "./common";
+import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, STATUS_BAD_REQUEST, STATUS_OK, Trip, TRIP_COLLECTION_NAME, User, USER_COLLECTION_NAME } from "./common";
 import { Collection, ObjectId } from "mongodb";
 
 export const router = express.Router();
@@ -16,7 +16,7 @@ export const router = express.Router();
 router.post("/create", async (req, res, next) => {
     // leaderId is required, that's the user that will own this new trip
     if (!req.body.leaderId) {
-        res.statusCode = 400;
+        res.statusCode = STATUS_BAD_REQUEST;
         res.json({ error: "leaderId required" });
         return;
     }
@@ -34,7 +34,7 @@ router.post("/create", async (req, res, next) => {
 
         // verify that leader user exists
         if ((await userCol.findOne({ _id: leaderId })) === null) {
-            res.statusCode = 400;
+            res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "leaderId user does not exist" });
             return;
         }
@@ -77,7 +77,7 @@ router.post("/create", async (req, res, next) => {
 router.post("/get", async (req, res, next) => {
     // tripId is required
     if (!req.body.tripId) {
-        res.statusCode = 400;
+        res.statusCode = STATUS_BAD_REQUEST;
         res.json({ error: "tripId required" });
         return;
     }
@@ -93,7 +93,7 @@ router.post("/get", async (req, res, next) => {
         // Get the trip requested
         const trip: any = await tripCol.findOne({ _id: tripId });
         if (trip === null) {
-            res.statusCode = 400;
+            res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "tripId not found" });
             return;
         }
@@ -125,7 +125,7 @@ router.post("/get", async (req, res, next) => {
 router.post("/update", async (req, res, next) => {
     // tripId is required
     if (!req.body.tripId) {
-        res.statusCode = 400;
+        res.statusCode = STATUS_BAD_REQUEST;
         res.json({ error: "tripId required" });
         return;
     }
@@ -138,7 +138,7 @@ router.post("/update", async (req, res, next) => {
 
         // verify that trip exists
         if ((await tripCol.findOne({ _id: tripId })) === null) {
-            res.statusCode = 400;
+            res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "trip does not exist" });
             return;
         }
@@ -167,7 +167,7 @@ router.post("/update", async (req, res, next) => {
 router.post("/delete", async (req, res, next) => {
     // tripId is required
     if (!req.body.tripId) {
-        res.statusCode = 400;
+        res.statusCode = STATUS_BAD_REQUEST;
         res.json({ error: "tripId required" });
         return;
     }
@@ -182,7 +182,7 @@ router.post("/delete", async (req, res, next) => {
 
         // verify that trip exists
         if ((await tripCol.findOne({ _id: tripId })) === null) {
-            res.statusCode = 400;
+            res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "trip does not exist" });
             return;
         }
@@ -207,7 +207,7 @@ router.post("/delete", async (req, res, next) => {
 router.post("/listMemberOf", async (req, res, next) => {
     // userId is required
     if (!req.body.userId) {
-        res.statusCode = 400;
+        res.statusCode = STATUS_BAD_REQUEST;
         res.json({ error: "userId required" });
         return;
     }
@@ -221,7 +221,7 @@ router.post("/listMemberOf", async (req, res, next) => {
 
         // verify that user exists
         if ((await userCol.findOne({ _id: userId })) === null) {
-            res.statusCode = 400;
+            res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "user does not exist" });
             return;
         }
@@ -242,7 +242,7 @@ router.post("/listMemberOf", async (req, res, next) => {
 router.post("/listOwnerOf", async (req, res, next) => {
     // userId is required
     if (!req.body.userId) {
-        res.statusCode = 400;
+        res.statusCode = STATUS_BAD_REQUEST;
         res.json({ error: "userId required" });
         return;
     }
@@ -256,7 +256,7 @@ router.post("/listOwnerOf", async (req, res, next) => {
 
         // verify that user exists
         if ((await userCol.findOne({ _id: userId })) === null) {
-            res.statusCode = 400;
+            res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "user does not exist" });
             return;
         }
@@ -274,11 +274,11 @@ router.post("/listOwnerOf", async (req, res, next) => {
 // TODO: move from userCRUD
 router.post("/join", async (req, res, next) => {
     // TODO: impl
-    res.status(200).json({message: "not implemented yet"});
+    res.status(STATUS_OK).json({message: "not implemented yet"});
 });
 
 // NOTE: this will need to remove the user from the trip and from all expenses (this might get a bit difficult with the payer field of expenses, so maybe we don't want to allow leaving?)
 router.post("/leave", async (req, res, next) => {
     // TODO: impl
-    res.status(200).json({message: "not implemented yet"});
+    res.status(STATUS_OK).json({message: "not implemented yet"});
 });
