@@ -184,24 +184,24 @@ router.post("/joinTrip", async (req, res, next) => {
     }
 });
 
-router.post("/resetPassword/:jwt", async (req, res) => {
-    // incoming email and new password
+// note that, due to how the create JWT code is hardcoded to only work for user login sessions, the authentication middleware can't be used for this route/endpoint; accordingly, the jwt gets checked with isExpired
+router.post("/resetPassword", async (req, res) => {
     const client = await getMongoClient();
     try {
         const db = client.db(DB_NAME);
         const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
 
-        const { newPassword } = req.body;
-        if (!newPassword) {
+        const { newPassword, jwt } = req.body;
+        if (!newPassword || !jwt) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
+            return;
         }
 
-        const { jwt } = req.params;
         if (isExpired(jwt)) {
             res.status(STATUS_UNAUTHENTICATED).send("Reset code has expired");
             return;
         }
 
-        // const email = extract("email", jwt);
         const userId = extractUserId(jwt);
         const hashedPassword = extract("hashedPassword", jwt);
         if (!userId || !hashedPassword) {
@@ -209,7 +209,6 @@ router.post("/resetPassword/:jwt", async (req, res) => {
             return;
         }
 
-        // const user = await userCollection.findOne({ email });
         const user = await userCollection.findOne({ _id: userId });
         if (!user) {
             res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
@@ -221,7 +220,6 @@ router.post("/resetPassword/:jwt", async (req, res) => {
             return;
         }
 
-        // const result = await userCollection.findOneAndUpdate({ email }, { password: newPassword });
         const result = await userCollection.updateOne({ _id: userId }, { $set: { password: newPassword } });
         if (result.acknowledged) {
             res.status(STATUS_OK).json({ message: "Successfully reset password" });
