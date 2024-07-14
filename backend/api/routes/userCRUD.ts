@@ -21,7 +21,7 @@ router.post("/register", async (req, res, next) => {
         // TODO: I believe we don't need an optional trip id here anymore?
         const { name, email, password, tripId } = req.body;
         if (!name || !email || !password) {
-            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed Request" });
+            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
             return;
         }
         /*if (!email.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)) {
@@ -62,7 +62,7 @@ router.post("/login", async (req, res, next) => {
 
         const { email, password } = req.body;
         if (!email || !password) {
-            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed Request" });
+            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
             return;
         }
 
@@ -94,7 +94,7 @@ router.put("/changeName", async (req, res) => {
         let { newName } = req.body;
 
         if (!newName) {
-            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed Request" });
+            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
             return;
         }
 

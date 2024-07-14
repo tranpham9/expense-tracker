@@ -1,9 +1,14 @@
 import express from "express";
-import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, STATUS_BAD_REQUEST, STATUS_OK, STATUS_UNAUTHENTICATED, Trip, TRIP_COLLECTION_NAME } from "./common";
+import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, STATUS_BAD_REQUEST, STATUS_INTERNAL_SERVER_ERROR, STATUS_OK, STATUS_UNAUTHENTICATED, Trip, TRIP_COLLECTION_NAME } from "./common";
 import { Collection, ObjectId } from "mongodb";
-import { extractUserId, refresh } from "../JWT";
+import { authenticationRouteHandler, extractUserId, refresh } from "../JWT";
 
 export const router = express.Router();
+
+const AUTHENTICATED_ROUTES = ["/*"];
+
+// JWT Verification
+router.use(AUTHENTICATED_ROUTES, authenticationRouteHandler);
 
 /*
  * ============================
@@ -17,21 +22,15 @@ export const router = express.Router();
  * Create a new expense, that belongs to a trip.
  */
 router.post("/create", async (req, res, next) => {
-    let { tripId, name, cost, description, jwt } = req.body;
+    let { tripId, name, cost, description } = req.body;
     description ??= ""; // description not required
 
-    if (!tripId || !name || !cost || !jwt) {
+    if (!tripId || !name || !cost) {
         res.status(STATUS_BAD_REQUEST).json({ error: "Malformed Request" });
         return;
     }
 
-    jwt = refresh(jwt);
-    if (!jwt) {
-        res.status(STATUS_UNAUTHENTICATED).json({ error: "Session Expired" });
-        return;
-    }
-
-    const userId = extractUserId(jwt);
+    const userId = extractUserId(res.locals.refreshedToken);
     if (!userId) {
         res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
         return;
@@ -63,7 +62,9 @@ router.post("/create", async (req, res, next) => {
         });
 
         // return the expense id
-        res.status(STATUS_OK).json({ expenseId: result.insertedId, jwt });
+        res.status(STATUS_OK).json({ expenseId: result.insertedId, jwt: res.locals.refreshedToken });
+    } catch (error) {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client.close();
     }
@@ -74,39 +75,36 @@ router.post("/create", async (req, res, next) => {
  * will return all the expenses for a single trip.
  */
 router.post("/get", async (req, res, next) => {
+    const { expenseId } = req.body;
+
     // expenseId is required
-    if (!req.body.expenseId) {
-        res.statusCode = STATUS_BAD_REQUEST;
-        res.json({ error: "expenseId required" });
+    if (!expenseId) {
+        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
         return;
     }
-    const expenseId = new ObjectId(req.body.expenseId);
 
     const client = await getMongoClient();
     try {
         const db = client.db(DB_NAME);
         const expenseCol: Collection<Expense> = db.collection(EXPENSE_COLLECTION_NAME);
-        let expense: any = await expenseCol.findOne({ _id: expenseId });
-        expense.token = res.locals.refreshedToken;
-        res.json(expense);
+        const expense = await expenseCol.findOne({ _id: ObjectId.createFromHexString(expenseId) });
+        res.status(STATUS_OK).json({ ...expense, jwt: res.locals.refreshedToken });
+    } catch (error) {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client.close();
     }
-
-    next();
 });
 
 /*
  * Updates the name, notes, cost of an expense
  */
 router.post("/update", async (req, res, next) => {
-    // expenseId is required
-    if (!req.body.expenseId) {
-        res.statusCode = STATUS_BAD_REQUEST;
-        res.json({ error: "expenseId required" });
+    const { expenseId, name, description, notes, cost, memberIds } = req.body;
+    if (!expenseId || (memberIds && !(memberIds instanceof Array))) {
+        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
         return;
     }
-    const expenseId = ObjectId.createFromHexString(req.body.expenseId);
 
     const client = await getMongoClient();
     try {
@@ -120,60 +118,54 @@ router.post("/update", async (req, res, next) => {
             return;
         }
 
-        // Update the fields if they were provided in the request
-        if (req.body.name) {
-            await expenseCol.updateOne({ _id: expenseId }, { name: req.body.name });
+        const result = await expenseCol.updateOne(
+            { _id: expenseId },
+            // only update values passed in as params
+            {
+                ...(name && { name }),
+                ...(description && { description }),
+                // expenses don't have notes
+                // ...(notes && { notes }),
+                ...(cost && { cost }),
+                ...(memberIds && { memberIds }),
+            }
+        );
+        if (result.acknowledged) {
+            res.status(STATUS_OK).json({ token: res.locals.refreshedToken });
+        } else {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Failed to update expense" });
         }
-        if (req.body.description) {
-            await expenseCol.updateOne({ _id: expenseId }, { notes: req.body.description });
-        }
-        if (req.body.cost) {
-            await expenseCol.updateOne({ _id: expenseId }, { notes: req.body.cost });
-        }
-
-        // Return the tripId
-        res.json({
-            expenseId: expenseId,
-            token: res.locals.refreshedToken,
-        });
+    } catch (error) {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client.close();
     }
-
-    next();
 });
 
 /*
  * Delete an expense
  */
 router.post("/delete", async (req, res, next) => {
-    // expenseId is required
-    if (!req.body.expenseId) {
-        res.statusCode = STATUS_BAD_REQUEST;
-        res.json({ error: "expenseId required" });
+    const { expenseId } = req.body;
+    if (!expenseId) {
+        res.status(STATUS_BAD_REQUEST).json({ error: "expenseId required" });
         return;
     }
-    const expenseId = new ObjectId(req.body.expenseId);
 
     const client = await getMongoClient();
     try {
         const db = client.db(DB_NAME);
         const expenseCol: Collection<Expense> = db.collection(EXPENSE_COLLECTION_NAME);
 
-        // verify that expense exists
-        if ((await expenseCol.findOne({ _id: expenseId })) === null) {
-            res.statusCode = STATUS_BAD_REQUEST;
-            res.json({ error: "expense does not exist" });
-            return;
+        const result = await expenseCol.deleteOne({ _id: expenseId });
+        if (result.acknowledged) {
+            res.status(STATUS_OK).json({ token: res.locals.refreshedToken });
+        } else {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Failed to delete expense" });
         }
-
-        // Just remove it
-        expenseCol.deleteOne({ _id: expenseId });
-
-        res.json({ token: res.locals.refreshedToken });
+    } catch (error) {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client.close();
     }
-
-    next();
 });
