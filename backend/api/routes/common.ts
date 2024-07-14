@@ -17,15 +17,18 @@ export const HOMEPAGE = "https://accountability-190955e8b06f.herokuapp.com";
 // references: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
 /** everything went as planned
  *
- * https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200 */
+ * https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/200
+ */
 export const STATUS_OK = 200;
 /** malformed json body/etc.
  *
- * https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400 */
+ * https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/400
+ */
 export const STATUS_BAD_REQUEST = 400;
 /** user isn't properly logged in/authenticated; could be equivalently named STATUS_UNAUTHORIZED
  *
- * https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401 */
+ * https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+ */
 export const STATUS_UNAUTHENTICATED = 401;
 /** invalid endpoint
  *
