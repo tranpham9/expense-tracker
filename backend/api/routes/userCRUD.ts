@@ -4,7 +4,7 @@ import { Collection, ObjectId } from "mongodb";
 import { createEmail, resetPasswordEmail, unverified } from "../tokenSender";
 import { verify } from "jsonwebtoken";
 import md5 from "md5";
-import { authenticationRouteHandler, createJWT, extractUserId, isExpired, refresh } from "../JWT";
+import { authenticationRouteHandler, createJWT, extract, extractUserId, isExpired, refresh } from "../JWT";
 
 export const router = express.Router();
 
@@ -184,25 +184,55 @@ router.post("/joinTrip", async (req, res, next) => {
     }
 });
 
-// FIXME: this is wrong; the user wouldn't be passing in an email and a new password via a GET request.  Instead, this would be a POST request initiated through the UI (accordingly, whatever link for reset password which gets sent to the user is something that frontend routing would need to handle).
-// TODO: once the type of this request is fixed, proper response status codes should be implemented
-router.post("/resetPassword/:token", async (req, res) => {
+router.post("/resetPassword/:jwt", async (req, res) => {
     // incoming email and new password
     const client = await getMongoClient();
-    const db = client.db(DB_NAME);
-    const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
+    try {
+        const db = client.db(DB_NAME);
+        const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
 
-    // call await resetpassword page
-    const { newPassword } = req.body;
-    const token = req.params.token;
+        const { newPassword } = req.body;
+        if (!newPassword) {
+        }
 
-    let ud = verify(token, process.env.ACCESS_TOKEN_SECRET!, { complete: true });
-    if (!ud) {
-        res.status(STATUS_UNAUTHENTICATED).send("JWT has expired");
+        const { jwt } = req.params;
+        if (isExpired(jwt)) {
+            res.status(STATUS_UNAUTHENTICATED).send("Reset code has expired");
+            return;
+        }
+
+        // const email = extract("email", jwt);
+        const userId = extractUserId(jwt);
+        const hashedPassword = extract("hashedPassword", jwt);
+        if (!userId || !hashedPassword) {
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+            return;
+        }
+
+        // const user = await userCollection.findOne({ email });
+        const user = await userCollection.findOne({ _id: userId });
+        if (!user) {
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+            return;
+        }
+
+        if (hashedPassword !== md5(user.password)) {
+            res.status(STATUS_UNAUTHENTICATED).send("Reset code is no longer valid");
+            return;
+        }
+
+        // const result = await userCollection.findOneAndUpdate({ email }, { password: newPassword });
+        const result = await userCollection.updateOne({ _id: userId }, { $set: { password: newPassword } });
+        if (result.acknowledged) {
+            res.status(STATUS_OK).json({ message: "Successfully reset password" });
+        } else {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Failed to update password" });
+        }
+    } catch (error) {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
+    } finally {
+        await client.close();
     }
-    //@ts-ignore
-    const updatedResult = await userCollection.findOneAndUpdate({ email: ud.payload.email, password: md5(ud.payload.password) }, { password: newPassword });
-    res.status(STATUS_OK).send("Password changed successfully");
 });
 
 router.get("/verify/:token", async (req, res) => {
