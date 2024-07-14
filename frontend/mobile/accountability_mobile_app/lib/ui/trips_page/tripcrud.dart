@@ -276,63 +276,6 @@ class _ViewMemberPage extends State<ViewMemberPage> {
   }
 }
 
-// TODO: Could possibly be an overlay??
-class AddMemberToTrip extends StatelessWidget {
-  // Get the email of the person that you want to add
-  final TextEditingController email = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      // Display the title at the top of the screen
-      appBar: AppBar(
-        title: const Text("Add a Member"),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child: ListView(
-          // Have our list of containers that will take in text input
-          children: <Widget>[
-            // Enter Name
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: TextField(
-                controller: email,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Email',
-                ),
-              ),
-            ),
-            // Confirm Add Trip
-            Container(
-              height: 50,
-              padding: const EdgeInsets.all(10),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                ),
-                child: const Text(
-                  'Add',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () {
-                  // TODO: Call the API to add the member to the trip
-                  // Ensure that the changes are reflected on the page
-
-                  // Go back to the last screen
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 // Expense Related Widgets
 class ViewExpensePage extends StatefulWidget {
   // Each trip has both a name and notes associated with it
