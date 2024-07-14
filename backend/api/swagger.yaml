@@ -48,9 +48,6 @@ paths:
           schema:
               type: object
               properties:
-                id:
-                  type: string
-                  description: Id of the user, suitable for other API endpoints
                 name:
                   type: string
                 email:
