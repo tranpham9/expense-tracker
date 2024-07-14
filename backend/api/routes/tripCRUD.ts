@@ -64,7 +64,7 @@ router.post("/create", async (req, res, next) => {
         // Return the tripId
         res.json({
             tripId: result.insertedId,
-            token: res.locals.refreshedToken
+            token: res.locals.refreshedToken,
         });
     } finally {
         await client.close();
@@ -154,7 +154,7 @@ router.post("/update", async (req, res, next) => {
         // Return the tripId
         res.json({
             tripId: tripId,
-            token: res.locals.refreshedToken
+            token: res.locals.refreshedToken,
         });
     } finally {
         await client.close();
@@ -195,7 +195,7 @@ router.post("/delete", async (req, res, next) => {
         await tripCol.deleteOne({ _id: tripId });
         await expenseCol.deleteMany({ tripId: tripId });
 
-        res.json({token: res.locals.refreshedToken});
+        res.json({ token: res.locals.refreshedToken });
     } finally {
         await client.close();
     }
@@ -229,7 +229,7 @@ router.post("/listMemberOf", async (req, res, next) => {
         // Return a list that this of trip ids (only include id + trip name)
         res.json({
             trips: await tripCol.find({ memberIds: userId }).project({ name: 1, notes: 1 }).toArray(),
-            token: res.locals.refreshedToken
+            token: res.locals.refreshedToken,
         });
     } finally {
         await client.close();
@@ -264,7 +264,7 @@ router.post("/listOwnerOf", async (req, res, next) => {
         // Return a list that this of trip ids (only include id + trip name + notes)
         res.json({
             trips: await tripCol.find({ leaderId: userId }).project({ name: 1, notes: 1 }).toArray(),
-            token: res.locals.refreshedToken
+            token: res.locals.refreshedToken,
         });
     } finally {
         await client.close();
@@ -274,11 +274,11 @@ router.post("/listOwnerOf", async (req, res, next) => {
 // TODO: move from userCRUD
 router.post("/join", async (req, res, next) => {
     // TODO: impl
-    res.status(STATUS_OK).json({message: "not implemented yet"});
+    res.status(STATUS_OK).json({ message: "not implemented yet" });
 });
 
 // NOTE: this will need to remove the user from the trip and from all expenses (this might get a bit difficult with the payer field of expenses, so maybe we don't want to allow leaving?)
 router.post("/leave", async (req, res, next) => {
     // TODO: impl
-    res.status(STATUS_OK).json({message: "not implemented yet"});
+    res.status(STATUS_OK).json({ message: "not implemented yet" });
 });

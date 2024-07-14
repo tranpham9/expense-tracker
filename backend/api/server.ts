@@ -52,7 +52,7 @@ app.use("/api/trips", tripCRUDRouter);
 app.use("/api/expenses", expenseCRUDRouter);
 
 app.post("*", (req, res, next) => {
-    res.status(STATUS_NOT_FOUND).json({ message: "Invalid endpoint" });
+    res.status(STATUS_NOT_FOUND).json({ error: "Invalid endpoint" });
 });
 
 // Serve the static frontend files
