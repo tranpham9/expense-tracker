@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { NextFunction, Request, Response } from "express";
 import { sign, verify, decode, JwtPayload } from "jsonwebtoken";
 import { ObjectId } from "mongodb";
 
@@ -53,3 +54,28 @@ export function extractUserId(jwt: string) {
 
     return ObjectId.createFromHexString((decodedJWT.payload as JwtPayload).userId as string);
 }
+
+export const authenticationRouteHandler = (req: Request, res: Response, next: NextFunction) => {
+    const { jwt } = req.body;
+    if (!jwt) {
+        res.status(400).json({ error: "Malformed Request" });
+        return;
+    }
+
+    const refreshedJWT = refresh(jwt);
+    if (!refreshedJWT) {
+        res.status(401).json({ error: "Session Expired" });
+        return;
+    }
+
+    // keep track of new JWT
+    res.locals.refreshedJWT = refreshedJWT;
+
+    /* Then only adding this to each route's response is needed:
+        req.json({
+        ...
+        token: res.locals.refreshedToken
+        });
+     */
+    next(); // continue processing this request
+};

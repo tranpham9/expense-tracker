@@ -4,9 +4,14 @@ import { Collection, ObjectId } from "mongodb";
 import { createEmail, resetPasswordEmail, unverified } from "../tokenSender";
 import { verify } from "jsonwebtoken";
 import md5 from "md5";
-import { createJWT, extractUserId, isExpired, refresh } from "../JWT";
+import { authenticationRouteHandler, createJWT, extractUserId, isExpired, refresh } from "../JWT";
 
 export const router = express.Router();
+
+const AUTHENTICATED_ROUTES = ["/changeName", "/joinTrip"];
+
+// JWT Verification
+router.use(AUTHENTICATED_ROUTES, authenticationRouteHandler);
 
 router.post("/register", async (req, res, next) => {
     const client = await getMongoClient();
@@ -261,4 +266,3 @@ router.get("/verify/:token", async (req, res) => {
         res.status(401).json({ error: "Invalid registration token" });
     }
 });
-

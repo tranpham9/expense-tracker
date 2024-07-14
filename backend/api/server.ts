@@ -43,35 +43,6 @@ app.post("/api/refreshJWT", async (req, res) => {
     }
 });
 
-// JWT Verification - For any routes declared *below* this one,
-// verification will be enforced with some exceptions.
-app.use("/api/", (req, res, next) => {
-    let exceptions = ["/users/login", "/users/registerUser", "/users/forgotPassword", "/users/resetPassword "];
-    if (exceptions.some((prefix) => req.path.startsWith(prefix))) {
-        // bypass verification for the paths above
-        next();
-        return;
-    }
-
-    if(!req.body.token || isExpired(req.body.token)) {
-        // terminates the response
-        res.statusCode = 400;
-        res.json({ error: "JWT token not provided or invalid/expired" });
-        return;
-    }
-
-    // JWT is good! Generate and keep track of a new token
-    res.locals.refreshedToken = refresh(req.body.token)?.toString();
-
-    /* Then only adding this to each route's response is needed:
-        req.json({
-        ...
-        token: res.locals.refreshedToken
-        });
-     */
-    next(); // continue processing this request
-});
-
 // All user related CRUD endpoints will be accessible under /api/
 app.use("/api/users", userCRUDRouter);
 // All trip related CRUD endpoints will be accessible under /api/trips/
