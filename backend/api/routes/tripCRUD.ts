@@ -1,7 +1,7 @@
 import express from "express";
 import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, STATUS_BAD_REQUEST, STATUS_OK, Trip, TRIP_COLLECTION_NAME, User, USER_COLLECTION_NAME } from "./common";
 import { Collection, ObjectId } from "mongodb";
-import { authenticationRouteHandler } from "../JWT";
+import { authenticationRouteHandler, extractUserId } from "../JWT";
 
 export const router = express.Router();
 
@@ -22,12 +22,12 @@ router.use(AUTHENTICATED_ROUTES, authenticationRouteHandler);
  */
 router.post("/create", async (req, res, next) => {
     // leaderId is required, that's the user that will own this new trip
-    if (!req.body.leaderId) {
+    const leaderId = extractUserId(res.locals.refreshedJWT);
+    if (!leaderId) {
         res.statusCode = STATUS_BAD_REQUEST;
         res.json({ error: "leaderId required" });
         return;
     }
-    const leaderId = ObjectId.createFromHexString(req.body.leaderId);
 
     // Default values for non-required fields
     req.body.name ??= "Unnamed Trip";
@@ -213,12 +213,12 @@ router.post("/delete", async (req, res, next) => {
  */
 router.post("/listMemberOf", async (req, res, next) => {
     // userId is required
+    const userId = extractUserId(res.locals.refreshedJWT);
     if (!req.body.userId) {
         res.statusCode = STATUS_BAD_REQUEST;
         res.json({ error: "userId required" });
         return;
     }
-    const userId = ObjectId.createFromHexString(req.body.userId);
 
     const client = await getMongoClient();
     try {
@@ -227,7 +227,7 @@ router.post("/listMemberOf", async (req, res, next) => {
         const userCol: Collection<User> = db.collection(USER_COLLECTION_NAME);
 
         // verify that user exists
-        if ((await userCol.findOne({ _id: userId })) === null) {
+        if ((await userCol.findOne({ _id: userId as ObjectId})) === null) {
             res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "user does not exist" });
             return;
@@ -235,7 +235,7 @@ router.post("/listMemberOf", async (req, res, next) => {
 
         // Return a list that this of trip ids (only include id + trip name)
         res.json({
-            trips: await tripCol.find({ memberIds: userId }).project({ name: 1, notes: 1 }).toArray(),
+            trips: await tripCol.find({ memberIds: userId as ObjectId}).project({ name: 1, notes: 1 }).toArray(),
             token: res.locals.refreshedToken,
         });
     } finally {
@@ -248,12 +248,12 @@ router.post("/listMemberOf", async (req, res, next) => {
  */
 router.post("/listOwnerOf", async (req, res, next) => {
     // userId is required
+    const userId = extractUserId(res.locals.refreshedJWT);
     if (!req.body.userId) {
         res.statusCode = STATUS_BAD_REQUEST;
         res.json({ error: "userId required" });
         return;
     }
-    const userId = ObjectId.createFromHexString(req.body.userId);
 
     const client = await getMongoClient();
     try {
@@ -262,7 +262,7 @@ router.post("/listOwnerOf", async (req, res, next) => {
         const userCol: Collection<User> = db.collection(USER_COLLECTION_NAME);
 
         // verify that user exists
-        if ((await userCol.findOne({ _id: userId })) === null) {
+        if ((await userCol.findOne({ _id: userId as ObjectId})) === null) {
             res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "user does not exist" });
             return;
@@ -270,7 +270,7 @@ router.post("/listOwnerOf", async (req, res, next) => {
 
         // Return a list that this of trip ids (only include id + trip name + notes)
         res.json({
-            trips: await tripCol.find({ leaderId: userId }).project({ name: 1, notes: 1 }).toArray(),
+            trips: await tripCol.find({ leaderId: userId as ObjectId}).project({ name: 1, notes: 1 }).toArray(),
             token: res.locals.refreshedToken,
         });
     } finally {
