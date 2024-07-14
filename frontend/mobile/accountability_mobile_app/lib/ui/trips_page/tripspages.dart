@@ -3,6 +3,7 @@ import 'package:accountability_mobile_app/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../models/Trip.dart';
+import 'viewtrippage.dart';
 
 // Trip Related Widgets
 class TripsPage extends StatefulWidget {
@@ -44,6 +45,7 @@ class _TripsPageState extends State<TripsPage> {
                   icon: const Icon(Icons.search),
                   onPressed: () {
                     // TODO: Perform a search and filter the matches to the top
+                    // Call api to return a list of trips that match the search and redraw them to the screen
                     print(_searchQuery.text);
                   },
                 ),
@@ -78,7 +80,7 @@ class _TripsPageState extends State<TripsPage> {
                             // TODO: Route to a page displaying information on a trip
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    ViewTripPage(trips[index])),
+                                    ViewTripPage(trip: trips[index])),
                           );
                         },
                       ),
