@@ -40,9 +40,9 @@ export function refresh(jwt: string) {
 
     // TODO: does userId need to be converted to an ObjectId?
     // @ts-ignore
-    let userId = decodedJWT.payload.userId;
+    const userId = ObjectId.createFromHexString(decodedJWT.payload.userId);
     // @ts-ignore
-    let email = decodedJWT.payload.email;
+    const email = decodedJWT.payload.email;
 
     return createJWT(userId, email);
 }
