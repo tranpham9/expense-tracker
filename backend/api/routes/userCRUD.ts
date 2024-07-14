@@ -251,22 +251,30 @@ router.post("/resetPassword", async (req, res) => {
 });
 
 router.get("/verify/:token", async (req, res) => {
+    // creates html for the respective message
+    const getHTMLTemplate = (message: string, shouldRedirect = false) => {
+        return `<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />${
+            shouldRedirect
+                ? `
+        <meta http-equiv="refresh" content="5; url=/" />`
+                : ""
+        }
+    </head>
+    <body>
+        <h3>${message}</h3>
+    </body>
+</html>`;
+    };
+
     let client: MongoClient | undefined;
     try {
         // get User document from token
         const { token } = req.params;
         const verified = unverified.get(token);
         if (!verified) {
-            res.status(STATUS_BAD_REQUEST).send(`
-<html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-    </head>
-    <body>
-        <h3>Verification failed; invalid verification code.</h3>
-    </body>
-</html>
-`);
+            res.status(STATUS_BAD_REQUEST).send(getHTMLTemplate("Verification failed; invalid verification code."));
             return;
         }
 
@@ -278,16 +286,7 @@ router.get("/verify/:token", async (req, res) => {
         // insert new user
         const result = await userCollection.insertOne(verified);
         if (!result.acknowledged) {
-            res.status(STATUS_BAD_REQUEST).send(`
-<html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-    </head>
-    <body>
-        <h3>Failed to register user.</h3>
-    </body>
-</html>
-`);
+            res.status(STATUS_BAD_REQUEST).send(getHTMLTemplate("Failed to register user."));
             return;
         }
         // If we get here, we're successfully verified
@@ -298,17 +297,7 @@ router.get("/verify/:token", async (req, res) => {
             res.status(308).redirect('/');
             */
         // Show some basic HTML that redirects to homepage after 5 seconds
-        res.status(STATUS_OK).send(`
-<html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta http-equiv="refresh" content="5;url=/" />
-    </head>
-    <body>
-        <h3>Verification successful. Redirecting to website in 5 seconds.</h3>
-    </body>
-</html>
-        `);
+        res.status(STATUS_OK).send(getHTMLTemplate("Verification successful. Redirecting to website in 5 seconds.", true));
 
         /*// if tripId is provided, add user to trip
             if (verified?.trips) {
@@ -317,7 +306,7 @@ router.get("/verify/:token", async (req, res) => {
                 await tripCollection.updateOne({ _id: ObjectId.createFromHexString(tripId) }, { $push: { memberIds: insertionResult.insertedId } });
             }*/
     } catch (error) {
-        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
+        res.status(STATUS_INTERNAL_SERVER_ERROR).send(getHTMLTemplate("Something went wrong."));
     } finally {
         await client?.close();
     }
