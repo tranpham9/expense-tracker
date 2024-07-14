@@ -1,8 +1,15 @@
 import express from "express";
 import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, STATUS_BAD_REQUEST, STATUS_OK, Trip, TRIP_COLLECTION_NAME, User, USER_COLLECTION_NAME } from "./common";
 import { Collection, ObjectId } from "mongodb";
+import { authenticationRouteHandler } from "../JWT";
 
 export const router = express.Router();
+
+const AUTHENTICATED_ROUTES = ["/*"];
+
+// JWT Verification
+router.use(AUTHENTICATED_ROUTES, authenticationRouteHandler);
+// TODO: need to ensure all the endpoints here are properly sending the refreshed JWT, etc.
 
 /*
  * ============================
