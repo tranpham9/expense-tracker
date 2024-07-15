@@ -9,6 +9,14 @@ basePath: /api
 schemes:
   - https
 
+tags: 
+  - name: users
+    description: Person using the app
+  - name: trips
+    description: Holds users and expenses
+  - name: expenses
+    description: Details activities and money spent
+
 paths:
   /refreshJWT:
     post:
@@ -36,6 +44,8 @@ paths:
   /users/login:
     post:
       summary: Application user login endpoint
+      tags: 
+        - users
       description: Performs user authentication
       parameters:
       - in: body
@@ -65,22 +75,12 @@ paths:
           description: "Authentication failure, either wrong username or password"
           schema:
                 $ref: '#/definitions/ErrorInfo'
-      responses:
-        "200":
-          description: Successfully joined trip
-          schema:
-            type: object
-            properties:
-              jwt:
-                type: string
-                description: Authenticated JWT
-        "400":
-          description: Malformed request or JSON on front-end
-          schema:
-                $ref: '#/definitions/ErrorInfo'
+      
   /users/register:
     post:
       summary: New user registration endpoint
+      tags: 
+        - users
       description: Creates a new application user
       parameters:
       - in: body
@@ -101,6 +101,8 @@ paths:
   /trips/create:
     post:
       summary: CREATE trip endpoint
+      tags: 
+        - trips
       description: Create a new, empty trip
       parameters:
       - in: body
@@ -138,6 +140,8 @@ paths:
   /trips/get:
     post:
       summary: READ trip endpoint
+      tags: 
+        - trips
       description: Get a trip with its associated users and expenses
       parameters:
       - in: body
@@ -203,6 +207,8 @@ paths:
   /trips/update:
     post:
       summary: UPDATE trip endpoint
+      tags: 
+        - trips
       description: Modify trip information
       parameters:
       - in: body
@@ -234,6 +240,8 @@ paths:
   /trips/delete:
     post:
       summary: DELETE trip endpoint
+      tags: 
+        - trips
       description: Remove a trip and associated data
       parameters:
       - in: body
@@ -263,6 +271,8 @@ paths:
   /trips/listMemberOf:
     post:
       summary: List trips as member user
+      tags: 
+        - trips
       description: List trips a user is part of, only shows member (non-leader) trips.
       parameters:
       - in: body
@@ -303,6 +313,8 @@ paths:
   /trips/listOwnerOf:
     post:
       summary: List trips owned by user
+      tags: 
+        - trips
       description: List trips that belong to a user, only shows owned trips where the user is the Leader.
       parameters:
       - in: body
@@ -343,6 +355,8 @@ paths:
   /trips/join:
     post:
       summary: Application user login endpoint
+      tags: 
+        - trips
       description: Performs user authentication
       parameters:
       - in: body
@@ -371,6 +385,8 @@ paths:
   /expenses/create:
     post:
       summary: CREATE expense endpoint
+      tags: 
+        - expenses 
       description: Create a new, blank expense
       parameters:
       - in: body
@@ -409,6 +425,8 @@ paths:
   /expenses/get:
     post:
       summary: READ expense endpoint
+      tags: 
+        - expenses 
       description: Read information about an expense. Note that /trips/get can return all the expenses at once.
       parameters:
       - in: body
@@ -446,6 +464,8 @@ paths:
   /expenses/update:
     post:
       summary: UPDATE expense endpoint
+      tags: 
+        - expenses 
       description: Modify expense properties
       parameters:
       - in: body
@@ -484,6 +504,8 @@ paths:
   /expenses/delete:
     post:
       summary: DELETE expense endpoint
+      tags: 
+        - expenses 
       description: Remove an expense and associated data
       parameters:
       - in: body
