@@ -31,7 +31,7 @@ router.post("/register", async (req, res, next) => {
         const newUser: User = {
             name: name.toString(),
             email: (email.toString() as string).trim().toLocaleLowerCase(),
-            password: password.toString(),
+            password: md5(password.toString()),
             trips: tripId ? [ObjectId.createFromHexString(tripId.toString())] : [],
         };
 
