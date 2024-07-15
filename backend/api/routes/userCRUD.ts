@@ -38,11 +38,12 @@ router.post("/register", async (req, res, next) => {
             res.status(406).json("Must be a valid email");
             return;
     }*/
+        const properEmail = formatEmail(email);
 
         // TODO: ensure trips should also include non-owning trips (i.e. ones where the user is a part of but not the creater/owner of)
         const newUser: User = {
             name: name.toString(),
-            email: formatEmail(email),
+            email: properEmail,
             password: md5(password.toString()),
             trips: tripId ? [ObjectId.createFromHexString(tripId.toString())] : [],
         };
@@ -52,7 +53,7 @@ router.post("/register", async (req, res, next) => {
         const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
 
         // ensure email doesn't already exist
-        const check = await userCollection.findOne({ email: email });
+        const check = await userCollection.findOne({ email: properEmail });
         // console.log(check);
         if (check) {
             console.error("Attempted to register a user with an existing email");
