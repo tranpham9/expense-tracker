@@ -64,7 +64,7 @@ router.post("/create", async (req, res, next) => {
         // randomly generated permanent invite code for this trip
         let inviteCode = null;
         // ensure such code does not already exist for another trip (unlikely but might as well check)
-        while (inviteCode == null || tripCol.findOne({ inviteCode: inviteCode }) !== null) {
+        while (inviteCode == null || !tripCol.findOne({ inviteCode: inviteCode })) {
             // 000000 to 999999 as string padded with zeroes
             let num = Math.floor(Math.random() * 1000000);
             inviteCode = String(num).padStart(6, "0");
@@ -81,7 +81,7 @@ router.post("/create", async (req, res, next) => {
         // And update the user object
         // NOTE: do we really need this? The trips already have a "leaderId" field,
         // which is the one used by the rest of the api functions.
-        await userCol.updateOne({ _id: leaderId }, { $push: { trips: result.insertedId } });
+        // await userCol.updateOne({ _id: leaderId }, { $push: { trips: result.insertedId } });
 
         // Return the tripId
         res.json({
@@ -169,10 +169,10 @@ router.post("/update", async (req, res, next) => {
 
         // Update the fields if they were provided in the request
         if (req.body.name) {
-            await tripCol.updateOne({ _id: tripId }, { name: req.body.name });
+            await tripCol.updateOne({ _id: tripId }, { $set: { name: req.body.name } });
         }
         if (req.body.notes) {
-            await tripCol.updateOne({ _id: tripId }, { notes: req.body.notes });
+            await tripCol.updateOne({ _id: tripId }, { $set: { notes: req.body.notes } });
         }
 
         // Return the tripId
