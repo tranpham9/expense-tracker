@@ -34,20 +34,22 @@ router.use(AUTHENTICATED_ROUTES, authenticationRouteHandler);
  * Creates a new empty Trip, with the name, notes, and leaderId provided.
  */
 router.post("/create", async (req, res, next) => {
-    // leaderId is required, that's the user that will own this new trip
-    const leaderId = extractUserId(res.locals.refreshedJWT);
-    if (!leaderId) {
-        res.statusCode = STATUS_BAD_REQUEST;
-        res.json({ error: "leaderId required" });
-        return;
-    }
-
-    // Default values for non-required fields
-    req.body.name ??= "Unnamed Trip";
-    req.body.notes ??= "No notes provided";
-
-    const client = await getMongoClient();
+    let client: MongoClient | undefined;
     try {
+        // leaderId is required, that's the user that will own this new trip
+        const leaderId = extractUserId(res.locals.refreshedJWT);
+        if (!leaderId) {
+            res.statusCode = STATUS_BAD_REQUEST;
+            res.json({ error: "leaderId required" });
+            return;
+        }
+
+        // Default values for non-required fields
+        req.body.name ??= "Unnamed Trip";
+        req.body.notes ??= "No notes provided";
+
+        client = await getMongoClient();
+
         const db = client.db(DB_NAME);
         const userCol: Collection<User> = db.collection(USER_COLLECTION_NAME);
         const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
@@ -84,10 +86,10 @@ router.post("/create", async (req, res, next) => {
         // Return the tripId
         res.json({
             tripId: result.insertedId,
-            jwt: res.locals.refreshedJWT
+            jwt: res.locals.refreshedJWT,
         });
     } finally {
-        await client.close();
+        await client?.close();
     }
 });
 
@@ -95,16 +97,17 @@ router.post("/create", async (req, res, next) => {
  * Read Information from a Trip, aggregates related expenses and members.
  */
 router.post("/get", async (req, res, next) => {
-    // tripId is required
-    if (!req.body.tripId) {
-        res.statusCode = STATUS_BAD_REQUEST;
-        res.json({ error: "tripId required" });
-        return;
-    }
-    const tripId = ObjectId.createFromHexString(req.body.tripId);
-
-    const client = await getMongoClient();
+    let client: MongoClient | undefined;
     try {
+        // tripId is required
+        if (!req.body.tripId) {
+            res.statusCode = STATUS_BAD_REQUEST;
+            res.json({ error: "tripId required" });
+            return;
+        }
+        const tripId = ObjectId.createFromHexString(req.body.tripId);
+
+        client = await getMongoClient();
         const db = client.db(DB_NAME);
         const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
         const expenseCol: Collection<Expense> = db.collection(EXPENSE_COLLECTION_NAME);
@@ -135,7 +138,7 @@ router.post("/get", async (req, res, next) => {
         trip.jwt = res.locals.refreshedJWT;
         res.json(trip);
     } finally {
-        await client.close();
+        await client?.close();
     }
 });
 
@@ -143,16 +146,17 @@ router.post("/get", async (req, res, next) => {
  * Updates the name, notes of a trip.
  */
 router.post("/update", async (req, res, next) => {
-    // tripId is required
-    if (!req.body.tripId) {
-        res.statusCode = STATUS_BAD_REQUEST;
-        res.json({ error: "tripId required" });
-        return;
-    }
-    const tripId = ObjectId.createFromHexString(req.body.tripId);
-
-    const client = await getMongoClient();
+    let client: MongoClient | undefined;
     try {
+        // tripId is required
+        if (!req.body.tripId) {
+            res.statusCode = STATUS_BAD_REQUEST;
+            res.json({ error: "tripId required" });
+            return;
+        }
+        const tripId = ObjectId.createFromHexString(req.body.tripId);
+
+        client = await getMongoClient();
         const db = client.db(DB_NAME);
         const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
 
@@ -174,10 +178,10 @@ router.post("/update", async (req, res, next) => {
         // Return the tripId
         res.json({
             tripId: tripId,
-            jwt: res.locals.refreshedJWT
+            jwt: res.locals.refreshedJWT,
         });
     } finally {
-        await client.close();
+        await client?.close();
     }
 });
 
@@ -185,16 +189,17 @@ router.post("/update", async (req, res, next) => {
  * Deletes a trip and all associated expenses.
  */
 router.post("/delete", async (req, res, next) => {
-    // tripId is required
-    if (!req.body.tripId) {
-        res.statusCode = STATUS_BAD_REQUEST;
-        res.json({ error: "tripId required" });
-        return;
-    }
-    const tripId = ObjectId.createFromHexString(req.body.tripId);
-
-    const client = await getMongoClient();
+    let client: MongoClient | undefined;
     try {
+        // tripId is required
+        if (!req.body.tripId) {
+            res.statusCode = STATUS_BAD_REQUEST;
+            res.json({ error: "tripId required" });
+            return;
+        }
+        const tripId = ObjectId.createFromHexString(req.body.tripId);
+
+        client = await getMongoClient();
         const db = client.db(DB_NAME);
         const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
         const expenseCol: Collection<Expense> = db.collection(EXPENSE_COLLECTION_NAME);
@@ -217,7 +222,7 @@ router.post("/delete", async (req, res, next) => {
 
         res.json({ jwt: res.locals.refreshedJWT });
     } finally {
-        await client.close();
+        await client?.close();
     }
 });
 
@@ -225,17 +230,18 @@ router.post("/delete", async (req, res, next) => {
  * List all the trips a user is as a member of (as non-owner only).
  */
 router.post("/listMemberOf", async (req, res, next) => {
-    // userId is required
-    const userId = extractUserId(res.locals.refreshedJWT);
-
-    const client = await getMongoClient();
+    let client: MongoClient | undefined;
     try {
+        // userId is required
+        const userId = extractUserId(res.locals.refreshedJWT);
+
+        client = await getMongoClient();
         const db = client.db(DB_NAME);
         const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
         const userCol: Collection<User> = db.collection(USER_COLLECTION_NAME);
 
         // verify that user exists
-        if ((await userCol.findOne({ _id: userId as ObjectId})) === null) {
+        if ((await userCol.findOne({ _id: userId as ObjectId })) === null) {
             res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "user does not exist" });
             return;
@@ -243,11 +249,14 @@ router.post("/listMemberOf", async (req, res, next) => {
 
         // Return a list that this of trip ids (only include id + trip name)
         res.json({
-            trips: await tripCol.find({ memberIds: userId as ObjectId}).project({ name: 1, notes: 1 }).toArray(),
-            jwt: res.locals.refreshedJWT
+            trips: await tripCol
+                .find({ memberIds: userId as ObjectId })
+                .project({ name: 1, notes: 1 })
+                .toArray(),
+            jwt: res.locals.refreshedJWT,
         });
     } finally {
-        await client.close();
+        await client?.close();
     }
 });
 
@@ -255,17 +264,18 @@ router.post("/listMemberOf", async (req, res, next) => {
  * List all the trips that belong to a user. (As Owner/Leader)
  */
 router.post("/listOwnerOf", async (req, res, next) => {
-    // userId is required
-    const userId = extractUserId(res.locals.refreshedJWT);
-
-    const client = await getMongoClient();
+    let client: MongoClient | undefined;
     try {
+        // userId is required
+        const userId = extractUserId(res.locals.refreshedJWT);
+
+        client = await getMongoClient();
         const db = client.db(DB_NAME);
         const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
         const userCol: Collection<User> = db.collection(USER_COLLECTION_NAME);
 
         // verify that user exists
-        if ((await userCol.findOne({ _id: userId as ObjectId})) === null) {
+        if ((await userCol.findOne({ _id: userId as ObjectId })) === null) {
             res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "user does not exist" });
             return;
@@ -273,11 +283,14 @@ router.post("/listOwnerOf", async (req, res, next) => {
 
         // Return a list that this of trip ids (only include id + trip name + notes)
         res.json({
-            trips: await tripCol.find({ leaderId: userId as ObjectId}).project({ name: 1, notes: 1 }).toArray(),
-            jwt: res.locals.refreshedJWT
+            trips: await tripCol
+                .find({ leaderId: userId as ObjectId })
+                .project({ name: 1, notes: 1 })
+                .toArray(),
+            jwt: res.locals.refreshedJWT,
         });
     } finally {
-        await client.close();
+        await client?.close();
     }
 });
 
