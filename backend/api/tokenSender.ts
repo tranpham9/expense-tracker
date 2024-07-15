@@ -4,7 +4,7 @@ import { createTransport } from "nodemailer";
 import { createJWT } from "./JWT";
 import { ObjectId, Collection } from "mongodb";
 import { error } from "console";
-import { DB_NAME, getMongoClient, HOMEPAGE, User, USER_COLLECTION_NAME } from "./routes/common";
+import { DB_NAME, formatEmail, getMongoClient, HOMEPAGE, User, USER_COLLECTION_NAME } from "./routes/common";
 import { json } from "stream/consumers";
 import { JsonWebTokenError, sign } from "jsonwebtoken";
 import md5 from "md5";
@@ -69,7 +69,7 @@ export async function resetPasswordEmail(email: string) {
     const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
 
     // standardize the format of emails
-    const properEmail = (email.toString() as string).trim().toLocaleLowerCase();
+    const properEmail = formatEmail(email);
 
     // acquire the user information to create a jwt
     const result = await userCollection.findOne({ email: properEmail });

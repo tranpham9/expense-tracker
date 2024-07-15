@@ -1,5 +1,17 @@
 import express from "express";
-import { DB_NAME, getMongoClient, STATUS_BAD_REQUEST, STATUS_INTERNAL_SERVER_ERROR, STATUS_OK, STATUS_UNAUTHENTICATED, Trip, TRIP_COLLECTION_NAME, User, USER_COLLECTION_NAME } from "./common";
+import {
+    DB_NAME,
+    formatEmail,
+    getMongoClient,
+    STATUS_BAD_REQUEST,
+    STATUS_INTERNAL_SERVER_ERROR,
+    STATUS_OK,
+    STATUS_UNAUTHENTICATED,
+    Trip,
+    TRIP_COLLECTION_NAME,
+    User,
+    USER_COLLECTION_NAME,
+} from "./common";
 import { Collection, MongoClient, ObjectId } from "mongodb";
 import { createEmail, resetPasswordEmail, unverified } from "../tokenSender";
 import { verify } from "jsonwebtoken";
@@ -30,7 +42,7 @@ router.post("/register", async (req, res, next) => {
         // TODO: ensure trips should also include non-owning trips (i.e. ones where the user is a part of but not the creater/owner of)
         const newUser: User = {
             name: name.toString(),
-            email: (email.toString() as string).trim().toLocaleLowerCase(),
+            email: formatEmail(email),
             password: md5(password.toString()),
             trips: tripId ? [ObjectId.createFromHexString(tripId.toString())] : [],
         };
@@ -69,8 +81,7 @@ router.post("/login", async (req, res, next) => {
             return;
         }
 
-        // trimmed and converted to lowercase to standardize format of emails
-        const properEmail = (email.toString() as string).trim().toLocaleLowerCase();
+        const properEmail = formatEmail(email);
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);

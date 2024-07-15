@@ -59,6 +59,14 @@ export async function getMongoClient(): Promise<MongoClient> {
     return client;
 }
 
+/**
+ * Standardizes email format for consistency with db
+ * @param email the raw email directly from caller of an endpoint; type any is deliberate (makes it easier to utilize this function with fields directly from the user)
+ */
+export function formatEmail(email: any) {
+    return (email.toString() as string).trim().toLocaleLowerCase();
+}
+
 /*
  * The following types are the schema of the underlying objects in the database.
  */
