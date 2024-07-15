@@ -10,6 +10,7 @@ import { AccountContextProvider, AccountOverlayContextProvider, LoginContextProv
 import { ThemeProvider } from "@emotion/react";
 import { CssBaseline } from "@mui/material";
 import { theme } from "./Theme";
+import Test from "./components/Test";
 
 export default function App() {
     /*
@@ -40,6 +41,11 @@ export default function App() {
                             <Route
                                 path={"/expenses"}
                                 element={<Expenses />}
+                            />
+                            {/* TODO: properly impl */}
+                            <Route
+                                path={"/reset/:jwt"}
+                                element={<Test />}
                             />
                         </Routes>
                     </AccountContextProvider>
