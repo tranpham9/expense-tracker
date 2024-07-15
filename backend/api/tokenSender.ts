@@ -72,7 +72,7 @@ export async function resetPasswordEmail(email: string) {
     const properEmail = (email.toString() as string).trim().toLocaleLowerCase();
 
     // acquire the user information to create a jwt
-    const result = await userCollection.findOne({ email });
+    const result = await userCollection.findOne({ email: properEmail });
     const expire = "5m";
     const jwt = "";
 
