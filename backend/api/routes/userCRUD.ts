@@ -147,17 +147,19 @@ router.post("/forgotPassword", async (req, res) => {
             return;
         }
 
+        const properEmail = formatEmail(email);
+
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
 
-        const foundEmail = userCollection.findOne({ email });
-        if (!foundEmail) {
+        const user = await userCollection.findOne({ email: properEmail });
+        if (!user) {
             res.status(STATUS_BAD_REQUEST).send("Invalid email");
             return;
         }
 
-        sendResetPasswordEmail(email);
+        sendResetPasswordEmail(user);
 
         res.status(STATUS_OK);
     } catch (error) {

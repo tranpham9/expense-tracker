@@ -7,7 +7,7 @@ import { STATUS_BAD_REQUEST, STATUS_NOT_FOUND, STATUS_UNAUTHENTICATED } from "./
 // create a token based on the name, email and password
 export function createJWT(userId: ObjectId, email: string) {
     try {
-        const user = { email, userId };
+        const user = { userId, email };
         //Sign the token based on user credentials
         return sign(user, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: "30m" });
     } catch (e) {

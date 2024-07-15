@@ -1,12 +1,9 @@
 // filename tokenSender.ts
 
 import { createTransport } from "nodemailer";
-import { createJWT } from "./JWT";
-import { ObjectId, Collection } from "mongodb";
-import { error } from "console";
-import { DB_NAME, formatEmail, getMongoClient, HOMEPAGE, User, USER_COLLECTION_NAME } from "./routes/common";
-import { json } from "stream/consumers";
-import { JsonWebTokenError, sign } from "jsonwebtoken";
+import { WithId } from "mongodb";
+import { HOMEPAGE, User } from "./routes/common";
+import { sign } from "jsonwebtoken";
 import md5 from "md5";
 
 const transporter = createTransport({
@@ -57,50 +54,30 @@ To verify your account, please use the following link:
     );
 }
 
-export async function resetPasswordEmail(email: string) {
-    const client = await getMongoClient();
-    const db = client.db(DB_NAME);
-    const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
-
-    // standardize the format of emails
-    const properEmail = formatEmail(email);
-
-    // acquire the user information to create a jwt
-    const result = await userCollection.findOne({ email: properEmail });
-    const expire = "5m";
-    const jwt = "";
-
-    if (result) {
-        const { _id, name, email } = result;
-        const hashedPassword = md5(result.password);
-        const jwt = sign({ _id, name, email, hashedPassword }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: expire });
-    }
+export function sendResetPasswordEmail(user: WithId<User>) {
+    const hashedPassword = md5(user.password);
+    const jwt = sign({ userId: user._id, email: user.email, hashedPassword }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: "5m" });
 
     const url = HOMEPAGE + "/resetPassword";
     //const url = "http://localhost:5000/resetPassword";
 
-    const mailConfigurations = {
-        // It should be a string of sender/server email
-        from: process.env.EMAIL,
+    transporter.sendMail(
+        {
+            from: process.env.EMAIL,
+            to: user.email,
+            subject: "Reset Password",
+            text: `There has been a request to reset your password for Accountability.
+To reset your password, please use the following link:
+        ${url}/${jwt}`,
+        },
+        function (error, info) {
+            if (error) {
+                console.error("Error sending email", error);
+            } else {
+                console.log("Email Sent Successfully");
+            }
 
-        to: email,
-
-        // Subject of Email
-        subject: "Reset Password",
-
-        // This would be the text of email body
-        text: `Hi! There, You have recently visited our website and requested to change your password\n 
-        Please follow the given link to change your password\n
-        ${url}/${jwt}\n\n
-        Thanks`,
-    };
-
-    transporter.sendMail(mailConfigurations, function (error, info) {
-        if (error) {
-            console.error("Error sending email", error);
+            console.log(info);
         }
-        console.log("Email Sent Successfully");
-        console.log(info);
-    });
-    return 200;
+    );
 }
