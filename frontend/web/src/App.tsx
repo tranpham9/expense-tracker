@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
 import Trips from "./pages/Trips";
+import Expenses from "./pages/Expenses";
 
 import "./App.css";
 import { AccountContextProvider, AccountOverlayContextProvider, LoginContextProvider } from "./Contexts/Account";
@@ -35,6 +36,10 @@ export default function App() {
                             <Route
                                 path={"/trips"}
                                 element={<Trips />}
+                            />
+                            <Route
+                                path={"/expenses"}
+                                element={<Expenses />}
                             />
                         </Routes>
                     </AccountContextProvider>
