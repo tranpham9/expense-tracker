@@ -13,7 +13,7 @@ import {
     USER_COLLECTION_NAME,
 } from "./common";
 import { Collection, MongoClient, ObjectId } from "mongodb";
-import { sendVerifyEmail, sendResetPasswordEmail, unverified } from "../tokenSender";
+import { sendVerifyEmail, sendResetPasswordEmail, unverified } from "../email";
 import { verify } from "jsonwebtoken";
 import md5 from "md5";
 import { authenticationRouteHandler, createJWT, extract, extractUserId, isExpired, refresh } from "../JWT";
