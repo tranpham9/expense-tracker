@@ -87,10 +87,13 @@ router.post("/login", async (req, res, next) => {
         const db = client.db(DB_NAME);
         const userCollection = db.collection(USER_COLLECTION_NAME);
 
+        let hashedPassword = md5(password);
+
         const foundUser = await userCollection.findOne({ email: properEmail });
-        if (foundUser && password === foundUser.password) {
+        if (foundUser && hashedPassword === foundUser.password) {
             const jwt = createJWT(foundUser._id, foundUser.email);
             res.status(STATUS_OK).json({
+                userId: foundUser._id,
                 name: foundUser.name,
                 email: foundUser.email,
                 jwt,
@@ -162,50 +165,6 @@ router.post("/forgotPassword", async (req, res) => {
         sendResetPasswordEmail(user);
 
         res.status(STATUS_OK);
-    } catch (error) {
-        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
-    } finally {
-        await client?.close();
-    }
-});
-
-// TODO: move to tripCRUD
-router.post("/joinTrip", async (req, res, next) => {
-    let client: MongoClient | undefined;
-    try {
-        const { inviteCode } = req.body;
-        if (!inviteCode) {
-            res.status(STATUS_BAD_REQUEST).json({ error: "inviteCode required" });
-            return;
-        }
-
-        const userId = extractUserId(res.locals.refreshedJWT);
-        if (!userId) {
-            res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
-            return;
-        }
-
-        client = await getMongoClient();
-        const db = client.db(DB_NAME);
-        const userCol: Collection<User> = db.collection(USER_COLLECTION_NAME);
-        const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
-
-        // query the trip with this invite code (unique per trip)
-        const trip = await tripCol.findOne({ inviteCode });
-        if (!trip) {
-            res.status(STATUS_BAD_REQUEST).json({ error: "Invalid invite code" });
-            return;
-        }
-
-        // prevent joining the same trip twice - technically not an error
-        if (trip.memberIds.some((x) => x.equals(userId))) {
-            res.status(STATUS_OK).json({ message: "Success (already a member of the trip)", jwt: res.locals.refreshedJWT });
-            return;
-        }
-
-        // if found, add this user to the trip
-        await tripCol.updateOne({ _id: trip._id }, { $push: { memberIds: userId } });
-        res.status(STATUS_OK).json({ message: "Successfully joined the trip", jwt: res.locals.refreshedJWT });
     } catch (error) {
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
