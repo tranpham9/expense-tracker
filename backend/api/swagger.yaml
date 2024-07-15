@@ -65,25 +65,6 @@ paths:
           description: "Authentication failure, either wrong username or password"
           schema:
                 $ref: '#/definitions/ErrorInfo'
-  /users/joinTrip:
-    post:
-      summary: Application user login endpoint
-      description: Performs user authentication
-      parameters:
-      - in: body
-        name: Login
-        schema:
-          type: object
-          properties:
-            inviteCode:
-              type: string
-              description: 6-digit invite Code
-            userId:
-              type: string
-              description: logged in userId
-            jwt:
-              type: string
-              description: Authenticated JWT
       responses:
         "200":
           description: Successfully joined trip
@@ -359,6 +340,34 @@ paths:
           description: Malformed request or JSON
           schema:
             $ref: '#/responses/BadRequest'
+  /trips/join:
+    post:
+      summary: Application user login endpoint
+      description: Performs user authentication
+      parameters:
+      - in: body
+        name: Login
+        schema:
+          type: object
+          properties:
+            inviteCode:
+              type: string
+              description: 6-digit invite Code
+            jwt:
+              type: string
+              description: Authenticated JWT
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: Successfully joined the trip
+              jwt:
+                type: string
+                description: Refreshed JWT
   /expenses/create:
     post:
       summary: CREATE expense endpoint
