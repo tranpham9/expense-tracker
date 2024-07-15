@@ -1,5 +1,3 @@
-// filename tokenSender.ts
-
 import { createTransport } from "nodemailer";
 import { WithId } from "mongodb";
 import { HOMEPAGE, User } from "./routes/common";
@@ -14,12 +12,6 @@ const transporter = createTransport({
     },
 });
 
-type mailConfigurations = {
-    from: string;
-    to: string;
-    subject: string;
-    text: string;
-};
 export const unverified = new Map<string, User>();
 export const resetPasswordMap = new Map<string, string>();
 
@@ -33,6 +25,7 @@ export function sendVerifyEmail(user: User) {
     // NOTE: only use this for testing locally (try not to commit with it uncommented)
     // const url = "http://localhost:5000/api/verify/";
 
+    // NOTE: by having the information inline like this, you automatically get the full type information for each key of the mailOptions object
     transporter.sendMail(
         {
             from: process.env.EMAIL,
