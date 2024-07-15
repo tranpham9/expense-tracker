@@ -87,8 +87,10 @@ router.post("/login", async (req, res, next) => {
         const db = client.db(DB_NAME);
         const userCollection = db.collection(USER_COLLECTION_NAME);
 
+        let hashedPassword = md5(password);
+
         const foundUser = await userCollection.findOne({ email: properEmail });
-        if (foundUser && password === foundUser.password) {
+        if (foundUser && hashedPassword === foundUser.password) {
             const jwt = createJWT(foundUser._id, foundUser.email);
             res.status(STATUS_OK).json({
                 name: foundUser.name,
