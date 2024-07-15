@@ -93,6 +93,7 @@ router.post("/login", async (req, res, next) => {
         if (foundUser && hashedPassword === foundUser.password) {
             const jwt = createJWT(foundUser._id, foundUser.email);
             res.status(STATUS_OK).json({
+                userId: foundUser._id,
                 name: foundUser.name,
                 email: foundUser.email,
                 jwt,
