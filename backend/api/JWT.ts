@@ -84,7 +84,7 @@ export function authenticationRouteHandler(req: Request, res: Response, next: Ne
     /* Then only adding this to each route's response is needed:
         req.json({
         ...
-        token: res.locals.refreshedToken
+        jwt: res.locals.refreshedJWT
         });
      */
     next(); // continue processing this request

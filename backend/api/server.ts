@@ -21,27 +21,20 @@ app.use(json());
 app.use(urlencoded({ extended: true }));
 
 app.post("/api/refreshJWT", async (req, res) => {
-    const { token } = req.body;
-    if (!token) {
-        return res.status(STATUS_BAD_REQUEST).json({ error: "Token is required" });
+    // Redudant with JWT.ts:authenticationRouteHandler, but works for a simple refresh
+    const { jwt } = req.body;
+    if (!jwt) {
+        res.status(STATUS_BAD_REQUEST).json({ error: "Authentication (JWT) required" });
+        return;
     }
 
-    try {
-        // Check if the token is expired
-        const expired = isExpired(token);
-        if (expired) {
-            return res.status(STATUS_UNAUTHENTICATED).json({ error: "Token has expired" });
-        }
-
-        // Refresh the token
-        const newToken = refresh(token);
-        if (!newToken) {
-            return res.status(STATUS_BAD_REQUEST).json({ error: "Could not refresh token" });
-        }
-        return res.status(STATUS_OK).json({ token: newToken });
-    } catch (error) {
-        return res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "error" });
+    const refreshedJWT = refresh(jwt);
+    if (!refreshedJWT) {
+        res.status(STATUS_UNAUTHENTICATED).json({ error: "Session Expired" });
+        return;
     }
+
+    res.status(STATUS_OK).json({jwt: refreshedJWT});
 });
 
 // All user related CRUD endpoints will be accessible under /api/

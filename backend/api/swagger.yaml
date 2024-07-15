@@ -19,7 +19,7 @@ paths:
         schema:
           type: object
           properties:
-            token:
+            jwt:
               type: string
       responses:
         "200":
@@ -27,7 +27,7 @@ paths:
           schema:
             type: object
             properties:
-              token:
+              jwt:
                 type: string
         "400":
           description: Malformed request or JSON on front-end
@@ -52,7 +52,7 @@ paths:
                   type: string
                 email:
                   type: string
-                token:
+                jwt:
                   type: string
                   description: Authenticated JWT
         "400":
@@ -79,12 +79,18 @@ paths:
             userId:
               type: string
               description: logged in userId
-            token:
+            jwt:
               type: string
               description: Authenticated JWT
       responses:
         "200":
           description: Successfully joined trip
+          schema:
+            type: object
+            properties:
+              jwt:
+                type: string
+                description: Authenticated JWT
         "400":
           description: Malformed request or JSON on front-end
           schema:
@@ -128,6 +134,9 @@ paths:
             notes:
               type: string
               description: Miscellaneous description for the trip
+            jwt:
+              type: string
+              description: Authenticated JWT
       responses:
         "200":
           description: OK
@@ -136,7 +145,7 @@ paths:
             properties:
               tripId:
                 description: The ID of the created trip
-              token:
+              jwt:
                 type: string
                 description: Refreshed JWT
         "400":
@@ -156,13 +165,16 @@ paths:
             tripId:
               type: string
               description: ID of the trip to read
+            jwt:
+              type: string
+              description: Authenticated JWT
       responses:
         "200":
           description: OK
           schema:
             type: object
             properties:
-              token:
+              jwt:
                 type: string
                 description: Refreshed JWT
               leaderId:
@@ -218,6 +230,9 @@ paths:
             tripId:
               type: string
               description: ID of the trip to modify
+            jwt:
+              type: string
+              description: Authenticated JWT
       responses:
         "200":
           description: OK
@@ -226,7 +241,7 @@ paths:
             properties:
               tripId:
                 description: Same as input ID
-              token:
+              jwt:
                 type: string
                 description: Refreshed JWT
         "400":
@@ -246,13 +261,16 @@ paths:
             tripId:
               type: string
               description: ID of the trip to delete
+            jwt:
+              type: string
+              description: Authenticated JWT
       responses:
         "200":
           description: OK
           schema:
             type: object
             properties:
-              token:
+              jwt:
                 type: string
                 description: Refreshed JWT
         "400":
@@ -269,16 +287,16 @@ paths:
         schema:
           type: object
           properties:
-            userId:
+            jwt:
               type: string
-              description: ID of the user to look for
+              description: Authenticated JWT
       responses:
         "200":
           description: OK
           schema:
             type: object
             properties:
-              token:
+              jwt:
                 type: string
                 description: Refreshed JWT
               trips:
@@ -309,16 +327,16 @@ paths:
         schema:
           type: object
           properties:
-            userId:
+            jwt:
               type: string
-              description: ID of the user to look for
+              description: Authenticated JWT
       responses:
         "200":
           description: OK
           schema:
             type: object
             properties:
-              token:
+              jwt:
                 type: string
                 description: Refreshed JWT
               trips:
@@ -358,6 +376,9 @@ paths:
               type: string
             cost:
               type: number
+            jwt:
+              type: string
+              description: Authenticated JWT              
       responses:
         "200":
           description: OK
@@ -367,7 +388,7 @@ paths:
               expenseId:
                 description: ID of the newly created expense
                 type: string
-              token:
+              jwt:
                 type: string
                 description: Refreshed JWT
         "400":
@@ -387,6 +408,9 @@ paths:
             expenseId:
               type: string
               description: ID of the expense to delete
+            jwt:
+              type: string
+              description: Authenticated JWT              
       responses:
         "200":
           description: OK
@@ -401,7 +425,7 @@ paths:
                 type: string
               cost:
                 type: number
-              token:
+              jwt:
                 type: string
                 description: Refreshed JWT
         "400":
@@ -427,6 +451,9 @@ paths:
               type: string
             cost:
               type: number
+            jwt:
+              type: string
+              description: Authenticated JWT              
       responses:
         "200":
           description: OK
@@ -436,7 +463,7 @@ paths:
               expenseId:
                 description: Same as input ID
                 type: string
-              token:
+              jwt:
                 type: string
                 description: Refreshed JWT
         "400":
@@ -456,13 +483,16 @@ paths:
             expenseId:
               type: string
               description: ID of the expense to delete
+            jwt:
+              type: string
+              description: Authenticated JWT              
       responses:
         "200":
           description: OK
           schema:
             type: object
             properties:
-              token:
+              jwt:
                 type: string
                 description: Refreshed JWT
         "400":

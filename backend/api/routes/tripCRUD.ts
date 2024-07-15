@@ -71,7 +71,7 @@ router.post("/create", async (req, res, next) => {
         // Return the tripId
         res.json({
             tripId: result.insertedId,
-            token: res.locals.refreshedToken,
+            jwt: res.locals.refreshedJWT
         });
     } finally {
         await client.close();
@@ -119,7 +119,7 @@ router.post("/get", async (req, res, next) => {
         // We can add some "bussiness logic" if we wanted to, like a sum of all the costs
         // or something like that
 
-        trip.token = res.locals.refreshedToken;
+        trip.jwt = res.locals.refreshedJWT;
         res.json(trip);
     } finally {
         await client.close();
@@ -161,7 +161,7 @@ router.post("/update", async (req, res, next) => {
         // Return the tripId
         res.json({
             tripId: tripId,
-            token: res.locals.refreshedToken,
+            jwt: res.locals.refreshedJWT
         });
     } finally {
         await client.close();
@@ -202,7 +202,7 @@ router.post("/delete", async (req, res, next) => {
         await tripCol.deleteOne({ _id: tripId });
         await expenseCol.deleteMany({ tripId: tripId });
 
-        res.json({ token: res.locals.refreshedToken });
+        res.json({ jwt: res.locals.refreshedJWT });
     } finally {
         await client.close();
     }
@@ -214,11 +214,6 @@ router.post("/delete", async (req, res, next) => {
 router.post("/listMemberOf", async (req, res, next) => {
     // userId is required
     const userId = extractUserId(res.locals.refreshedJWT);
-    if (!req.body.userId) {
-        res.statusCode = STATUS_BAD_REQUEST;
-        res.json({ error: "userId required" });
-        return;
-    }
 
     const client = await getMongoClient();
     try {
@@ -236,7 +231,7 @@ router.post("/listMemberOf", async (req, res, next) => {
         // Return a list that this of trip ids (only include id + trip name)
         res.json({
             trips: await tripCol.find({ memberIds: userId as ObjectId}).project({ name: 1, notes: 1 }).toArray(),
-            token: res.locals.refreshedToken,
+            jwt: res.locals.refreshedJWT
         });
     } finally {
         await client.close();
@@ -249,11 +244,6 @@ router.post("/listMemberOf", async (req, res, next) => {
 router.post("/listOwnerOf", async (req, res, next) => {
     // userId is required
     const userId = extractUserId(res.locals.refreshedJWT);
-    if (!req.body.userId) {
-        res.statusCode = STATUS_BAD_REQUEST;
-        res.json({ error: "userId required" });
-        return;
-    }
 
     const client = await getMongoClient();
     try {
@@ -271,7 +261,7 @@ router.post("/listOwnerOf", async (req, res, next) => {
         // Return a list that this of trip ids (only include id + trip name + notes)
         res.json({
             trips: await tripCol.find({ leaderId: userId as ObjectId}).project({ name: 1, notes: 1 }).toArray(),
-            token: res.locals.refreshedToken,
+            jwt: res.locals.refreshedJWT
         });
     } finally {
         await client.close();

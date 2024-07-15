@@ -62,7 +62,7 @@ router.post("/create", async (req, res, next) => {
         });
 
         // return the expense id
-        res.status(STATUS_OK).json({ expenseId: result.insertedId, jwt: res.locals.refreshedToken });
+        res.status(STATUS_OK).json({ expenseId: result.insertedId, jwt: res.locals.refreshedJWT });
     } catch (error) {
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
@@ -131,7 +131,7 @@ router.post("/update", async (req, res, next) => {
             }
         );
         if (result.acknowledged) {
-            res.status(STATUS_OK).json({ token: res.locals.refreshedToken });
+            res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
         } else {
             res.status(STATUS_BAD_REQUEST).json({ error: "Failed to update expense" });
         }
@@ -159,7 +159,7 @@ router.post("/delete", async (req, res, next) => {
 
         const result = await expenseCol.deleteOne({ _id: expenseId });
         if (result.acknowledged) {
-            res.status(STATUS_OK).json({ token: res.locals.refreshedToken });
+            res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
         } else {
             res.status(STATUS_BAD_REQUEST).json({ error: "Failed to delete expense" });
         }

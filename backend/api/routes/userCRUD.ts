@@ -192,7 +192,7 @@ router.post("/joinTrip", async (req, res, next) => {
 
         // if found, add this user to the trip
         await tripCol.updateOne({ _id: trip._id }, { $push: { memberIds: userId } });
-        res.status(STATUS_OK).json({ message: "Successfully joined the trip" });
+        res.status(STATUS_OK).json({ message: "Successfully joined the trip", jwt: res.locals.refreshedJWT });
     } catch (error) {
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
