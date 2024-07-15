@@ -190,6 +190,11 @@ class _EditNameNotesPage extends State<EditNameNotesPage> {
     notesController.text = widget.trip.notes;
   }
 
+  static Future<int?> editNameNotes(
+      String tripId, String name, String notes) async {
+    return await TripCRUD.editNameNotes(tripId, name, notes);
+  }
+
   Widget build(BuildContext context) {
     // Build the page
     return Scaffold(
@@ -221,7 +226,14 @@ class _EditNameNotesPage extends State<EditNameNotesPage> {
                 widget.trip.name = nameController.text;
                 widget.trip.notes = notesController.text;
                 // TODO: Write the changes with the API and reflect those changes on the page
-
+                editNameNotes(widget.trip.id, nameController.text,
+                        notesController.text)
+                    .then((response) {
+                  if (response == null) {
+                    print("Error editing names/notes");
+                    return;
+                  }
+                });
                 // Go back to the last screen
                 Navigator.pop(context);
               },

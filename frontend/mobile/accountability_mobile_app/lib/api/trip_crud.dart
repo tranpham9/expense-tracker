@@ -55,12 +55,43 @@ class TripCRUD {
       Response response =
           await dio.post('${Config.remoteApiURL}${Config.createTripAPI}',
               data: jsonEncode(
-                <String, String>{'name': name, 'notes': notes},
+                <String, String?>{
+                  'jwt': await Globals.storage.read(key: 'jwt'),
+                  'name': name,
+                  'notes': notes
+                },
               ));
       if (response.statusCode != 200) {
         throw Exception("Error in Creating a Trip");
       }
       // Successfully added a trip
+      return 200;
+    } catch (e) {
+      print('Error: $e');
+    }
+    return null;
+  }
+
+  // Edit the name and notes of the trip
+  static Future<int?> editNameNotes(
+      String tripId, String name, String notes) async {
+    final Dio dio = new Dio();
+
+    try {
+      // TODO: Need to put the correct url's here
+      Response response =
+          await dio.post('${Config.remoteApiURL}${Config.updateTripAPI}',
+              data: jsonEncode(<String, String?>{
+                'jwt': await Globals.storage.read(key: 'jwt'),
+                'tripId': tripId,
+                'name': name,
+                'notes': notes
+              }));
+
+      if (response.statusCode != 200) {
+        throw Exception("Error in Creating a Trip");
+      }
+      // Successful edit
       return 200;
     } catch (e) {
       print('Error: $e');
