@@ -13,7 +13,7 @@ import {
     USER_COLLECTION_NAME,
 } from "./common";
 import { Collection, MongoClient, ObjectId } from "mongodb";
-import { createEmail, resetPasswordEmail, unverified } from "../tokenSender";
+import { createVerifyEmail, resetPasswordEmail, unverified } from "../tokenSender";
 import { verify } from "jsonwebtoken";
 import md5 from "md5";
 import { authenticationRouteHandler, createJWT, extract, extractUserId, isExpired, refresh } from "../JWT";
@@ -62,7 +62,7 @@ router.post("/register", async (req, res, next) => {
         }
 
         // method that sends an email with the token
-        await createEmail(newUser);
+        await createVerifyEmail(newUser);
 
         // console.log("A user was registered successfully");
         res.status(STATUS_OK);

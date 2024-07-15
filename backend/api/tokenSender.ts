@@ -26,15 +26,16 @@ type mailConfigurations = {
 export const unverified = new Map<string, User>();
 export const resetPasswordMap = new Map<string, string>();
 
-export function createEmail(user: User) {
+export function createVerifyEmail(user: User) {
     // const token = createToken(userId, name, email);
 
     let uuid = crypto.randomUUID();
 
     unverified.set(uuid, user);
 
-    //const url = HOMEPAGE + "/api/verify/";
-    const url = "http://localhost:5000/api/verify/";
+    const url = HOMEPAGE + "/api/verify";
+    // NOTE: only use this for testing locally (try not to commit with it uncommented)
+    // const url = "http://localhost:5000/api/verify/";
 
     const mailConfigurations = {
         // It should be a string of sender/server email
@@ -46,11 +47,9 @@ export function createEmail(user: User) {
         subject: "Email Verification",
 
         // This would be the text of email body
-        text: `Hi! There, You have recently visited our website and entered your email.\n 
-        Please follow the given link to verify your email\n
-        ${url}${uuid}
-        
-        Thanks`,
+        text: `Your email has recently been used to register an account for Accountability.
+To verify your account, please use the following link:
+    ${url}/${uuid}`
     };
 
     transporter.sendMail(mailConfigurations, function (error, info) {
