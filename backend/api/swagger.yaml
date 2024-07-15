@@ -110,18 +110,15 @@ paths:
         schema:
           type: object
           properties:
-            leaderId:
+            jwt:
               type: string
-              description: ID of the user that owns the trip
+              description: Authenticated JWT
             name:
               type: string
               description: Title of the trip
             notes:
               type: string
               description: Miscellaneous description for the trip
-            jwt:
-              type: string
-              description: Authenticated JWT
       responses:
         "200":
           description: OK
