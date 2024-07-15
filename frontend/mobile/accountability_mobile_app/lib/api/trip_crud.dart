@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:accountability_mobile_app/api/config.dart';
+import 'package:accountability_mobile_app/globals.dart';
 import 'package:dio/dio.dart';
 import '../models/Trip.dart';
 
 class TripCRUD {
   // Fetch a list of trips the user is in
-  static Future<List<Trip>?> getTrips(String userId) async {
+  static Future<List<Trip>?> getTrips() async {
     // Create a connection client
     final Dio dio = new Dio();
 
@@ -13,7 +14,8 @@ class TripCRUD {
       // Call the API
       Response response = await dio.post(
           '${Config.remoteApiURL}${Config.getTripsAPI}',
-          data: jsonEncode(<String, String>{'userId': userId}),
+          data: jsonEncode(
+              <String, String?>{'jwt': await Globals.storage.read(key: 'jwt')}),
           options: Options(responseType: ResponseType.plain));
 
       // If there was an error, return an error
@@ -26,7 +28,8 @@ class TripCRUD {
       // Get another response
       response = await dio.post(
           '${Config.remoteApiURL}${Config.getTripsOwnedAPI}',
-          data: jsonEncode(<String, String>{'userId': userId}),
+          data: jsonEncode(
+              <String, String?>{'jwt': await Globals.storage.read(key: 'jwt')}),
           options: Options(responseType: ResponseType.plain));
 
       // If there was an error, return an error

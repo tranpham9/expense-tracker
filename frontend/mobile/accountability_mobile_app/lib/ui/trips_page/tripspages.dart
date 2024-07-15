@@ -1,3 +1,4 @@
+// Show all of the trips you are a part of in a list format
 import 'package:accountability_mobile_app/api/trip_crud.dart';
 import 'package:accountability_mobile_app/globals.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +17,8 @@ class _TripsPageState extends State<TripsPage> {
   final TextEditingController _searchQuery = TextEditingController();
 
   // Get a list of trips a user is apart of
-  Future<List<Trip>?> getTrips(String userId) async {
-    return await TripCRUD.getTrips(Globals.user!.id);
+  Future<List<Trip>?> getTrips() async {
+    return await TripCRUD.getTrips();
   }
 
   @override
@@ -56,7 +57,7 @@ class _TripsPageState extends State<TripsPage> {
             ),
             Expanded(
               child: FutureBuilder<List<Trip>?>(
-                future: getTrips(Globals.user!.id),
+                future: getTrips(),
                 builder: (context, snapshot) {
                   // Display the loading skeleton for the trips
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -128,6 +129,10 @@ class TripsSkeleton extends StatelessWidget {
 // Generate a receipt for the current trip, which includes all members and expenses up to this point
 // TODO: Need to determine how to lay this out and complete the calculations
 class ReceiptPage extends StatefulWidget {
+  final Trip trip;
+  // Pass a trip to the widget
+  const ReceiptPage({super.key, required this.trip});
+
   @override
   State<ReceiptPage> createState() => _ReceiptPage();
 }

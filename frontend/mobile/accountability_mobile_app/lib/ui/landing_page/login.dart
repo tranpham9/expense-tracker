@@ -9,7 +9,6 @@ import '../../utility/helpers.dart';
 import '../home_page/homepage.dart';
 import './register.dart';
 import './forgot_password.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // Main login widget
 class LoginPage extends StatefulWidget {

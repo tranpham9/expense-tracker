@@ -1,6 +1,7 @@
 import 'package:accountability_mobile_app/ui/trips_page/tripspages.dart';
 import 'package:flutter/material.dart';
 import '../../models/Trip.dart';
+import 'tripcrud.dart';
 
 class ViewTripPage extends StatefulWidget {
   final Trip trip;
@@ -33,11 +34,12 @@ class _ViewTripsPage extends State<ViewTripPage> {
                     onPressed: () {
                       // TODO: Call API to edit the notes of an app (Overlay/Pop up to fill in)
                       // Navigate to the name and notes edit page
-                      // Navigator.push(
-                      //     context,
-                      //     // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
-                      //     MaterialPageRoute(
-                      //         builder: (context) => EditNameNotesPage(trip)));
+                      Navigator.push(
+                          context,
+                          // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  EditNameNotesPage(widget.trip)));
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,
@@ -50,7 +52,7 @@ class _ViewTripsPage extends State<ViewTripPage> {
             ),
           ),
           ListTile(
-            title: Text('Trip Code'),
+            title: Text("${widget.trip.inviteCode}"),
             subtitle: Text('Trip Code'),
             // List the edit button
           ),
@@ -64,7 +66,7 @@ class _ViewTripsPage extends State<ViewTripPage> {
           Row(
             children: [
               // Display the members of the trip in a horizontal scroll format
-              // TODO: Apply skeletonizer here for loading animation and load all members of this trip
+              // TODO: Apply skeletonizer here for loading animation and load all members of this trip (horizontal scroll)
               Expanded(
                 child: SizedBox(
                   width: 75,
@@ -109,6 +111,7 @@ class _ViewTripsPage extends State<ViewTripPage> {
           ElevatedButton(
             onPressed: () {
               // TODO: Navigate to add expense page. Will probably need to pass the current tripId so we can call the API
+              // Pop up or overlay
               // Navigator.push(
               //     context,
               //     // Add a new expense to the trip
@@ -157,13 +160,12 @@ class _ViewTripsPage extends State<ViewTripPage> {
           )),
           ElevatedButton(
               onPressed: () {
-                // Pass the list of members & list of expenses to determine total cost and cost amongst members
-                // TODO: Call the API to get the monetary details of the current trip. ie. who owes who what amount of money
-                // Display a page where all this information will reside
+                // Generate a receipt for a given trip, simply passing the trip will allow us to get more info to display
                 Navigator.push(
                     context,
                     // Generate a receipt for the current trip
-                    MaterialPageRoute(builder: (context) => ReceiptPage()));
+                    MaterialPageRoute(
+                        builder: (context) => ReceiptPage(trip: widget.trip)));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).primaryColor,

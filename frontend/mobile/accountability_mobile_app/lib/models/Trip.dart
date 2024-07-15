@@ -15,23 +15,21 @@ class Trip {
   String id;
   String name;
   String notes;
+  int inviteCode;
 
-  Trip({
-    required this.id,
-    required this.name,
-    required this.notes,
-  });
+  Trip(
+      {required this.id,
+      required this.name,
+      required this.notes,
+      required this.inviteCode});
 
   factory Trip.fromJson(Map<String, dynamic> json) => Trip(
-        // id: Id.fromJson(json["_id"]),
-        id: json["_id"],
-        name: json["name"],
-        notes: json["notes"],
-      );
+      // id: Id.fromJson(json["_id"]),
+      id: json["_id"],
+      name: json["name"],
+      notes: json["notes"],
+      inviteCode: json["inviteCode"]);
 
-  Map<String, dynamic> toJson() => {
-        "_id": id,
-        "name": name,
-        "notes": notes,
-      };
+  Map<String, dynamic> toJson() =>
+      {"_id": id, "name": name, "notes": notes, "inviteCode": inviteCode};
 }

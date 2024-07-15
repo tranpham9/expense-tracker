@@ -2,6 +2,7 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import './ui/landing_page/login.dart';
 
+// TODO: Most of the API endpoints will need to be fixed once the jwt implementation has been fixed...
 void main() => runApp(const ConsistentApp());
 
 class ConsistentApp extends StatelessWidget {

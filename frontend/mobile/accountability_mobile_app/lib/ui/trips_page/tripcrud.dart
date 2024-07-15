@@ -1,7 +1,6 @@
 // Display all of the different pages related to the different CRUD operations for each trip
 import 'package:accountability_mobile_app/api/trip_crud.dart';
 import 'package:flutter/material.dart';
-import '../../globals.dart';
 import '../../models/Expense.dart';
 import '../../models/Trip.dart';
 import '../../models/User.dart';
@@ -178,7 +177,7 @@ class EditNameNotesPage extends StatefulWidget {
   State<EditNameNotesPage> createState() => _EditNameNotesPage();
 }
 
-// TODO: This is kind of messed up...
+// TODO: This is kind of messed up... Should be an overlay
 // Could possibly be an overlay??
 class _EditNameNotesPage extends State<EditNameNotesPage> {
   TextEditingController nameController = TextEditingController();
@@ -290,6 +289,7 @@ class ViewExpensePage extends StatefulWidget {
 }
 
 // TODO: Need to decide how we want to implement the edit functionality here...
+// Since there won't be much info display could possibly be a pop up or overlay
 class _ViewExpensePage extends State<ViewExpensePage> {
   @override
   Widget build(BuildContext context) {
@@ -331,6 +331,7 @@ class _ViewExpensePage extends State<ViewExpensePage> {
                   ),
                 )),
             // Display Payer
+            // might not do this either
             // Container(
             //   padding: const EdgeInsets.all(10),
             //   child: ListTile(
@@ -353,7 +354,7 @@ class _ViewExpensePage extends State<ViewExpensePage> {
                 ),
               ),
             ),
-            // Display Members
+            // Display Members (might not do this)
             // Expanded(
             //   // Build a list of all of the members in the trip
             //   child: ListView.builder(
@@ -397,6 +398,7 @@ class _ViewExpensePage extends State<ViewExpensePage> {
   }
 }
 
+// TODO: Might change since we might not be storing this amount of information
 class AddExpensePage extends StatelessWidget {
   // Grab text that will be entered by the user
   final TextEditingController name = TextEditingController();
@@ -440,7 +442,7 @@ class AddExpensePage extends StatelessWidget {
                 ),
               ),
             ),
-            // Enter Members
+            // Enter Cost
             Container(
               padding: const EdgeInsets.all(10),
               child: TextField(
@@ -452,28 +454,28 @@ class AddExpensePage extends StatelessWidget {
                 ),
               ),
             ),
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: TextField(
-                obscureText: true,
-                controller: payer,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Payer',
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: TextField(
-                obscureText: true,
-                controller: members,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Members',
-                ),
-              ),
-            ),
+            // Container(
+            //   padding: const EdgeInsets.all(10),
+            //   child: TextField(
+            //     obscureText: true,
+            //     controller: payer,
+            //     decoration: const InputDecoration(
+            //       border: OutlineInputBorder(),
+            //       labelText: 'Payer',
+            //     ),
+            //   ),
+            // ),
+            // Container(
+            //   padding: const EdgeInsets.all(10),
+            //   child: TextField(
+            //     obscureText: true,
+            //     controller: members,
+            //     decoration: const InputDecoration(
+            //       border: OutlineInputBorder(),
+            //       labelText: 'Members',
+            //     ),
+            //   ),
+            // ),
             // Confirm Add Trip
             Container(
               height: 50,
