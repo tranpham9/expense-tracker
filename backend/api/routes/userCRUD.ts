@@ -13,7 +13,7 @@ import {
     USER_COLLECTION_NAME,
 } from "./common";
 import { Collection, MongoClient, ObjectId } from "mongodb";
-import { createVerifyEmail, resetPasswordEmail, unverified } from "../tokenSender";
+import { sendVerifyEmail, sendResetPasswordEmail, unverified } from "../tokenSender";
 import { verify } from "jsonwebtoken";
 import md5 from "md5";
 import { authenticationRouteHandler, createJWT, extract, extractUserId, isExpired, refresh } from "../JWT";
@@ -61,8 +61,7 @@ router.post("/register", async (req, res, next) => {
             return;
         }
 
-        // method that sends an email with the token
-        await createVerifyEmail(newUser);
+        sendVerifyEmail(newUser);
 
         // console.log("A user was registered successfully");
         res.status(STATUS_OK);
@@ -158,7 +157,7 @@ router.post("/forgotPassword", async (req, res) => {
             return;
         }
 
-        await resetPasswordEmail(email);
+        sendResetPasswordEmail(email);
 
         res.status(STATUS_OK);
     } catch (error) {

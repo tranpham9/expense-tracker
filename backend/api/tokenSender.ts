@@ -26,10 +26,9 @@ type mailConfigurations = {
 export const unverified = new Map<string, User>();
 export const resetPasswordMap = new Map<string, string>();
 
-export function createVerifyEmail(user: User) {
-    // const token = createToken(userId, name, email);
-
-    let uuid = crypto.randomUUID();
+// there isn't a good way to "verify" that an email successfully sent (so nothing needs to be returned from thie function)
+export function sendVerifyEmail(user: User) {
+    const uuid = crypto.randomUUID();
 
     unverified.set(uuid, user);
 
@@ -37,29 +36,25 @@ export function createVerifyEmail(user: User) {
     // NOTE: only use this for testing locally (try not to commit with it uncommented)
     // const url = "http://localhost:5000/api/verify/";
 
-    const mailConfigurations = {
-        // It should be a string of sender/server email
-        from: process.env.EMAIL,
-
-        to: user.email,
-
-        // Subject of Email
-        subject: "Email Verification",
-
-        // This would be the text of email body
-        text: `Your email has recently been used to register an account for Accountability.
+    transporter.sendMail(
+        {
+            from: process.env.EMAIL,
+            to: user.email,
+            subject: "Email Verification",
+            text: `Your email has recently been used to register an account for Accountability.
 To verify your account, please use the following link:
-    ${url}/${uuid}`
-    };
+    ${url}/${uuid}`,
+        },
+        (error, info) => {
+            if (error) {
+                console.error("Error sending email", error);
+            } else {
+                console.log("Email Sent Successfully");
+            }
 
-    transporter.sendMail(mailConfigurations, function (error, info) {
-        if (error) {
-            console.error("Error sending email", error);
+            console.log(info);
         }
-        console.log("Email Sent Successfully");
-        console.log(info);
-    });
-    return 200;
+    );
 }
 
 export async function resetPasswordEmail(email: string) {
