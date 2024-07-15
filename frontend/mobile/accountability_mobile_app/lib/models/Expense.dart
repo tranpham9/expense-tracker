@@ -12,10 +12,8 @@ class Expense {
   String id;
   String name;
   String tripId;
-  String cost;
+  double cost;
   String description;
-  List<String> memberIds;
-  String payerId;
 
   Expense({
     required this.id,
@@ -23,8 +21,6 @@ class Expense {
     required this.tripId,
     required this.cost,
     required this.description,
-    required this.memberIds,
-    required this.payerId,
   });
 
   factory Expense.fromJson(Map<String, dynamic> json) => Expense(
@@ -33,10 +29,6 @@ class Expense {
         tripId: json["tripId"],
         cost: json["cost"],
         description: json["description"],
-        // FIXME: Since Id will now be a String
-        memberIds:
-            List<String>.from(json["memberIds"].map((x) => String.fromJson(x))),
-        payerId: json["payerId"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -45,8 +37,5 @@ class Expense {
         "tripId": tripId,
         "cost": cost,
         "description": description,
-        // FIXME: Id is a string
-        "memberIds": List<dynamic>.from(memberIds.map((x) => x.toJson())),
-        "payerId": payerId,
       };
 }

@@ -2,7 +2,9 @@
 import 'package:accountability_mobile_app/api/trip_crud.dart';
 import 'package:flutter/material.dart';
 import '../../globals.dart';
-import '../../models/models.dart';
+import '../../models/Expense.dart';
+import '../../models/Trip.dart';
+import '../../models/User.dart';
 import '../../utility/helpers.dart';
 
 class AddTripsPage extends StatefulWidget {
@@ -14,13 +16,14 @@ class _AddTripsPageState extends State<AddTripsPage> {
   // Grab text that will be entered by the user
   final TextEditingController name = TextEditingController();
   final TextEditingController notes = TextEditingController();
+  // The user can enter a trip code to join someone else's trip
   final TextEditingController code = TextEditingController();
 
   // Show a pop up overlay after a successful registration
   OverlayEntry? _overlayEntry;
 
-  Future<int?> createTrip(String leaderId, String name, String notes) async {
-    return await TripCRUD.createTrip(leaderId, name, notes);
+  Future<int?> createTrip(String name, String notes) async {
+    return await TripCRUD.createTrip(name, notes);
   }
 
   // Show a given pop up overlay
@@ -84,8 +87,7 @@ class _AddTripsPageState extends State<AddTripsPage> {
                 ),
                 onPressed: () {
                   // Create a trip with the current user as the leader
-                  createTrip(Globals.user!.id, name.text, notes.text)
-                      .then((response) {
+                  createTrip(name.text, notes.text).then((response) {
                     // Display an error message to the user
                     if (response == null) {
                       _showOverlay(
@@ -329,19 +331,19 @@ class _ViewExpensePage extends State<ViewExpensePage> {
                   ),
                 )),
             // Display Payer
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: ListTile(
-                leading: Text(
-                  "Who Payed",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-                trailing: Text(
-                  "${widget.expense.payerId} Payed",
-                  style: TextStyle(fontSize: 15),
-                ),
-              ),
-            ),
+            // Container(
+            //   padding: const EdgeInsets.all(10),
+            //   child: ListTile(
+            //     leading: Text(
+            //       "Who Payed",
+            //       style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            //     ),
+            //     trailing: Text(
+            //       "${widget.expense.payerId} Payed",
+            //       style: TextStyle(fontSize: 15),
+            //     ),
+            //   ),
+            // ),
             Container(
               padding: const EdgeInsets.all(10),
               child: ListTile(
@@ -352,21 +354,21 @@ class _ViewExpensePage extends State<ViewExpensePage> {
               ),
             ),
             // Display Members
-            Expanded(
-              // Build a list of all of the members in the trip
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  String member = widget.expense.membersIds[index];
-                  return ListTile(
-                    title: Text(
-                      member,
-                      style: TextStyle(fontSize: 15),
-                    ),
-                  );
-                },
-                itemCount: widget.expense.membersIds.length,
-              ),
-            ),
+            // Expanded(
+            //   // Build a list of all of the members in the trip
+            //   child: ListView.builder(
+            //     itemBuilder: (context, index) {
+            //       String member = widget.expense.membersIds[index];
+            //       return ListTile(
+            //         title: Text(
+            //           member,
+            //           style: TextStyle(fontSize: 15),
+            //         ),
+            //       );
+            //     },
+            //     itemCount: widget.expense.membersIds.length,
+            //   ),
+            // ),
             // Confirm Edit
             Container(
               height: 50,

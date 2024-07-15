@@ -44,20 +44,15 @@ class TripCRUD {
   }
 
   // Create a trip with the current user as the leader
-  static Future<int?> createTrip(
-      String leaderId, String name, String notes) async {
+  static Future<int?> createTrip(String name, String notes) async {
     // Create a connection client
     final Dio dio = new Dio();
 
     try {
       Response response =
-          await dio.post('${Config.remoteApiURL}${Config.createTrip}',
+          await dio.post('${Config.remoteApiURL}${Config.createTripAPI}',
               data: jsonEncode(
-                <String, String>{
-                  'leaderId': leaderId,
-                  'name': name,
-                  'notes': notes
-                },
+                <String, String>{'name': name, 'notes': notes},
               ));
       if (response.statusCode != 200) {
         throw Exception("Error in Creating a Trip");

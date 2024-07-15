@@ -9,6 +9,7 @@ import '../../utility/helpers.dart';
 import '../home_page/homepage.dart';
 import './register.dart';
 import './forgot_password.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // Main login widget
 class LoginPage extends StatefulWidget {
@@ -105,7 +106,8 @@ class _LoginPage extends State<LoginPage> {
                     ? null
                     : () {
                         // Call the login endpoint
-                        loginUser(email.text, password.text).then((response) {
+                        loginUser(email.text, password.text)
+                            .then((response) async {
                           // Let the user know the email/password was wrong
                           if (response == null) {
                             setState(() {
@@ -126,6 +128,11 @@ class _LoginPage extends State<LoginPage> {
                           });
                           // Set the current user of the app
                           Globals.user = response;
+                          // TODO: Set up sort of local secure storage to place 'jwt'
+                          // Store the jwt for future use
+                          await Globals.storage
+                              .write(key: 'jwt', value: response.jwt);
+                          print(Globals.storage.read(key: 'jwt'));
                           // Route to the home page
                           Navigator.push(
                             context,

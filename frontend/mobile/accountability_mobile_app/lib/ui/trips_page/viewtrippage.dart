@@ -64,7 +64,7 @@ class _ViewTripsPage extends State<ViewTripPage> {
           Row(
             children: [
               // Display the members of the trip in a horizontal scroll format
-              // TODO: Apply skeletonizer here and load all members of this trip
+              // TODO: Apply skeletonizer here for loading animation and load all members of this trip
               Expanded(
                 child: SizedBox(
                   width: 75,
@@ -132,7 +132,8 @@ class _ViewTripsPage extends State<ViewTripPage> {
               child: SizedBox(
             width: double.infinity,
             height: 100,
-            // TODO: Skeletonizer here too to display all expenses
+            // TODO: Skeletonizer here too to display all expenses.
+            // Display all expenses by getting all of the expenses for a related trip
             // child: ListView.builder(
             //   scrollDirection: Axis.vertical,
             //   // Callback to determine how to format each trip in the list
