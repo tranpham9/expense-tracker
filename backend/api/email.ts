@@ -21,9 +21,9 @@ export function sendVerifyEmail(user: User) {
 
     unverified.set(uuid, user);
 
-    const url = HOMEPAGE + "/api/verify";
+    const url = HOMEPAGE + "/api/users/verify";
     // NOTE: only use this for testing locally (try not to commit with it uncommented)
-    // const url = "http://localhost:5000/api/verify/";
+    //const url = "http://localhost:5000/api/users/verify";
 
     // NOTE: by having the information inline like this, you automatically get the full type information for each key of the mailOptions object
     transporter.sendMail(
@@ -45,6 +45,7 @@ To verify your account, please use the following link:
             console.log(info);
         }
     );
+    return;
 }
 
 export function sendResetPasswordEmail(user: WithId<User>) {
@@ -73,4 +74,5 @@ To reset your password, please use the following link:
             console.log(info);
         }
     );
+    return;
 }

@@ -61,7 +61,7 @@ router.post("/register", async (req, res, next) => {
             return;
         }
 
-        sendVerifyEmail(newUser);
+        await sendVerifyEmail(newUser);
 
         // console.log("A user was registered successfully");
         res.status(STATUS_OK);
@@ -69,6 +69,7 @@ router.post("/register", async (req, res, next) => {
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
+        res.end();
     }
 });
 
@@ -162,7 +163,7 @@ router.post("/forgotPassword", async (req, res) => {
             return;
         }
 
-        sendResetPasswordEmail(user);
+        await sendResetPasswordEmail(user);
 
         res.status(STATUS_OK);
     } catch (error) {
