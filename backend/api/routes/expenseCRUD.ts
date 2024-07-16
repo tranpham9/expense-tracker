@@ -86,11 +86,18 @@ router.post("/create", async (req, res) => {
  * will return all the expenses for a single trip.
  */
 router.post("/get", async (req, res) => {
-    const { expenseId } = req.body;
+    let { expenseId } = req.body;
 
     // expenseId is required
     if (!expenseId) {
         res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
+        return;
+    }
+    expenseId = ObjectId.createFromHexString(expenseId);
+
+    const userId = extractUserId(res.locals.refreshedJWT);
+    if (!userId) {
+        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
         return;
     }
 
@@ -98,8 +105,30 @@ router.post("/get", async (req, res) => {
     try {
         const db = client.db(DB_NAME);
         const expenseCollection = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
-        const expense = await expenseCollection.findOne({ _id: ObjectId.createFromHexString(expenseId) });
-        res.status(STATUS_OK).json({ ...expense, jwt: res.locals.refreshedToken });
+        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
+
+        const expense = await expenseCollection.findOne({ _id: expenseId });
+        if (!expense) {
+            // TODO: WRONG
+            res.status(STATUS_BAD_REQUEST).json({ error: "Invalid expense" });
+            return;
+        }
+
+        // ensure user is part of trip
+        const trip = await tripCollection.findOne({
+            _id: expense.tripId,
+            $or: [
+                //[wrap]
+                { leaderId: userId },
+                { memberIds: userId },
+            ],
+        });
+        if (!trip) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Invalid trip" });
+            return;
+        }
+
+        res.status(STATUS_OK).json({ expense, jwt: res.locals.refreshedToken });
     } catch (error) {
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
