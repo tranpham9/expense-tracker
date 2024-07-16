@@ -34,7 +34,7 @@ app.post("/api/refreshJWT", async (req, res) => {
         return;
     }
 
-    res.status(STATUS_OK).json({jwt: refreshedJWT});
+    res.status(STATUS_OK).json({ jwt: refreshedJWT });
 });
 
 // All user related CRUD endpoints will be accessible under /api/
