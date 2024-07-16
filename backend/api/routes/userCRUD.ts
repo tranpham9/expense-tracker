@@ -61,7 +61,7 @@ router.post("/register", async (req, res, next) => {
             return;
         }
 
-        await sendVerifyEmail(newUser);
+        sendVerifyEmail(newUser);
 
         // console.log("A user was registered successfully");
         res.status(STATUS_OK);
@@ -163,7 +163,7 @@ router.post("/forgotPassword", async (req, res) => {
             return;
         }
 
-        await sendResetPasswordEmail(user);
+        sendResetPasswordEmail(user);
 
         res.status(STATUS_OK);
     } catch (error) {

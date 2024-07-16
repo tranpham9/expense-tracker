@@ -45,7 +45,6 @@ To verify your account, please use the following link:
             console.log(info);
         }
     );
-    return;
 }
 
 export function sendResetPasswordEmail(user: WithId<User>) {
@@ -74,5 +73,4 @@ To reset your password, please use the following link:
             console.log(info);
         }
     );
-    return;
 }
