@@ -1,6 +1,6 @@
 import express from "express";
 import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, STATUS_BAD_REQUEST, STATUS_INTERNAL_SERVER_ERROR, STATUS_OK, STATUS_UNAUTHENTICATED, Trip, TRIP_COLLECTION_NAME } from "./common";
-import { ObjectId } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import { authenticationRouteHandler, extractUserId } from "../JWT";
 
 export const router = express.Router();
@@ -22,12 +22,13 @@ router.use(AUTHENTICATED_ROUTES, authenticationRouteHandler);
  * Create a new expense, that belongs to a trip.
  */
 router.post("/create", async (req, res) => {
-    const { name, cost } = req.body;
+    const { name, cost, memberIds } = req.body;
 
     let { tripId, description } = req.body;
     description ??= ""; // description not required
 
-    if (!tripId || !name || !cost) {
+    // TODO: figure out if cost will come in as a number vs a string
+    if (!tripId || !name || (!cost && cost !== 0) || !(memberIds instanceof Array)) {
         res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
         return;
     }
@@ -39,35 +40,44 @@ router.post("/create", async (req, res) => {
         return;
     }
 
-    const client = await getMongoClient();
+    let client: MongoClient | undefined;
     try {
+        client = await getMongoClient();
         const db = client.db(DB_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
         const expenseCollection = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
 
-        // verify that trip exists
-        if ((await tripCollection.findOne({ _id: tripId })) === null) {
-            res.statusCode = STATUS_BAD_REQUEST;
-            res.json({ error: "trip does not exist" });
+        // verify tripId is a valid trip the user is a part of
+        const trip = await tripCollection.findOne({
+            _id: tripId,
+            $or: [
+                //[wrap]
+                { leaderId: userId },
+                { memberIds: userId },
+            ],
+        });
+        if (!trip) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Invalid trip" });
             return;
         }
 
         const result = await expenseCollection.insertOne({
             tripId,
             payerId: userId,
-            /* TODO: we'll implement expense splitting later */
-            memberIds: [],
+            memberIds,
             name,
             cost,
             description,
         });
-
-        // return the expense id
-        res.status(STATUS_OK).json({ expenseId: result.insertedId, jwt: res.locals.refreshedJWT });
+        if (result.acknowledged) {
+            res.status(STATUS_OK).json({ expenseId: result.insertedId, jwt: res.locals.refreshedJWT });
+        } else {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Failed to create expense" });
+        }
     } catch (error) {
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
-        await client.close();
+        await client?.close();
     }
 });
 
