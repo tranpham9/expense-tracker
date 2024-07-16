@@ -39,7 +39,7 @@ router.post("/create", async (req, res, next) => {
     notes ??= "";
 
     if (!name) {
-        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed Request" });
+        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
         return;
     }
 
@@ -368,6 +368,51 @@ router.post("/search", async (req, res, next) => {
         );
 
         res.status(STATUS_OK).json({ trips, jwt: res.locals.refreshedJWT });
+    } catch (error) {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
+    } finally {
+        await client?.close();
+    }
+});
+
+// NOTE: this is in tripCRUD since we are listing the expenses for a particular trip ("/api/trip/listExpenses" makes the most sense)
+router.post("/listExpenses", async (req, res, next) => {
+    const { tripId } = req.body;
+    if (!tripId) {
+        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
+        return;
+    }
+
+    const userId = extractUserId(res.locals.refreshedJWT);
+    if (!userId) {
+        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+        return;
+    }
+
+    let client: MongoClient | undefined;
+    try {
+        client = await getMongoClient();
+        const db = client.db(DB_NAME);
+        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
+        const expenseCollection = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
+
+        // https://www.mongodb.com/docs/manual/tutorial/query-arrays/#query-an-array-for-an-element
+        const trip = await tripCollection.findOne({
+            _id: tripId,
+            $or: [
+                //[wrap]
+                { leaderId: userId },
+                { memberIds: userId },
+            ],
+        });
+        if (!trip) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Invalid trip" });
+            return;
+        }
+
+        const expenses = await expenseCollection.find({ tripId }).toArray();
+
+        res.status(STATUS_OK).json({ expenses, jwt: res.locals.refreshedJWT });
     } catch (error) {
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {

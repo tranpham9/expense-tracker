@@ -26,7 +26,7 @@ router.post("/create", async (req, res, next) => {
     description ??= ""; // description not required
 
     if (!tripId || !name || !cost) {
-        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed Request" });
+        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
         return;
     }
 
