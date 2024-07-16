@@ -210,16 +210,46 @@ router.post("/update", async (req, res) => {
  * Delete an expense
  */
 router.post("/delete", async (req, res) => {
-    const { expenseId } = req.body;
+    let { expenseId } = req.body;
     if (!expenseId) {
-        res.status(STATUS_BAD_REQUEST).json({ error: "expenseId required" });
+        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
+        return;
+    }
+    expenseId = ObjectId.createFromHexString(expenseId);
+
+    const userId = extractUserId(res.locals.refreshedJWT);
+    if (!userId) {
+        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
         return;
     }
 
-    const client = await getMongoClient();
+    let client: MongoClient | undefined;
     try {
+        client = await getMongoClient();
         const db = client.db(DB_NAME);
         const expenseCollection = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
+        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
+
+        const expense = await expenseCollection.findOne({ _id: expenseId });
+        if (!expense) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Invalid expense" });
+            return;
+        }
+
+        // ensure user is part of trip
+        const trip = await tripCollection.findOne({
+            _id: expense.tripId,
+            $or: [
+                //[wrap]
+                { leaderId: userId },
+                { memberIds: userId },
+            ],
+        });
+        if (!trip) {
+            // NOTE: this is an invalid expense, not an invalid trip; whatever supposed expense the user is trying to access exists, but it is not one they have access to, so in their eyes it is "invalid"/"doesn't exist"
+            res.status(STATUS_BAD_REQUEST).json({ error: "Invalid expense" });
+            return;
+        }
 
         const result = await expenseCollection.deleteOne({ _id: expenseId });
         if (result.acknowledged) {
@@ -230,6 +260,6 @@ router.post("/delete", async (req, res) => {
     } catch (error) {
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
-        await client.close();
+        await client?.close();
     }
 });

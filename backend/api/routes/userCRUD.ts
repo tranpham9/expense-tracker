@@ -116,7 +116,7 @@ router.put("/changeName", async (req, res) => {
 
         const result = await userCollection.updateOne({ _id: userId }, { $set: { name: newName } });
 
-        if (result.modifiedCount === 1) {
+        if (result.acknowledged) {
             res.status(STATUS_OK).json({ message: "Name updated successfully", jwt: res.locals.refreshedJWT });
         } else {
             res.status(STATUS_BAD_REQUEST).json({ error: "Failed to update name" });
