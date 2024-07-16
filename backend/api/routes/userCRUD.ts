@@ -64,12 +64,11 @@ router.post("/register", async (req, res, next) => {
         sendVerifyEmail(newUser);
 
         // console.log("A user was registered successfully");
-        res.status(STATUS_OK);
+        res.status(STATUS_OK).json({ message: "Successfully sent register verification email" });
     } catch (error) {
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
-        res.end();
     }
 });
 
@@ -165,7 +164,7 @@ router.post("/forgotPassword", async (req, res) => {
 
         sendResetPasswordEmail(user);
 
-        res.status(STATUS_OK);
+        res.status(STATUS_OK).json({ message: "Successfully sent reset password email" });
     } catch (error) {
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
