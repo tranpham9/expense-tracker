@@ -1,6 +1,6 @@
 import express from "express";
 import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, STATUS_BAD_REQUEST, STATUS_INTERNAL_SERVER_ERROR, STATUS_OK, STATUS_UNAUTHENTICATED, Trip, TRIP_COLLECTION_NAME } from "./common";
-import { Collection, ObjectId } from "mongodb";
+import { ObjectId } from "mongodb";
 import { authenticationRouteHandler, extractUserId } from "../JWT";
 
 export const router = express.Router();
@@ -43,8 +43,8 @@ router.post("/create", async (req, res) => {
     const client = await getMongoClient();
     try {
         const db = client.db(DB_NAME);
-        const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
-        const expenseCol: Collection<Expense> = db.collection(EXPENSE_COLLECTION_NAME);
+        const tripCol = db.collection<Trip>(TRIP_COLLECTION_NAME);
+        const expenseCol = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
 
         // verify that trip exists
         if ((await tripCol.findOne({ _id: tripId })) === null) {
@@ -88,7 +88,7 @@ router.post("/get", async (req, res) => {
     const client = await getMongoClient();
     try {
         const db = client.db(DB_NAME);
-        const expenseCol: Collection<Expense> = db.collection(EXPENSE_COLLECTION_NAME);
+        const expenseCol = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
         const expense = await expenseCol.findOne({ _id: ObjectId.createFromHexString(expenseId) });
         res.status(STATUS_OK).json({ ...expense, jwt: res.locals.refreshedToken });
     } catch (error) {
@@ -111,7 +111,7 @@ router.post("/update", async (req, res) => {
     const client = await getMongoClient();
     try {
         const db = client.db(DB_NAME);
-        const expenseCol: Collection<Expense> = db.collection(EXPENSE_COLLECTION_NAME);
+        const expenseCol = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
 
         // verify that expense exists
         if ((await expenseCol.findOne({ _id: expenseId })) === null) {
@@ -157,7 +157,7 @@ router.post("/delete", async (req, res) => {
     const client = await getMongoClient();
     try {
         const db = client.db(DB_NAME);
-        const expenseCol: Collection<Expense> = db.collection(EXPENSE_COLLECTION_NAME);
+        const expenseCol = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
 
         const result = await expenseCol.deleteOne({ _id: expenseId });
         if (result.acknowledged) {
