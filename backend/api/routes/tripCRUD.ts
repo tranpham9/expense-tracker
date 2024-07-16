@@ -334,3 +334,43 @@ router.post("/leave", async (req, res, next) => {
     // TODO: impl
     res.status(STATUS_OK).json({ message: "not implemented yet" });
 });
+
+router.post("/search", async (req, res, next) => {
+    let { query, page } = req.body;
+    query ??= "";
+    const pageNumber = page?.toString() || 1;
+
+    const userId = extractUserId(res.locals.refreshedJWT);
+    if (!userId) {
+        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+        return;
+    }
+
+    let client: MongoClient | undefined;
+    try {
+        client = await getMongoClient();
+        const db = client.db(DB_NAME);
+        const tripCollection = db.collection(TRIP_COLLECTION_NAME);
+
+        // https://www.mongodb.com/docs/manual/tutorial/query-arrays/#query-an-array-for-an-element
+        // TODO: might want to search for exact phrase instead ( https://www.mongodb.com/docs/manual/reference/operator/query/text/#definition )
+        const trips = await tripCollection.find(
+            {
+                $or: [
+                    //[wrap]
+                    { leaderId: userId },
+                    { memberIds: userId },
+                ],
+                $text: { $search: query },
+            },
+            // if needed, can add "projection: {<field_name>: 1}" within options to isolate specific fields
+            { skip: (pageNumber - 1) * 10, limit: 10 }
+        );
+
+        res.status(STATUS_OK).json({ trips, jwt: res.locals.refreshedJWT });
+    } catch (error) {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
+    } finally {
+        await client?.close();
+    }
+});
