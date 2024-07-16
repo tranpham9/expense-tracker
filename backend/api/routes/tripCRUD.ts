@@ -180,38 +180,42 @@ router.post("/update", async (req, res) => {
  * Deletes a trip and all associated expenses.
  */
 router.post("/delete", async (req, res) => {
+    let { tripId } = req.body;
+    if (!tripId) {
+        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
+        return;
+    }
+    tripId = ObjectId.createFromHexString(tripId);
+
+    const userId = extractUserId(res.locals.refreshedJWT);
+    if (!userId) {
+        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+        return;
+    }
+
     let client: MongoClient | undefined;
     try {
-        // tripId is required
-        if (!req.body.tripId) {
-            res.statusCode = STATUS_BAD_REQUEST;
-            res.json({ error: "tripId required" });
-            return;
-        }
-        const tripId = ObjectId.createFromHexString(req.body.tripId);
-
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
         const expenseCollection = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
-        const userCollection = db.collection<User>(USER_COLLECTION_NAME);
 
-        // verify that trip exists
-        if ((await tripCollection.findOne({ _id: tripId })) === null) {
-            res.statusCode = STATUS_BAD_REQUEST;
-            res.json({ error: "trip does not exist" });
+        // only delete trip if user is leader
+        const result = await tripCollection.deleteOne({
+            _id: tripId,
+            leaderId: userId,
+        });
+        if (!result.acknowledged) {
+            // user can't delete this trip ("invalid" since it might not be a trip that they should "know" of)
+            res.status(STATUS_BAD_REQUEST).json({ error: "Invalid trip" });
             return;
         }
 
-        // Remove this trip from the leader user's `trips` field
-        const leaderId = (await tripCollection.findOne({ _id: tripId }))?.leaderId;
-        await userCollection.updateOne({ _id: leaderId }, { $pull: { trips: tripId } });
+        // cascade the deletion (at this point, the user was able to successfully delete the trip, so all the corresponding expenses should get expunged)
+        // no need to await since it's possible for there to be no corresponding expenses for the trip (in which case the deletion wouldn't get acknowledged, i.e. the deletion count would be 0)
+        expenseCollection.deleteMany({ tripId });
 
-        // Delete this trip, and all associated expenses
-        await tripCollection.deleteOne({ _id: tripId });
-        await expenseCollection.deleteMany({ tripId: tripId });
-
-        res.json({ jwt: res.locals.refreshedJWT });
+        res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
     } finally {
         await client?.close();
     }
