@@ -50,7 +50,7 @@ router.post("/register", async (req, res, next) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
+        const userCollection = db.collection<User>(USER_COLLECTION_NAME);
 
         // ensure email doesn't already exist
         const check = await userCollection.findOne({ email: properEmail });
@@ -85,7 +85,7 @@ router.post("/login", async (req, res, next) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const userCollection = db.collection(USER_COLLECTION_NAME);
+        const userCollection = db.collection<User>(USER_COLLECTION_NAME);
 
         let hashedPassword = md5(password);
 
@@ -125,7 +125,7 @@ router.put("/changeName", async (req, res) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const userCollection = db.collection(USER_COLLECTION_NAME);
+        const userCollection = db.collection<User>(USER_COLLECTION_NAME);
 
         const result = await userCollection.updateOne({ _id: userId }, { $set: { name: newName } });
 
@@ -154,7 +154,7 @@ router.post("/forgotPassword", async (req, res) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
+        const userCollection = db.collection<User>(USER_COLLECTION_NAME);
 
         const user = await userCollection.findOne({ email: properEmail });
         if (!user) {
@@ -196,7 +196,7 @@ router.post("/resetPassword", async (req, res) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
+        const userCollection = db.collection<User>(USER_COLLECTION_NAME);
 
         const user = await userCollection.findOne({ _id: userId });
         if (!user) {
@@ -252,8 +252,7 @@ router.get("/verify/:token", async (req, res) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const userCollection: Collection<User> = db.collection(USER_COLLECTION_NAME);
-        const tripCollection: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
+        const userCollection = db.collection<User>(USER_COLLECTION_NAME);
 
         // insert new user
         const result = await userCollection.insertOne(verified);
