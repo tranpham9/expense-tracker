@@ -2,7 +2,7 @@ import "dotenv/config";
 import { NextFunction, Request, Response } from "express";
 import { sign, verify, decode, JwtPayload } from "jsonwebtoken";
 import { ObjectId } from "mongodb";
-import { STATUS_BAD_REQUEST, STATUS_NOT_FOUND, STATUS_UNAUTHENTICATED } from "./routes/common";
+import { STATUS_BAD_REQUEST, STATUS_UNAUTHENTICATED } from "./routes/common";
 
 // create a token based on the name, email and password
 export function createJWT(userId: ObjectId, email: string) {

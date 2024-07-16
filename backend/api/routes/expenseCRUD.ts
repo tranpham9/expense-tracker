@@ -1,7 +1,7 @@
 import express from "express";
 import { DB_NAME, Expense, EXPENSE_COLLECTION_NAME, getMongoClient, STATUS_BAD_REQUEST, STATUS_INTERNAL_SERVER_ERROR, STATUS_OK, STATUS_UNAUTHENTICATED, Trip, TRIP_COLLECTION_NAME } from "./common";
 import { Collection, ObjectId } from "mongodb";
-import { authenticationRouteHandler, extractUserId, refresh } from "../JWT";
+import { authenticationRouteHandler, extractUserId } from "../JWT";
 
 export const router = express.Router();
 
@@ -21,8 +21,10 @@ router.use(AUTHENTICATED_ROUTES, authenticationRouteHandler);
 /*
  * Create a new expense, that belongs to a trip.
  */
-router.post("/create", async (req, res, next) => {
-    let { tripId, name, cost, description } = req.body;
+router.post("/create", async (req, res) => {
+    const { name, cost } = req.body;
+
+    let { tripId, description } = req.body;
     description ??= ""; // description not required
 
     if (!tripId || !name || !cost) {
@@ -74,7 +76,7 @@ router.post("/create", async (req, res, next) => {
  * Read an expense. Note that this can also be done with /trips/readTrip which
  * will return all the expenses for a single trip.
  */
-router.post("/get", async (req, res, next) => {
+router.post("/get", async (req, res) => {
     const { expenseId } = req.body;
 
     // expenseId is required
@@ -99,8 +101,8 @@ router.post("/get", async (req, res, next) => {
 /*
  * Updates the name, notes, cost of an expense
  */
-router.post("/update", async (req, res, next) => {
-    const { expenseId, name, description, notes, cost, memberIds } = req.body;
+router.post("/update", async (req, res) => {
+    const { expenseId, name, description, cost, memberIds } = req.body;
     if (!expenseId || (memberIds && !(memberIds instanceof Array))) {
         res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
         return;
@@ -145,7 +147,7 @@ router.post("/update", async (req, res, next) => {
 /*
  * Delete an expense
  */
-router.post("/delete", async (req, res, next) => {
+router.post("/delete", async (req, res) => {
     const { expenseId } = req.body;
     if (!expenseId) {
         res.status(STATUS_BAD_REQUEST).json({ error: "expenseId required" });

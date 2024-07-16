@@ -7,16 +7,13 @@ import {
     STATUS_INTERNAL_SERVER_ERROR,
     STATUS_OK,
     STATUS_UNAUTHENTICATED,
-    Trip,
-    TRIP_COLLECTION_NAME,
     User,
     USER_COLLECTION_NAME,
 } from "./common";
-import { Collection, MongoClient, ObjectId } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import { sendVerifyEmail, sendResetPasswordEmail, unverified } from "../email";
-import { verify } from "jsonwebtoken";
 import md5 from "md5";
-import { authenticationRouteHandler, createJWT, extract, extractUserId, isExpired, refresh } from "../JWT";
+import { authenticationRouteHandler, createJWT, extract, extractUserId, isExpired } from "../JWT";
 
 export const router = express.Router();
 
@@ -25,7 +22,7 @@ const AUTHENTICATED_ROUTES = ["/changeName", "/joinTrip"];
 // JWT Verification
 router.use(AUTHENTICATED_ROUTES, authenticationRouteHandler);
 
-router.post("/register", async (req, res, next) => {
+router.post("/register", async (req, res) => {
     let client: MongoClient | undefined;
     try {
         // TODO: I believe we don't need an optional trip id here anymore?
@@ -72,7 +69,7 @@ router.post("/register", async (req, res, next) => {
     }
 });
 
-router.post("/login", async (req, res, next) => {
+router.post("/login", async (req, res) => {
     let client: MongoClient | undefined;
     try {
         const { email, password } = req.body;
@@ -87,7 +84,7 @@ router.post("/login", async (req, res, next) => {
         const db = client.db(DB_NAME);
         const userCollection = db.collection<User>(USER_COLLECTION_NAME);
 
-        let hashedPassword = md5(password);
+        const hashedPassword = md5(password);
 
         const foundUser = await userCollection.findOne({ email: properEmail });
         if (foundUser && hashedPassword === foundUser.password) {

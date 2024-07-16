@@ -13,7 +13,7 @@ import {
     Expense,
     EXPENSE_COLLECTION_NAME,
 } from "./common";
-import { Collection, MongoClient, ObjectId } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import { authenticationRouteHandler, extractUserId } from "../JWT";
 
 export const router = express.Router();
@@ -33,11 +33,12 @@ router.use(AUTHENTICATED_ROUTES, authenticationRouteHandler);
 /*
  * Creates a new empty Trip, with the name, notes, and leaderId provided.
  */
-router.post("/create", async (req, res, next) => {
-    let { name, notes } = req.body;
+router.post("/create", async (req, res) => {
+    let { notes } = req.body;
     // default values for non-required fields
     notes ??= "";
 
+    const { name } = req.body;
     if (!name) {
         res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
         return;
@@ -54,7 +55,6 @@ router.post("/create", async (req, res, next) => {
         client = await getMongoClient();
 
         const db = client.db(DB_NAME);
-        const userCol = db.collection<User>(USER_COLLECTION_NAME);
         const tripCol = db.collection<Trip>(TRIP_COLLECTION_NAME);
 
         // randomly generated permanent invite code for this trip
@@ -88,7 +88,7 @@ router.post("/create", async (req, res, next) => {
 /*
  * Read Information from a Trip, aggregates related expenses and members.
  */
-router.post("/get", async (req, res, next) => {
+router.post("/get", async (req, res) => {
     let client: MongoClient | undefined;
     try {
         // tripId is required
@@ -106,8 +106,8 @@ router.post("/get", async (req, res, next) => {
         const userCol = db.collection<User>(USER_COLLECTION_NAME);
 
         // Get the trip requested
-        const trip: any = await tripCol.findOne({ _id: tripId });
-        if (trip === null) {
+        const trip = await tripCol.findOne({ _id: tripId });
+        if (!trip) {
             res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "tripId not found" });
             return;
@@ -120,15 +120,14 @@ router.post("/get", async (req, res, next) => {
         // but here we'll just construct it manually.
 
         // Get all the expenses related to this trip
-        trip.allExpenses = await expenseCol.find({ tripId: tripId }).toArray();
+        const allExpenses = await expenseCol.find({ tripId: tripId }).toArray();
         // Get all the information for users in this trip
-        trip.allMembers = await userCol.find({ _id: { $in: trip.memberIds } }).toArray();
+        const allMembers = await userCol.find({ _id: { $in: trip.memberIds } }).toArray();
 
         // We can add some "bussiness logic" if we wanted to, like a sum of all the costs
         // or something like that
 
-        trip.jwt = res.locals.refreshedJWT;
-        res.json(trip);
+        res.json({ trip: { ...trip, allExpenses, allMembers }, jwt: res.locals.refreshedJWT });
     } finally {
         await client?.close();
     }
@@ -137,7 +136,7 @@ router.post("/get", async (req, res, next) => {
 /*
  * Updates the name, notes of a trip.
  */
-router.post("/update", async (req, res, next) => {
+router.post("/update", async (req, res) => {
     let client: MongoClient | undefined;
     try {
         // tripId is required
@@ -180,7 +179,7 @@ router.post("/update", async (req, res, next) => {
 /*
  * Deletes a trip and all associated expenses.
  */
-router.post("/delete", async (req, res, next) => {
+router.post("/delete", async (req, res) => {
     let client: MongoClient | undefined;
     try {
         // tripId is required
@@ -221,7 +220,7 @@ router.post("/delete", async (req, res, next) => {
 /*
  * List all the trips a user is as a member of (as non-owner only).
  */
-router.post("/listMemberOf", async (req, res, next) => {
+router.post("/listMemberOf", async (req, res) => {
     let client: MongoClient | undefined;
     try {
         // userId is required
@@ -255,7 +254,7 @@ router.post("/listMemberOf", async (req, res, next) => {
 /*
  * List all the trips that belong to a user. (As Owner/Leader)
  */
-router.post("/listOwnerOf", async (req, res, next) => {
+router.post("/listOwnerOf", async (req, res) => {
     let client: MongoClient | undefined;
     try {
         // userId is required
@@ -286,7 +285,7 @@ router.post("/listOwnerOf", async (req, res, next) => {
     }
 });
 
-router.post("/join", async (req, res, next) => {
+router.post("/join", async (req, res) => {
     let client: MongoClient | undefined;
     try {
         const { inviteCode } = req.body;
@@ -303,7 +302,6 @@ router.post("/join", async (req, res, next) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const userCol = db.collection<User>(USER_COLLECTION_NAME);
         const tripCol = db.collection<Trip>(TRIP_COLLECTION_NAME);
 
         // query the trip with this invite code (unique per trip)
@@ -330,15 +328,17 @@ router.post("/join", async (req, res, next) => {
 });
 
 // NOTE: this will need to remove the user from the trip and from all expenses (this might get a bit difficult with the payer field of expenses, so maybe we don't want to allow leaving?)
-router.post("/leave", async (req, res, next) => {
+router.post("/leave", async (req, res) => {
     // TODO: impl
     res.status(STATUS_OK).json({ message: "not implemented yet" });
 });
 
-router.post("/search", async (req, res, next) => {
-    let { query, page } = req.body;
-    query ??= "";
+router.post("/search", async (req, res) => {
+    const { page } = req.body;
     const pageNumber = page?.toString() || 1;
+
+    let { query } = req.body;
+    query ??= "";
 
     const userId = extractUserId(res.locals.refreshedJWT);
     if (!userId) {
@@ -378,7 +378,7 @@ router.post("/search", async (req, res, next) => {
 });
 
 // NOTE: this is in tripCRUD since we are listing the expenses for a particular trip ("/api/trip/listExpenses" makes the most sense)
-router.post("/listExpenses", async (req, res, next) => {
+router.post("/listExpenses", async (req, res) => {
     const { tripId } = req.body;
     if (!tripId) {
         res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
