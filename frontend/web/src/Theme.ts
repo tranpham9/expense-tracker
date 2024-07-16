@@ -16,7 +16,7 @@ const baseTheme = createTheme({
         },
         text: {
             primary: common["white"],
-            secondary: grey[400],
+            secondary: grey[400], 
         },
         error: {
             // This is the default error color for MUI (I added it to the palette so that it can be easily accessed/used in normal text as well)

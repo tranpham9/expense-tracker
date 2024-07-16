@@ -1,20 +1,26 @@
-import { Box, Grid, Paper, Skeleton, Stack } from "@mui/material";
+import { Button, Divider, Grid, Paper, Skeleton, Stack, Typography } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 
 //TODO: change array to be dynamically sized, we don't need pagination for expenses
 export default function Expenses() {
     return (
         <>
-            <Box
+            <Grid></Grid>
+            <Divider />
+            <Grid
+                direction="row"
                 sx={{
                     display: "flex",
-                    justifyContent: "center",
+                    justifyContent: "space-between",
                     alignItems: "center",
-                    m: 2,
+                    mx: 4,
+                    my: 2,
                 }}
             >
-                <h1>Trip Name Expenses</h1>
-            </Box>
-            <Stack sx={{ textAlign: "center" }}>
+                <Typography variant="h5">{"Expense Name"}</Typography>
+                <Button startIcon={<AddIcon />}> Add Expenses </Button>
+            </Grid>
+            <Stack sx={{ textAlign: "center", mx: 4 }}>
                 {[...Array(20).keys()].map((i) => (
                     <Paper
                         key={i}
