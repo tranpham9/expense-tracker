@@ -54,8 +54,8 @@ router.post("/create", async (req, res, next) => {
         client = await getMongoClient();
 
         const db = client.db(DB_NAME);
-        const userCol: Collection<User> = db.collection(USER_COLLECTION_NAME);
-        const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
+        const userCol = db.collection<User>(USER_COLLECTION_NAME);
+        const tripCol = db.collection<Trip>(TRIP_COLLECTION_NAME);
 
         // randomly generated permanent invite code for this trip
         let inviteCode: string | undefined;
@@ -101,9 +101,9 @@ router.post("/get", async (req, res, next) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
-        const expenseCol: Collection<Expense> = db.collection(EXPENSE_COLLECTION_NAME);
-        const userCol: Collection<User> = db.collection(USER_COLLECTION_NAME);
+        const tripCol = db.collection<Trip>(TRIP_COLLECTION_NAME);
+        const expenseCol = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
+        const userCol = db.collection<User>(USER_COLLECTION_NAME);
 
         // Get the trip requested
         const trip: any = await tripCol.findOne({ _id: tripId });
@@ -150,7 +150,7 @@ router.post("/update", async (req, res, next) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
+        const tripCol = db.collection<Trip>(TRIP_COLLECTION_NAME);
 
         // verify that trip exists
         if ((await tripCol.findOne({ _id: tripId })) === null) {
@@ -193,9 +193,9 @@ router.post("/delete", async (req, res, next) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
-        const expenseCol: Collection<Expense> = db.collection(EXPENSE_COLLECTION_NAME);
-        const userCol: Collection<User> = db.collection(USER_COLLECTION_NAME);
+        const tripCol = db.collection<Trip>(TRIP_COLLECTION_NAME);
+        const expenseCol = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
+        const userCol = db.collection<User>(USER_COLLECTION_NAME);
 
         // verify that trip exists
         if ((await tripCol.findOne({ _id: tripId })) === null) {
@@ -229,8 +229,8 @@ router.post("/listMemberOf", async (req, res, next) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
-        const userCol: Collection<User> = db.collection(USER_COLLECTION_NAME);
+        const tripCol = db.collection<Trip>(TRIP_COLLECTION_NAME);
+        const userCol = db.collection<User>(USER_COLLECTION_NAME);
 
         // verify that user exists
         if ((await userCol.findOne({ _id: userId as ObjectId })) === null) {
@@ -263,8 +263,8 @@ router.post("/listOwnerOf", async (req, res, next) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
-        const userCol: Collection<User> = db.collection(USER_COLLECTION_NAME);
+        const tripCol = db.collection<Trip>(TRIP_COLLECTION_NAME);
+        const userCol = db.collection<User>(USER_COLLECTION_NAME);
 
         // verify that user exists
         if ((await userCol.findOne({ _id: userId as ObjectId })) === null) {
@@ -303,8 +303,8 @@ router.post("/join", async (req, res, next) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const userCol: Collection<User> = db.collection(USER_COLLECTION_NAME);
-        const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
+        const userCol = db.collection<User>(USER_COLLECTION_NAME);
+        const tripCol = db.collection<Trip>(TRIP_COLLECTION_NAME);
 
         // query the trip with this invite code (unique per trip)
         const trip = await tripCol.findOne({ inviteCode });
@@ -350,7 +350,7 @@ router.post("/search", async (req, res, next) => {
     try {
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const tripCollection = db.collection(TRIP_COLLECTION_NAME);
+        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
 
         // https://www.mongodb.com/docs/manual/tutorial/query-arrays/#query-an-array-for-an-element
         // TODO: might want to search for exact phrase instead ( https://www.mongodb.com/docs/manual/reference/operator/query/text/#definition )
