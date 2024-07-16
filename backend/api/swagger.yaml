@@ -118,7 +118,7 @@ paths:
               description: Title of the trip
             notes:
               type: string
-              description: Miscellaneous description for the trip
+              description: Miscellaneous description for the trip (optional)
       responses:
         "200":
           description: OK
