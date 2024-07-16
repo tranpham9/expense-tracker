@@ -3,7 +3,7 @@
  * Common utilities, types, constants, and functions for the API.
  */
 
-import { Collection, MongoClient, ObjectId } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 
 export const DB_NAME = "appData";
 export const USER_COLLECTION_NAME = "User";
@@ -45,25 +45,21 @@ export const STATUS_INTERNAL_SERVER_ERROR = 500;
  * Get an open connection to the Mongo database. The caller should
  * close() the returned MongoClient object.
  */
-export async function getMongoClient(): Promise<MongoClient> {
-    let client: MongoClient;
-    let uri: string;
-
-    uri = process.env.MONGODB_URI!;
-    if (uri === null) {
+export async function getMongoClient() {
+    const uri = process.env.MONGODB_URI!;
+    if (!uri) {
         throw new Error("MONGODB_URI environment variable not defined");
     }
 
-    client = new MongoClient(uri);
-    await client.connect();
-    return client;
+    const client = new MongoClient(uri);
+    return client.connect();
 }
 
 /**
  * Standardizes email format for consistency with db
  * @param email the raw email directly from caller of an endpoint; type any is deliberate (makes it easier to utilize this function with fields directly from the user)
  */
-export function formatEmail(email: any) {
+export function formatEmail(email: object) {
     return (email.toString() as string).trim().toLocaleLowerCase();
 }
 

@@ -2,11 +2,11 @@ import "dotenv/config";
 import express, { json, urlencoded } from "express";
 import { join } from "path";
 import cors from "cors";
-import { isExpired, refresh } from "./JWT";
+import { refresh } from "./JWT";
 import { router as tripCRUDRouter } from "./routes/tripCRUD";
 import { router as expenseCRUDRouter } from "./routes/expenseCRUD";
 import { router as userCRUDRouter } from "./routes/userCRUD";
-import { STATUS_BAD_REQUEST, STATUS_INTERNAL_SERVER_ERROR, STATUS_NOT_FOUND, STATUS_OK, STATUS_UNAUTHENTICATED } from "./routes/common";
+import { STATUS_BAD_REQUEST, STATUS_NOT_FOUND, STATUS_OK, STATUS_UNAUTHENTICATED } from "./routes/common";
 
 // Heroku will pass the port we must listen on via the environment, otherwise default to 5000.
 const port = process.env.PORT || 5000;
@@ -44,7 +44,7 @@ app.use("/api/trips", tripCRUDRouter);
 // All expense related CRUD endpoints will be accessible under /api/expenses/
 app.use("/api/expenses", expenseCRUDRouter);
 
-app.post("*", (req, res, next) => {
+app.post("*", (req, res) => {
     res.status(STATUS_NOT_FOUND).json({ error: "Invalid endpoint" });
 });
 
@@ -53,7 +53,7 @@ const FRONTEND_DIST_PATH = join(__dirname, "../../../frontend/web/dist"); // sta
 app.use(express.static(FRONTEND_DIST_PATH));
 
 // any get request provides the index.html file (which avoids issues with pathing/routing)
-app.get("*", (req, res, next) => {
+app.get("*", (req, res) => {
     res.sendFile(join(FRONTEND_DIST_PATH, "index.html"));
 });
 
