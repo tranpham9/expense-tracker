@@ -1,15 +1,5 @@
 import express from "express";
-import {
-    DB_NAME,
-    formatEmail,
-    getMongoClient,
-    STATUS_BAD_REQUEST,
-    STATUS_INTERNAL_SERVER_ERROR,
-    STATUS_OK,
-    STATUS_UNAUTHENTICATED,
-    User,
-    USER_COLLECTION_NAME,
-} from "./common";
+import { DB_NAME, formatEmail, getMongoClient, STATUS_BAD_REQUEST, STATUS_INTERNAL_SERVER_ERROR, STATUS_OK, STATUS_UNAUTHENTICATED, User, USER_COLLECTION_NAME } from "./common";
 import { MongoClient, ObjectId } from "mongodb";
 import { sendVerifyEmail, sendResetPasswordEmail, unverified } from "../email";
 import md5 from "md5";
