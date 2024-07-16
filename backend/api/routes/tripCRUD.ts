@@ -34,60 +34,52 @@ router.use(AUTHENTICATED_ROUTES, authenticationRouteHandler);
  * Creates a new empty Trip, with the name, notes, and leaderId provided.
  */
 router.post("/create", async (req, res, next) => {
+    let { name, notes } = req.body;
+    // default values for non-required fields
+    notes ??= "";
+
+    if (!name) {
+        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed Request" });
+        return;
+    }
+
+    const userId = extractUserId(res.locals.refreshedJWT);
+    if (!userId) {
+        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+        return;
+    }
+
     let client: MongoClient | undefined;
     try {
-        // leaderId is required, that's the user that will own this new trip
-        const leaderId = extractUserId(res.locals.refreshedJWT);
-        if (!leaderId) {
-            res.statusCode = STATUS_BAD_REQUEST;
-            res.json({ error: "leaderId required" });
-            return;
-        }
-
-        // Default values for non-required fields
-        req.body.name ??= "Unnamed Trip";
-        req.body.notes ??= "No notes provided";
-
         client = await getMongoClient();
 
         const db = client.db(DB_NAME);
         const userCol: Collection<User> = db.collection(USER_COLLECTION_NAME);
         const tripCol: Collection<Trip> = db.collection(TRIP_COLLECTION_NAME);
 
-        // verify that leader user exists
-        if ((await userCol.findOne({ _id: leaderId })) === null) {
-            res.statusCode = STATUS_BAD_REQUEST;
-            res.json({ error: "leaderId user does not exist" });
-            return;
-        }
-
         // randomly generated permanent invite code for this trip
-        let inviteCode = null;
+        let inviteCode: string | undefined;
         // ensure such code does not already exist for another trip (unlikely but might as well check)
-        while (inviteCode == null || !tripCol.findOne({ inviteCode: inviteCode })) {
+        while (!inviteCode || tripCol.findOne({ inviteCode })) {
             // 000000 to 999999 as string padded with zeroes
-            let num = Math.floor(Math.random() * 1000000);
-            inviteCode = String(num).padStart(6, "0");
+            const generated = Math.floor(Math.random() * 1000000);
+            inviteCode = generated.toString().padStart(6, "0");
         }
 
         const result = await tripCol.insertOne({
-            name: req.body.name,
-            notes: req.body.notes,
+            name,
+            notes,
             memberIds: [],
-            leaderId: leaderId,
+            leaderId: userId,
             inviteCode: inviteCode,
         });
 
-        // And update the user object
-        // NOTE: do we really need this? The trips already have a "leaderId" field,
-        // which is the one used by the rest of the api functions.
-        // await userCol.updateOne({ _id: leaderId }, { $push: { trips: result.insertedId } });
-
-        // Return the tripId
         res.json({
             tripId: result.insertedId,
             jwt: res.locals.refreshedJWT,
         });
+    } catch (error) {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
     }
