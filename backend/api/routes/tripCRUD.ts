@@ -60,7 +60,7 @@ router.post("/create", async (req, res) => {
         // randomly generated permanent invite code for this trip
         let inviteCode: string | undefined;
         // ensure such code does not already exist for another trip (unlikely but might as well check)
-        while (!inviteCode || tripCol.findOne({ inviteCode })) {
+        while (!inviteCode || await tripCol.findOne({ inviteCode })) {
             // 000000 to 999999 as string padded with zeroes
             const generated = Math.floor(Math.random() * 1000000);
             inviteCode = generated.toString().padStart(6, "0");
