@@ -354,18 +354,20 @@ router.post("/search", async (req, res, next) => {
 
         // https://www.mongodb.com/docs/manual/tutorial/query-arrays/#query-an-array-for-an-element
         // TODO: might want to search for exact phrase instead ( https://www.mongodb.com/docs/manual/reference/operator/query/text/#definition )
-        const trips = await tripCollection.find(
-            {
-                $or: [
-                    //[wrap]
-                    { leaderId: userId },
-                    { memberIds: userId },
-                ],
-                $text: { $search: query },
-            },
-            // if needed, can add "projection: {<field_name>: 1}" within options to isolate specific fields
-            { skip: (pageNumber - 1) * 10, limit: 10 }
-        );
+        const trips = await tripCollection
+            .find(
+                {
+                    $or: [
+                        //[wrap]
+                        { leaderId: userId },
+                        { memberIds: userId },
+                    ],
+                    $text: { $search: query },
+                },
+                // if needed, can add "projection: {<field_name>: 1}" within options to isolate specific fields
+                { skip: (pageNumber - 1) * 10, limit: 10 }
+            )
+            .toArray();
 
         res.status(STATUS_OK).json({ trips, jwt: res.locals.refreshedJWT });
     } catch (error) {
