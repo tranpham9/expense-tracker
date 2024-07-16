@@ -10,7 +10,18 @@ export default [
   ...tseslint.configs.recommended,
   {
     rules: {
-      "@typescript-eslint/ban-ts-comment": "warn"
+      "@typescript-eslint/ban-ts-comment": "warn",
+      "@typescript-eslint/no-misused-promises": [
+        "error",
+        {
+          checksVoidReturn: false
+        }
+      ]
+    },
+    languageOptions: {
+      parserOptions: {
+        project: ["./tsconfig.json"]
+      }
     }
   }
 ];
