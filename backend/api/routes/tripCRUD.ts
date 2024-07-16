@@ -55,18 +55,18 @@ router.post("/create", async (req, res) => {
         client = await getMongoClient();
 
         const db = client.db(DB_NAME);
-        const tripCol = db.collection<Trip>(TRIP_COLLECTION_NAME);
+        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
 
         // randomly generated permanent invite code for this trip
         let inviteCode: string | undefined;
         // ensure such code does not already exist for another trip (unlikely but might as well check)
-        while (!inviteCode || await tripCol.findOne({ inviteCode })) {
+        while (!inviteCode || await tripCollection.findOne({ inviteCode })) {
             // 000000 to 999999 as string padded with zeroes
             const generated = Math.floor(Math.random() * 1000000);
             inviteCode = generated.toString().padStart(6, "0");
         }
 
-        const result = await tripCol.insertOne({
+        const result = await tripCollection.insertOne({
             name,
             notes,
             memberIds: [],
@@ -101,12 +101,12 @@ router.post("/get", async (req, res) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const tripCol = db.collection<Trip>(TRIP_COLLECTION_NAME);
-        const expenseCol = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
-        const userCol = db.collection<User>(USER_COLLECTION_NAME);
+        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
+        const expenseCollection = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
+        const userCollection = db.collection<User>(USER_COLLECTION_NAME);
 
         // Get the trip requested
-        const trip = await tripCol.findOne({ _id: tripId });
+        const trip = await tripCollection.findOne({ _id: tripId });
         if (!trip) {
             res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "tripId not found" });
@@ -120,9 +120,9 @@ router.post("/get", async (req, res) => {
         // but here we'll just construct it manually.
 
         // Get all the expenses related to this trip
-        const allExpenses = await expenseCol.find({ tripId: tripId }).toArray();
+        const allExpenses = await expenseCollection.find({ tripId: tripId }).toArray();
         // Get all the information for users in this trip
-        const allMembers = await userCol.find({ _id: { $in: trip.memberIds } }).toArray();
+        const allMembers = await userCollection.find({ _id: { $in: trip.memberIds } }).toArray();
 
         // We can add some "bussiness logic" if we wanted to, like a sum of all the costs
         // or something like that
@@ -149,10 +149,10 @@ router.post("/update", async (req, res) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const tripCol = db.collection<Trip>(TRIP_COLLECTION_NAME);
+        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
 
         // verify that trip exists
-        if ((await tripCol.findOne({ _id: tripId })) === null) {
+        if ((await tripCollection.findOne({ _id: tripId })) === null) {
             res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "trip does not exist" });
             return;
@@ -160,10 +160,10 @@ router.post("/update", async (req, res) => {
 
         // Update the fields if they were provided in the request
         if (req.body.name) {
-            await tripCol.updateOne({ _id: tripId }, { $set: { name: req.body.name } });
+            await tripCollection.updateOne({ _id: tripId }, { $set: { name: req.body.name } });
         }
         if (req.body.notes) {
-            await tripCol.updateOne({ _id: tripId }, { $set: { notes: req.body.notes } });
+            await tripCollection.updateOne({ _id: tripId }, { $set: { notes: req.body.notes } });
         }
 
         // Return the tripId
@@ -192,24 +192,24 @@ router.post("/delete", async (req, res) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const tripCol = db.collection<Trip>(TRIP_COLLECTION_NAME);
-        const expenseCol = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
-        const userCol = db.collection<User>(USER_COLLECTION_NAME);
+        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
+        const expenseCollection = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
+        const userCollection = db.collection<User>(USER_COLLECTION_NAME);
 
         // verify that trip exists
-        if ((await tripCol.findOne({ _id: tripId })) === null) {
+        if ((await tripCollection.findOne({ _id: tripId })) === null) {
             res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "trip does not exist" });
             return;
         }
 
         // Remove this trip from the leader user's `trips` field
-        const leaderId = (await tripCol.findOne({ _id: tripId }))?.leaderId;
-        await userCol.updateOne({ _id: leaderId }, { $pull: { trips: tripId } });
+        const leaderId = (await tripCollection.findOne({ _id: tripId }))?.leaderId;
+        await userCollection.updateOne({ _id: leaderId }, { $pull: { trips: tripId } });
 
         // Delete this trip, and all associated expenses
-        await tripCol.deleteOne({ _id: tripId });
-        await expenseCol.deleteMany({ tripId: tripId });
+        await tripCollection.deleteOne({ _id: tripId });
+        await expenseCollection.deleteMany({ tripId: tripId });
 
         res.json({ jwt: res.locals.refreshedJWT });
     } finally {
@@ -228,11 +228,11 @@ router.post("/listMemberOf", async (req, res) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const tripCol = db.collection<Trip>(TRIP_COLLECTION_NAME);
-        const userCol = db.collection<User>(USER_COLLECTION_NAME);
+        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
+        const userCollection = db.collection<User>(USER_COLLECTION_NAME);
 
         // verify that user exists
-        if ((await userCol.findOne({ _id: userId as ObjectId })) === null) {
+        if ((await userCollection.findOne({ _id: userId as ObjectId })) === null) {
             res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "user does not exist" });
             return;
@@ -240,7 +240,7 @@ router.post("/listMemberOf", async (req, res) => {
 
         // Return a list that this of trip ids (only include id + trip name)
         res.json({
-            trips: await tripCol
+            trips: await tripCollection
                 .find({ memberIds: userId as ObjectId })
                 .project({ name: 1, notes: 1 })
                 .toArray(),
@@ -262,11 +262,11 @@ router.post("/listOwnerOf", async (req, res) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const tripCol = db.collection<Trip>(TRIP_COLLECTION_NAME);
-        const userCol = db.collection<User>(USER_COLLECTION_NAME);
+        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
+        const userCollection = db.collection<User>(USER_COLLECTION_NAME);
 
         // verify that user exists
-        if ((await userCol.findOne({ _id: userId as ObjectId })) === null) {
+        if ((await userCollection.findOne({ _id: userId as ObjectId })) === null) {
             res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "user does not exist" });
             return;
@@ -274,7 +274,7 @@ router.post("/listOwnerOf", async (req, res) => {
 
         // Return a list that this of trip ids (only include id + trip name + notes)
         res.json({
-            trips: await tripCol
+            trips: await tripCollection
                 .find({ leaderId: userId as ObjectId })
                 .project({ name: 1, notes: 1 })
                 .toArray(),
@@ -302,10 +302,10 @@ router.post("/join", async (req, res) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const tripCol = db.collection<Trip>(TRIP_COLLECTION_NAME);
+        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
 
         // query the trip with this invite code (unique per trip)
-        const trip = await tripCol.findOne({ inviteCode });
+        const trip = await tripCollection.findOne({ inviteCode });
         if (!trip) {
             res.status(STATUS_BAD_REQUEST).json({ error: "Invalid invite code" });
             return;
@@ -318,7 +318,7 @@ router.post("/join", async (req, res) => {
         }
 
         // if found, add this user to the trip
-        await tripCol.updateOne({ _id: trip._id }, { $push: { memberIds: userId } });
+        await tripCollection.updateOne({ _id: trip._id }, { $push: { memberIds: userId } });
         res.status(STATUS_OK).json({ message: "Successfully joined the trip", jwt: res.locals.refreshedJWT });
     } catch (error) {
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });

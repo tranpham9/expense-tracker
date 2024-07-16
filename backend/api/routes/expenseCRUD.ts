@@ -31,6 +31,7 @@ router.post("/create", async (req, res) => {
         res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
         return;
     }
+    tripId = ObjectId.createFromHexString(tripId);
 
     const userId = extractUserId(res.locals.refreshedToken);
     if (!userId) {
@@ -38,22 +39,20 @@ router.post("/create", async (req, res) => {
         return;
     }
 
-    tripId = ObjectId.createFromHexString(tripId);
-
     const client = await getMongoClient();
     try {
         const db = client.db(DB_NAME);
-        const tripCol = db.collection<Trip>(TRIP_COLLECTION_NAME);
-        const expenseCol = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
+        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
+        const expenseCollection = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
 
         // verify that trip exists
-        if ((await tripCol.findOne({ _id: tripId })) === null) {
+        if ((await tripCollection.findOne({ _id: tripId })) === null) {
             res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "trip does not exist" });
             return;
         }
 
-        const result = await expenseCol.insertOne({
+        const result = await expenseCollection.insertOne({
             tripId,
             payerId: userId,
             /* TODO: we'll implement expense splitting later */
@@ -88,8 +87,8 @@ router.post("/get", async (req, res) => {
     const client = await getMongoClient();
     try {
         const db = client.db(DB_NAME);
-        const expenseCol = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
-        const expense = await expenseCol.findOne({ _id: ObjectId.createFromHexString(expenseId) });
+        const expenseCollection = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
+        const expense = await expenseCollection.findOne({ _id: ObjectId.createFromHexString(expenseId) });
         res.status(STATUS_OK).json({ ...expense, jwt: res.locals.refreshedToken });
     } catch (error) {
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
@@ -111,16 +110,16 @@ router.post("/update", async (req, res) => {
     const client = await getMongoClient();
     try {
         const db = client.db(DB_NAME);
-        const expenseCol = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
+        const expenseCollection = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
 
         // verify that expense exists
-        if ((await expenseCol.findOne({ _id: expenseId })) === null) {
+        if ((await expenseCollection.findOne({ _id: expenseId })) === null) {
             res.statusCode = STATUS_BAD_REQUEST;
             res.json({ error: "expense does not exist" });
             return;
         }
 
-        const result = await expenseCol.updateOne(
+        const result = await expenseCollection.updateOne(
             { _id: expenseId },
             // only update values passed in as params
             {
@@ -157,9 +156,9 @@ router.post("/delete", async (req, res) => {
     const client = await getMongoClient();
     try {
         const db = client.db(DB_NAME);
-        const expenseCol = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
+        const expenseCollection = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
 
-        const result = await expenseCol.deleteOne({ _id: expenseId });
+        const result = await expenseCollection.deleteOne({ _id: expenseId });
         if (result.acknowledged) {
             res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
         } else {
