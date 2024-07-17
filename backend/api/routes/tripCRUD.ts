@@ -316,7 +316,8 @@ router.post("/join", async (req, res) => {
         }
 
         // prevent joining the same trip twice - technically not an error
-        if (trip.memberIds.some((x) => x.equals(userId))) {
+        if (trip.leaderId.equals(userId) || trip.memberIds.some((memberId) => memberId.equals(userId))) {
+            // TODO: should this error out instead?
             res.status(STATUS_OK).json({ message: "Success (already a member of the trip)", jwt: res.locals.refreshedJWT });
             return;
         }
