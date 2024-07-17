@@ -308,23 +308,18 @@ router.post("/join", async (req, res) => {
         const db = client.db(DB_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
 
-        // query the trip with this invite code (unique per trip)
-        const trip = await tripCollection.findOne({ inviteCode });
-        if (!trip) {
+        const result = await tripCollection.updateOne(
+            // can't be the leader
+            { inviteCode, leaderId: { $ne: userId } },
+            // only add if not already in list
+            { $addToSet: { memberIds: userId } }
+        );
+        if (result.acknowledged) {
+            res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
+        } else {
+            // either the invite code doesn't exist or the user is not someone who can join the invite code (i.e. they are the leader or already a part of the trip), so it's an invalid code for them
             res.status(STATUS_BAD_REQUEST).json({ error: "Invalid invite code" });
-            return;
         }
-
-        // prevent joining the same trip twice - technically not an error
-        if (trip.leaderId.equals(userId) || trip.memberIds.some((memberId) => memberId.equals(userId))) {
-            // TODO: should this error out instead?
-            res.status(STATUS_OK).json({ message: "Success (already a member of the trip)", jwt: res.locals.refreshedJWT });
-            return;
-        }
-
-        // if found, add this user to the trip
-        await tripCollection.updateOne({ _id: trip._id }, { $push: { memberIds: userId } });
-        res.status(STATUS_OK).json({ message: "Successfully joined the trip", jwt: res.locals.refreshedJWT });
     } catch (error) {
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
