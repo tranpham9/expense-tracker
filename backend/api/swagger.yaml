@@ -546,12 +546,24 @@ paths:
           schema:
             type: object
             properties:
-              message:
-                type: string
-                description: TODO PLACE RESPONSE HERE (it's an array)
+              trips:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      description: ID of the trip, suitable for other /trips/ endpoint calls
+                    name:
+                      type: string
+                      description: Title of the trip
+                    notes:
+                      type: string
+                      description: Miscellaneous description for the trip
               jwt:
                 type: string
                 description: Refreshed JWT
+                
         "401":
           description: "Authentication failure, invalid JWT"
           schema:
@@ -584,9 +596,20 @@ paths:
           schema:
             type: object
             properties:
-              message:
-                type: string
-                description: TODO PLACE RESPONSE HERE (it's an array)
+              expenses:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      description: ID of the expense, suitable for other /expense/ endpoint calls
+                    name:
+                      type: string
+                      description: Title of the trip
+                    notes:
+                      type: string
+                      description: Miscellaneous description for the trip
               jwt:
                 type: string
                 description: Refreshed JWT
