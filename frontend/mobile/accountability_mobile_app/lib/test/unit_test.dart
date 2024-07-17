@@ -20,4 +20,12 @@ void main() {
     // test
     expect(disableButton(errorTexts, textInputs), true);
   });
+  // Produce an MD5 hash on the input text
+  test('Testing \'MD5 Hash\'', () {
+    // set up
+    String text = "COP4331";
+    // MD5 Hasher: https://www.md5hashgenerator.com/
+    // test
+    expect(hash(text), "5832a71366768098cceb7095efb774f2");
+  });
 }

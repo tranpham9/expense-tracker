@@ -105,7 +105,7 @@ class _LoginPage extends State<LoginPage> {
                     ? null
                     : () {
                         // Call the login endpoint
-                        loginUser(email.text, password.text)
+                        loginUser(email.text, hash(password.text))
                             .then((response) async {
                           // Let the user know the email/password was wrong
                           if (response == null) {

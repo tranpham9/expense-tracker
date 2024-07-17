@@ -112,7 +112,8 @@ class _RegisterPage extends State<RegisterPage> {
                       ? null
                       : () {
                           //Call the register API
-                          registerUser(name.text, email.text, password.text)
+                          registerUser(
+                                  name.text, email.text, hash(password.text))
                               .then((res) {
                             // Failed to register
                             if (res == 400) {

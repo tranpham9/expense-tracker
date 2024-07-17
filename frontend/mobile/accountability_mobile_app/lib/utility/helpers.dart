@@ -1,4 +1,7 @@
 // Contains all helper functions that would be need to complete common tasks throughout the application
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 
 // Input which type you want to validate, ie. password, email, name
@@ -55,6 +58,11 @@ bool disableButton(List<String?> errorTexts, List<String> textInputs) {
     }
   }
   return false;
+}
+
+// Return the MD5 hash of the input text
+String hash(String text) {
+  return md5.convert(utf8.encode(text)).toString();
 }
 
 // Create an overlay with the text of 'message'
