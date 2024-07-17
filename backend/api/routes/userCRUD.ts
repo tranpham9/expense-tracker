@@ -1,13 +1,13 @@
 import express from "express";
 import { DB_NAME, formatEmail, getMongoClient, STATUS_BAD_REQUEST, STATUS_INTERNAL_SERVER_ERROR, STATUS_OK, STATUS_UNAUTHENTICATED, User, USER_COLLECTION_NAME } from "./common";
-import { MongoClient, ObjectId } from "mongodb";
+import { MongoClient } from "mongodb";
 import { sendVerifyEmail, sendResetPasswordEmail, unverified } from "../email";
 import md5 from "md5";
 import { authenticationRouteHandler, createJWT, extract, extractUserId, isExpired } from "../JWT";
 
 export const router = express.Router();
 
-const AUTHENTICATED_ROUTES = ["/changeName", "/joinTrip"];
+const AUTHENTICATED_ROUTES = ["/update"];
 
 // JWT Verification
 router.use(AUTHENTICATED_ROUTES, authenticationRouteHandler);
@@ -16,7 +16,7 @@ router.post("/register", async (req, res) => {
     let client: MongoClient | undefined;
     try {
         // TODO: I believe we don't need an optional trip id here anymore?
-        const { name, email, password, tripId } = req.body;
+        const { name, email, password, bio } = req.body;
         if (!name || !email || !password) {
             res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
             return;
@@ -32,7 +32,7 @@ router.post("/register", async (req, res) => {
             name: name.toString(),
             email: properEmail,
             password: md5(password.toString()),
-            trips: tripId ? [ObjectId.createFromHexString(tripId.toString())] : [],
+            bio: bio || "", // optional
         };
 
         client = await getMongoClient();
@@ -95,32 +95,33 @@ router.post("/login", async (req, res) => {
     }
 });
 
-router.put("/changeName", async (req, res) => {
+router.put("/update", async (req, res) => {
+    const { name, bio } = req.body;
+
+    const userId = extractUserId(res.locals.refreshedJWT);
+    if (!userId) {
+        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+        return;
+    }
+
     let client: MongoClient | undefined;
     try {
-        const { newName } = req.body;
-        if (!newName) {
-            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
-            return;
-        }
-
-        const userId = extractUserId(res.locals.refreshedJWT);
-        if (!userId) {
-            res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
-            return;
-        }
-
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const userCollection = db.collection<User>(USER_COLLECTION_NAME);
 
-        const result = await userCollection.updateOne({ _id: userId }, { $set: { name: newName } });
-
-        if (result.acknowledged) {
-            res.status(STATUS_OK).json({ message: "Name updated successfully", jwt: res.locals.refreshedJWT });
-        } else {
-            res.status(STATUS_BAD_REQUEST).json({ error: "Failed to update name" });
-        }
+        await userCollection.updateOne(
+            { _id: userId },
+            // only update values passed in as params
+            {
+                $set: {
+                    ...(name && { name }),
+                    ...(bio && { bio }),
+                },
+            }
+        );
+        // it isn't guaranteed that anything will be modified, so we just return STATUS_OK uncodnitionally
+        res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
     } catch (error) {
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {

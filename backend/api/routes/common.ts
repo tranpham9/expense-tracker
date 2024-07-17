@@ -71,7 +71,7 @@ export type User = {
     name: string;
     email: string;
     password: string;
-    trips: ObjectId[];
+    bio: string;
 };
 
 export type Expense = {
