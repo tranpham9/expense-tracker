@@ -99,24 +99,27 @@ paths:
           description: "Authentication failure, either wrong username or password"
           schema:
                 $ref: '#/definitions/ErrorInfo'
-  /users/changeName:
+  /users/update:
     post:
-      summary: Change name of the user
+      summary: Update the personal information of the user
       tags:
         - users
-      description: Change the name of the current user
+      description: Change the name and bio of the user
       parameters:
       - in: body
-        name: changeName
+        name: update
         schema:
           type: object
           properties:
             jwt:
               type: string
               description: Authenticated JWT
-            newName:
+            name:
               type: string
               description: New name for the user
+            bio:
+              type: string
+              description: Small bio for the user
       responses:
         "200":
           description: OK
@@ -148,7 +151,7 @@ paths:
       description: Grab the email of the users who wants to reset their password
       parameters:
       - in: body
-        name: forgotPassword
+        name: Forgot Password
         schema:
           type: object
           properties:
@@ -180,7 +183,7 @@ paths:
       description: Grab the new password and reste it for that user
       parameters:
       - in: body
-        name: newPassword
+        name: Reset Password
         schema:
           type: object
           properties:
