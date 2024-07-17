@@ -98,6 +98,79 @@ paths:
           description: "Authentication failure, either wrong username or password"
           schema:
                 $ref: '#/definitions/ErrorInfo'
+  /users/changeName:
+    post:
+      summary: Change name of the user
+      tags:
+        - users
+      description: Change the name of the current user
+      parameters:
+      - in: body
+        name: changeName
+        schema:
+          type: object
+          properties:
+            jwt:
+              type: string
+              description: Authenticated JWT
+            newName:
+              type: string
+              description: New name for the user
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                description: Success message
+              jwt:
+                type: string
+                description: Refreshed JWT
+        "400":
+          description: Malformed request or JSON
+          schema:
+            $ref: '#/responses/BadRequest'
+        "401":
+          description: "Authentication failure, invalid JWT"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
+        "500":
+          description: "Status internal server error"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
+  /users/forgotPassword:
+     post:
+      summary: Send email to allow the user to change their password
+      tags:
+        - users
+      description: Grab the email of the users who wants to reset their password
+      parameters:
+      - in: body
+        name: forgotPassword
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+              description: Email for the reset link to be sent to
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: Success message
+        "400":
+          description: Malformed request or JSON
+          schema:
+            $ref: '#/responses/BadRequest'
+        "500":
+          description: "Status internal server error"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
   /trips/create:
     post:
       summary: CREATE trip endpoint
