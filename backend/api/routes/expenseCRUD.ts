@@ -188,10 +188,12 @@ router.post("/update", async (req, res) => {
             { _id: expenseId },
             // only update values passed in as params
             {
-                ...(name && { name }),
-                ...(description && { description }),
-                ...(cost && { cost }),
-                ...(memberIds && { memberIds }),
+                $set: {
+                    ...(name && { name }),
+                    ...(description && { description }),
+                    ...(cost && { cost }),
+                    ...(memberIds && { memberIds }),
+                },
             }
         );
         if (result.acknowledged) {
