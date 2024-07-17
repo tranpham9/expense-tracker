@@ -130,7 +130,7 @@ paths:
         "400":
           description: Malformed request or JSON
           schema:
-            $ref: '#/responses/BadRequest'
+            $ref: '#/definitions/ErrorInfo'
         "401":
           description: "Authentication failure, invalid JWT"
           schema:
@@ -164,9 +164,44 @@ paths:
                 type: string
                 description: Success message
         "400":
-          description: Malformed request or JSON
+          description: Malformed request or JSON on front-end
           schema:
-            $ref: '#/responses/BadRequest'
+                $ref: '#/definitions/ErrorInfo'
+        "500":
+          description: "Status internal server error"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
+  /users/resetPassword:
+    post:
+      summary: Once routed to the reset password page, allow the user to reset their password
+      tags:
+        - users
+      description: Grab the new password and reste it for that user
+      parameters:
+      - in: body
+        name: newPassword
+        schema:
+          type: object
+          properties:
+            newPassword:
+              type: string
+              description: New password for that user
+            jwt:
+              type: string
+              description: Authenticated JWT
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: Success message
+        "401":
+          description: "Authentication failure, invalid JWT"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
         "500":
           description: "Status internal server error"
           schema:
@@ -182,6 +217,7 @@ paths:
         name: JSON
         schema:
           type: object
+          required: [jwt, name]
           properties:
             jwt:
               type: string
@@ -207,6 +243,14 @@ paths:
           description: Malformed request or JSON
           schema:
             $ref: '#/responses/BadRequest'
+        "401":
+          description: "Authentication failure, invalid JWT"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
+        "500":
+          description: "Status internal server error"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
   /trips/get:
     post:
       summary: READ trip endpoint
@@ -219,12 +263,12 @@ paths:
         schema:
           type: object
           properties:
-            tripId:
-              type: string
-              description: ID of the trip to read
             jwt:
               type: string
               description: Authenticated JWT
+            tripId:
+              type: string
+              description: ID of the trip to read
       responses:
         "200":
           description: OK
@@ -273,7 +317,11 @@ paths:
         "400":
           description: Malformed request or JSON
           schema:
-            $ref: '#/responses/BadRequest'
+            $ref: '#/definitions/ErrorInfo'
+        "401":
+          description: "Authentication failure, invalid JWT"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
   /trips/update:
     post:
       summary: UPDATE trip endpoint
@@ -285,13 +333,20 @@ paths:
         name: JSON
         schema:
           type: object
+          required: [jwt, tripId]
           properties:
-            tripId:
-              type: string
-              description: ID of the trip to modify
             jwt:
               type: string
               description: Authenticated JWT
+            tripId:
+              type: string
+              description: ID of the trip to modify
+            name:
+              type: string
+              description: New name of the trip (optional)
+            notes:
+              type: string
+              description: New notes for the trip (optional)
       responses:
         "200":
           description: OK
@@ -306,25 +361,25 @@ paths:
         "400":
           description: Malformed request or JSON
           schema:
-            $ref: '#/responses/BadRequest'
+            $ref: '#/definitions/ErrorInfo'
   /trips/delete:
     post:
       summary: DELETE trip endpoint
       tags: 
         - trips
-      description: Remove a trip and associated data
+      description: Remove a trip and all associated data
       parameters:
       - in: body
         name: JSON
         schema:
           type: object
           properties:
-            tripId:
-              type: string
-              description: ID of the trip to delete
             jwt:
               type: string
               description: Authenticated JWT
+            tripId:
+              type: string
+              description: ID of the trip to delete
       responses:
         "200":
           description: OK
@@ -337,7 +392,11 @@ paths:
         "400":
           description: Malformed request or JSON
           schema:
-            $ref: '#/responses/BadRequest'
+            $ref: '#/definitions/ErrorInfo'
+        "401":
+          description: "Authentication failure, invalid JWT"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
   /trips/listMemberOf:
     post:
       summary: List trips as member user
@@ -424,22 +483,22 @@ paths:
             $ref: '#/responses/BadRequest'
   /trips/join:
     post:
-      summary: Application user login endpoint
+      summary: Joining trip endpoint
       tags: 
         - trips
-      description: Performs user authentication
+      description: Allows a user to join a trip
       parameters:
       - in: body
-        name: Login
+        name: Join
         schema:
           type: object
           properties:
-            inviteCode:
-              type: string
-              description: 6-digit invite Code
             jwt:
               type: string
               description: Authenticated JWT
+            inviteCode:
+              type: string
+              description: 6-digit invite Code
       responses:
         "200":
           description: OK
@@ -452,6 +511,97 @@ paths:
               jwt:
                 type: string
                 description: Refreshed JWT
+        "400":
+          description: Malformed request or JSON
+          schema:
+            $ref: '#/definitions/ErrorInfo'
+        "401":
+          description: "Authentication failure, invalid JWT"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
+  /trips/search:
+    post:
+      summary: Search the through a users list of trips
+      tags: 
+        - trips
+      description: Performs a search for trip(s)
+      parameters:
+      - in: body
+        name: Search
+        schema:
+          type: object
+          properties:
+            jwt:
+              type: string
+              description: Authenticated JWT
+            page:
+              type: integer 
+              description: Page number you want to retrieve
+            query:
+              type: string
+              description: The string we want to search against
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: TODO PLACE RESPONSE HERE (it's an array)
+              jwt:
+                type: string
+                description: Refreshed JWT
+        "401":
+          description: "Authentication failure, invalid JWT"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
+        "500":
+          description: "Status internal server error"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
+  /trips/listExpenses:
+    post:
+      summary: List all expenses related to a trip
+      tags: 
+        - trips
+      description: Returns all expenses related to one trip
+      parameters:
+      - in: body
+        name: Search
+        schema:
+          type: object
+          properties:
+            jwt:
+              type: string
+              description: Authenticated JWT
+            tripId:
+              type: string 
+              description: ID of the trip you want expenses for
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                description: TODO PLACE RESPONSE HERE (it's an array)
+              jwt:
+                type: string
+                description: Refreshed JWT
+        "400":
+          description: Malformed request or JSON
+          schema:
+            $ref: '#/definitions/ErrorInfo'
+        "401":
+          description: "Authentication failure, invalid JWT"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
+        "500":
+          description: "Status internal server error"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
   /expenses/create:
     post:
       summary: CREATE expense endpoint
@@ -463,7 +613,11 @@ paths:
         name: JSON
         schema:
           type: object
+          required: [jwt,tripId,name, ]
           properties:
+            jwt:
+              type: string
+              description: Authenticated JWT      
             tripId:
               type: string
               description: ID of the trip this expense will belong to
@@ -472,10 +626,7 @@ paths:
             description:
               type: string
             cost:
-              type: number
-            jwt:
-              type: string
-              description: Authenticated JWT              
+              type: number        
       responses:
         "200":
           description: OK
@@ -491,7 +642,7 @@ paths:
         "400":
           description: Malformed request or JSON
           schema:
-            $ref: '#/responses/BadRequest'
+            $ref: '#/definitions/ErrorInfo'
   /expenses/get:
     post:
       summary: READ expense endpoint
