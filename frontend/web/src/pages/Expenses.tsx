@@ -1,25 +1,44 @@
-import { Button, Divider, Grid, Paper, Skeleton, Stack, Typography } from "@mui/material";
+import { Avatar, AvatarGroup, Box, Button, Grid, Paper, Skeleton, Stack, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import { getInitials } from "../utility/Manipulation";
 
-//TODO: change array to be dynamically sized, we don't need pagination for expenses
+// TODO: get member names from backend
+const members: string[] = ["Joe Bro", "Bob", "Carol", "David", "Emily"];
+
+// TODO: probably remove avatar group and turn them into cards and have cards to include $ owe to friends
 export default function Expenses() {
     return (
         <>
-            <Grid></Grid>
-            <Divider />
             <Grid
-                direction="row"
+                container
+                direction={"row"}
+                justifyContent={"space-between"}
+                px={4}
+                py={2}
+            >
+                <Grid item>
+                    <Typography variant="h4">{"Trip Expense"}</Typography>
+                </Grid>
+                <Grid item>
+                    <AvatarGroup
+                        max={4}
+                        spacing={4}
+                    >
+                        {members.map((member, i) => (
+                            <Avatar key={i}>{getInitials(member)}</Avatar>
+                        ))}
+                    </AvatarGroup>
+                </Grid>
+            </Grid>
+            <Box
                 sx={{
                     display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    mx: 4,
-                    my: 2,
+                    justifyContent: "flex-end",
+                    px: 4,
                 }}
             >
-                <Typography variant="h5">{"Expense Name"}</Typography>
-                <Button startIcon={<AddIcon />}> Add Expenses </Button>
-            </Grid>
+                <Button startIcon={<AddIcon />}> Add an Expense </Button>
+            </Box>
             <Stack sx={{ textAlign: "center", mx: 4 }}>
                 {[...Array(20).keys()].map((i) => (
                     <Paper
