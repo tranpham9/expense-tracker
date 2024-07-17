@@ -41,6 +41,7 @@ paths:
           description: Malformed request or JSON on front-end
           schema:
             $ref: '#/definitions/ErrorInfo'
+  # ----------- Users ----------- #
   /users/login:
     post:
       summary: Application user login endpoint
@@ -206,6 +207,7 @@ paths:
           description: "Status internal server error"
           schema:
                 $ref: '#/definitions/ErrorInfo'
+  # ----------- Trips ----------- #
   /trips/create:
     post:
       summary: CREATE trip endpoint
@@ -625,6 +627,7 @@ paths:
           description: "Status internal server error"
           schema:
                 $ref: '#/definitions/ErrorInfo'
+  # ----------- Expenses ----------- # 
   /expenses/create:
     post:
       summary: CREATE expense endpoint
@@ -636,7 +639,7 @@ paths:
         name: JSON
         schema:
           type: object
-          required: [jwt,tripId,name, ]
+          required: [jwt,tripId,name]
           properties:
             jwt:
               type: string
@@ -649,7 +652,14 @@ paths:
             description:
               type: string
             cost:
-              type: number        
+              type: number
+            memberIds:
+              type: array
+              items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
       responses:
         "200":
           description: OK
@@ -666,6 +676,14 @@ paths:
           description: Malformed request or JSON
           schema:
             $ref: '#/definitions/ErrorInfo'
+        "401":
+          description: "Authentication failure, invalid JWT"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
+        "500":
+            description: "Status internal server error"
+            schema:
+                $ref: '#/definitions/ErrorInfo'
   /expenses/get:
     post:
       summary: READ expense endpoint
@@ -678,12 +696,13 @@ paths:
         schema:
           type: object
           properties:
+            jwt:
+              type: string
+              description: Authenticated JWT
             expenseId:
               type: string
               description: ID of the expense to delete
-            jwt:
-              type: string
-              description: Authenticated JWT              
+                          
       responses:
         "200":
           description: OK
@@ -698,13 +717,28 @@ paths:
                 type: string
               cost:
                 type: number
+              memberIds:
+                type: array
+                items:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
               jwt:
                 type: string
                 description: Refreshed JWT
         "400":
           description: Malformed request or JSON
           schema:
-            $ref: '#/responses/BadRequest'
+            $ref: '#/definitions/ErrorInfo'
+        "401":
+          description: "Authentication failure, invalid JWT"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
+        "500":
+            description: "Status internal server error"
+            schema:
+                $ref: '#/definitions/ErrorInfo'
   /expenses/update:
     post:
       summary: UPDATE expense endpoint
@@ -716,7 +750,11 @@ paths:
         name: JSON
         schema:
           type: object
+          required: [jwt,expenseId]
           properties:
+            jwt:
+              type: string
+              description: Authenticated JWT
             expenseId:
               type: string
               description: ID of the expense to modify
@@ -725,10 +763,14 @@ paths:
             description:
               type: string
             cost:
-              type: number
-            jwt:
-              type: string
-              description: Authenticated JWT              
+              type: number  
+            memberIds:
+                type: array
+                items:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
       responses:
         "200":
           description: OK
@@ -744,7 +786,15 @@ paths:
         "400":
           description: Malformed request or JSON
           schema:
-            $ref: '#/responses/BadRequest'
+            $ref: '#/definitions/ErrorInfo'
+        "401":
+          description: "Authentication failure, invalid JWT"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
+        "500":
+            description: "Status internal server error"
+            schema:
+                $ref: '#/definitions/ErrorInfo'
   /expenses/delete:
     post:
       summary: DELETE expense endpoint
@@ -757,12 +807,12 @@ paths:
         schema:
           type: object
           properties:
-            expenseId:
-              type: string
-              description: ID of the expense to delete
             jwt:
               type: string
-              description: Authenticated JWT              
+              description: Authenticated JWT  
+            expenseId:
+              type: string
+              description: ID of the expense to delete          
       responses:
         "200":
           description: OK
@@ -775,7 +825,15 @@ paths:
         "400":
           description: Malformed request or JSON
           schema:
-            $ref: '#/responses/BadRequest'      
+            $ref: '#/definitions/ErrorInfo'   
+        "401":
+          description: "Authentication failure, invalid JWT"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
+        "500":
+            description: "Status internal server error"
+            schema:
+                $ref: '#/definitions/ErrorInfo'
 definitions:
     LoginDefinition:
       type: object
