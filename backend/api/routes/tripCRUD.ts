@@ -8,8 +8,6 @@ import {
     STATUS_UNAUTHENTICATED,
     Trip,
     TRIP_COLLECTION_NAME,
-    User,
-    USER_COLLECTION_NAME,
     Expense,
     EXPENSE_COLLECTION_NAME,
     STATUS_NOT_IMPLEMENTED,
@@ -79,56 +77,6 @@ router.post("/create", async (req, res) => {
             tripId: result.insertedId,
             jwt: res.locals.refreshedJWT,
         });
-    } catch (error) {
-        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
-    } finally {
-        await client?.close();
-    }
-});
-
-/*
- * Read Information from a Trip, aggregates related expenses and members.
- */
-// NOTE: /listExpenses should probably be used instead
-// FIXME: this endpoint doesn't properly ensure the user is allowed to get this trip, and it does't properly handle getting leader + members (nor does it exclude the user themself from said list)
-router.post("/get", async (req, res) => {
-    let { tripId } = req.body;
-    if (!tripId) {
-        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
-        return;
-    }
-    tripId = ObjectId.createFromHexString(tripId);
-
-    let client: MongoClient | undefined;
-    try {
-        client = await getMongoClient();
-        const db = client.db(DB_NAME);
-        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
-        const expenseCollection = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
-        const userCollection = db.collection<User>(USER_COLLECTION_NAME);
-
-        // Get the trip requested
-        const trip = await tripCollection.findOne({ _id: tripId });
-        if (!trip) {
-            res.status(STATUS_BAD_REQUEST).json({ error: "Invalid trip" });
-            return;
-        }
-
-        // To help the frontend, aggregate all the information neccesary
-        // about the trip members and expenses.
-
-        // There may be a way to group everything by a single mongo query,
-        // but here we'll just construct it manually.
-
-        // Get all the expenses related to this trip
-        const allExpenses = await expenseCollection.find({ tripId }).toArray();
-        // Get all the information for users in this trip
-        const allMembers = await userCollection.find({ _id: { $in: trip.memberIds } }).toArray();
-
-        // We can add some "bussiness logic" if we wanted to, like a sum of all the costs
-        // or something like that
-
-        res.json({ trip: { ...trip, allExpenses, allMembers }, jwt: res.locals.refreshedJWT });
     } catch (error) {
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
@@ -238,80 +186,6 @@ router.post("/delete", async (req, res) => {
         expenseCollection.deleteMany({ tripId });
 
         res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
-    } catch (error) {
-        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
-    } finally {
-        await client?.close();
-    }
-});
-
-/*
- * List all the trips a user is as a member of (as non-owner only).
- */
-// NOTE: /search should probably be used instead (this code is a bit outdated and doesn't have proper status codes/error messages for things like malformed JWT)
-router.post("/listMemberOf", async (req, res) => {
-    let client: MongoClient | undefined;
-    try {
-        // userId is required
-        const userId = extractUserId(res.locals.refreshedJWT);
-
-        client = await getMongoClient();
-        const db = client.db(DB_NAME);
-        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
-        const userCollection = db.collection<User>(USER_COLLECTION_NAME);
-
-        // verify that user exists
-        if ((await userCollection.findOne({ _id: userId as ObjectId })) === null) {
-            res.statusCode = STATUS_BAD_REQUEST;
-            res.json({ error: "user does not exist" });
-            return;
-        }
-
-        // Return a list that this of trip ids (only include id + trip name)
-        res.json({
-            trips: await tripCollection
-                .find({ memberIds: userId as ObjectId })
-                .project({ name: 1, description: 1 })
-                .toArray(),
-            jwt: res.locals.refreshedJWT,
-        });
-    } catch (error) {
-        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
-    } finally {
-        await client?.close();
-    }
-});
-
-/*
- * List all the trips that belong to a user. (As Owner/Leader)
- */
-// NOTE: /search should probably be used instead (this code is a bit outdated and doesn't have proper status codes/error messages for things like malformed JWT)
-router.post("/listOwnerOf", async (req, res) => {
-    let client: MongoClient | undefined;
-    try {
-        // userId is required
-        const userId = extractUserId(res.locals.refreshedJWT);
-
-        client = await getMongoClient();
-        const db = client.db(DB_NAME);
-        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
-        const userCollection = db.collection<User>(USER_COLLECTION_NAME);
-
-        // verify that user exists
-        if ((await userCollection.findOne({ _id: userId as ObjectId })) === null) {
-            res.statusCode = STATUS_BAD_REQUEST;
-            res.json({ error: "user does not exist" });
-            return;
-        }
-
-        // Return a list that this of trip ids (only include id + trip name + description)
-        res.json({
-            trips: await tripCollection
-                .find({ leaderId: userId as ObjectId })
-                .project({ name: 1, description: 1 })
-                .toArray(),
-            jwt: res.locals.refreshedJWT,
-        });
     } catch (error) {
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
