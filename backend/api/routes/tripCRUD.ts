@@ -12,6 +12,7 @@ import {
     USER_COLLECTION_NAME,
     Expense,
     EXPENSE_COLLECTION_NAME,
+    STATUS_NOT_IMPLEMENTED,
 } from "./common";
 import { MongoClient, ObjectId } from "mongodb";
 import { authenticationRouteHandler, extractUserId } from "../JWT";
@@ -247,6 +248,7 @@ router.post("/delete", async (req, res) => {
 /*
  * List all the trips a user is as a member of (as non-owner only).
  */
+// NOTE: /listExpenses should probably be used instead (this code is a bit outdated and doesn't have proper status codes/error messages for things like malformed JWT)
 router.post("/listMemberOf", async (req, res) => {
     let client: MongoClient | undefined;
     try {
@@ -283,6 +285,7 @@ router.post("/listMemberOf", async (req, res) => {
 /*
  * List all the trips that belong to a user. (As Owner/Leader)
  */
+// NOTE: /listExpenses should probably be used instead (this code is a bit outdated and doesn't have proper status codes/error messages for things like malformed JWT)
 router.post("/listOwnerOf", async (req, res) => {
     let client: MongoClient | undefined;
     try {
@@ -317,20 +320,20 @@ router.post("/listOwnerOf", async (req, res) => {
 });
 
 router.post("/join", async (req, res) => {
+    const { inviteCode } = req.body;
+    if (!inviteCode) {
+        res.status(STATUS_BAD_REQUEST).json({ error: "inviteCode required" });
+        return;
+    }
+
+    const userId = extractUserId(res.locals.refreshedJWT);
+    if (!userId) {
+        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+        return;
+    }
+
     let client: MongoClient | undefined;
     try {
-        const { inviteCode } = req.body;
-        if (!inviteCode) {
-            res.status(STATUS_BAD_REQUEST).json({ error: "inviteCode required" });
-            return;
-        }
-
-        const userId = extractUserId(res.locals.refreshedJWT);
-        if (!userId) {
-            res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
-            return;
-        }
-
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
@@ -357,7 +360,7 @@ router.post("/join", async (req, res) => {
 // NOTE: this will need to remove the user from the trip and from all expenses (this might get a bit difficult with the payer field of expenses, so maybe we don't want to allow leaving?)
 router.post("/leave", async (req, res) => {
     // TODO: impl
-    res.status(STATUS_OK).json({ message: "not implemented yet" });
+    res.status(STATUS_NOT_IMPLEMENTED).json({ message: "not implemented yet" });
 });
 
 router.post("/search", async (req, res) => {

@@ -40,6 +40,11 @@ export const STATUS_NOT_FOUND = 404;
  * https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
  */
 export const STATUS_INTERNAL_SERVER_ERROR = 500;
+/** not yet implemented/sorted
+ * 
+ * https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/501
+ */
+export const STATUS_NOT_IMPLEMENTED = 501;
 
 /*
  * Get an open connection to the Mongo database. The caller should
