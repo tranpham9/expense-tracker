@@ -41,7 +41,7 @@ export const STATUS_NOT_FOUND = 404;
  */
 export const STATUS_INTERNAL_SERVER_ERROR = 500;
 /** not yet implemented/sorted
- * 
+ *
  * https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/501
  */
 export const STATUS_NOT_IMPLEMENTED = 501;
@@ -79,19 +79,19 @@ export type User = {
     bio: string;
 };
 
-export type Expense = {
-    name: string;
-    tripId: ObjectId;
-    description: string;
-    cost: string;
-    memberIds: ObjectId[];
-    payerId: ObjectId;
-};
-
 export type Trip = {
     name: string;
     description: string;
-    memberIds: ObjectId[];
-    leaderId: ObjectId;
     inviteCode: string;
+    leaderId: ObjectId;
+    memberIds: ObjectId[];
+};
+
+export type Expense = {
+    name: string;
+    description: string;
+    cost: string;
+    tripId: ObjectId;
+    payerId: ObjectId;
+    memberIds: ObjectId[];
 };
