@@ -11,6 +11,7 @@
   "include": [
     "*.ts",
     "routes/*.ts",
-    "eslint.config.mjs"
+    "eslint.config.mjs",
+    "__tests__/*.test.ts"
   ],
 }
