@@ -365,7 +365,7 @@ router.post("/leave", async (req, res) => {
 
 router.post("/search", async (req, res) => {
     const { page } = req.body;
-    const pageNumber = page?.toString() || 1;
+    const pageNumber = parseInt(page?.toString()) || 1;
 
     let { query } = req.body;
     query ??= "";
