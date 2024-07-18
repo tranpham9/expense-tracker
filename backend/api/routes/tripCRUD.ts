@@ -248,7 +248,7 @@ router.post("/delete", async (req, res) => {
 /*
  * List all the trips a user is as a member of (as non-owner only).
  */
-// NOTE: /listExpenses should probably be used instead (this code is a bit outdated and doesn't have proper status codes/error messages for things like malformed JWT)
+// NOTE: /search should probably be used instead (this code is a bit outdated and doesn't have proper status codes/error messages for things like malformed JWT)
 router.post("/listMemberOf", async (req, res) => {
     let client: MongoClient | undefined;
     try {
@@ -285,7 +285,7 @@ router.post("/listMemberOf", async (req, res) => {
 /*
  * List all the trips that belong to a user. (As Owner/Leader)
  */
-// NOTE: /listExpenses should probably be used instead (this code is a bit outdated and doesn't have proper status codes/error messages for things like malformed JWT)
+// NOTE: /search should probably be used instead (this code is a bit outdated and doesn't have proper status codes/error messages for things like malformed JWT)
 router.post("/listOwnerOf", async (req, res) => {
     let client: MongoClient | undefined;
     try {
