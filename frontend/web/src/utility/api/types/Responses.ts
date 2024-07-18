@@ -2,7 +2,10 @@ type RegisterUserResponse = {
     message: string;
 };
 export type LoginResponse = {
-    token: { accessToken: string };
+    userId: string;
+    name: string;
+    email: string;
+    jwt: string;
 };
 
 export type Responses = {
