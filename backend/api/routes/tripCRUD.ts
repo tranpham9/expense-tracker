@@ -74,7 +74,7 @@ router.post("/create", async (req, res) => {
             inviteCode: inviteCode,
         });
 
-        res.json({
+        res.status(STATUS_OK).json({
             tripId: result.insertedId,
             jwt: res.locals.refreshedJWT,
         });
@@ -88,17 +88,18 @@ router.post("/create", async (req, res) => {
 /*
  * Read Information from a Trip, aggregates related expenses and members.
  */
+// NOTE: /listExpenses should probably be used instead
+// FIXME: this endpoint doesn't properly ensure the user is allowed to get this trip, and it does't properly handle getting leader + members (nor does it exclude the user themself from said list)
 router.post("/get", async (req, res) => {
+    let { tripId } = req.body;
+    if (!tripId) {
+        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
+        return;
+    }
+    tripId = ObjectId.createFromHexString(tripId);
+
     let client: MongoClient | undefined;
     try {
-        // tripId is required
-        if (!req.body.tripId) {
-            res.statusCode = STATUS_BAD_REQUEST;
-            res.json({ error: "tripId required" });
-            return;
-        }
-        const tripId = ObjectId.createFromHexString(req.body.tripId);
-
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
@@ -108,8 +109,7 @@ router.post("/get", async (req, res) => {
         // Get the trip requested
         const trip = await tripCollection.findOne({ _id: tripId });
         if (!trip) {
-            res.statusCode = STATUS_BAD_REQUEST;
-            res.json({ error: "tripId not found" });
+            res.status(STATUS_BAD_REQUEST).json({ error: "Invalid trip" });
             return;
         }
 
@@ -120,7 +120,7 @@ router.post("/get", async (req, res) => {
         // but here we'll just construct it manually.
 
         // Get all the expenses related to this trip
-        const allExpenses = await expenseCollection.find({ tripId: tripId }).toArray();
+        const allExpenses = await expenseCollection.find({ tripId }).toArray();
         // Get all the information for users in this trip
         const allMembers = await userCollection.find({ _id: { $in: trip.memberIds } }).toArray();
 
@@ -137,16 +137,15 @@ router.post("/get", async (req, res) => {
  * Updates the name, notes of a trip.
  */
 router.post("/update", async (req, res) => {
+    let { tripId } = req.body;
+    if (!tripId) {
+        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
+        return;
+    }
+    tripId = ObjectId.createFromHexString(tripId);
+
     let client: MongoClient | undefined;
     try {
-        // tripId is required
-        if (!req.body.tripId) {
-            res.statusCode = STATUS_BAD_REQUEST;
-            res.json({ error: "tripId required" });
-            return;
-        }
-        const tripId = ObjectId.createFromHexString(req.body.tripId);
-
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
