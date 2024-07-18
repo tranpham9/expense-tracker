@@ -230,7 +230,7 @@ paths:
             name:
               type: string
               description: Title of the trip
-            notes:
+            description:
               type: string
               description: Miscellaneous description for the trip (optional)
       responses:
@@ -289,7 +289,7 @@ paths:
               name:
                 type: string
                 description: Title of the trip
-              notes:
+              description:
                 type: string
                 description: Miscellaneous description for the trip 
               inviteCode:
@@ -349,9 +349,9 @@ paths:
             name:
               type: string
               description: New name of the trip (optional)
-            notes:
+            description:
               type: string
-              description: New notes for the trip (optional)
+              description: New description for the trip (optional)
       responses:
         "200":
           description: OK
@@ -437,7 +437,7 @@ paths:
                     name:
                       type: string
                       description: Title of the trip
-                    notes:
+                    description:
                       type: string
                       description: Miscellaneous description for the trip
         "400":
@@ -479,7 +479,7 @@ paths:
                     name:
                       type: string
                       description: Title of the trip
-                    notes:
+                    description:
                       type: string
                       description: Miscellaneous description for the trip
         "400":
@@ -562,7 +562,7 @@ paths:
                     name:
                       type: string
                       description: Title of the trip
-                    notes:
+                    description:
                       type: string
                       description: Miscellaneous description for the trip
               jwt:
@@ -612,7 +612,7 @@ paths:
                     name:
                       type: string
                       description: Title of the trip
-                    notes:
+                    description:
                       type: string
                       description: Miscellaneous description for the trip
               jwt:
