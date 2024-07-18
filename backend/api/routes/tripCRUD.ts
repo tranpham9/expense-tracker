@@ -137,12 +137,20 @@ router.post("/get", async (req, res) => {
  * Updates the name, notes of a trip.
  */
 router.post("/update", async (req, res) => {
+    const { name, notes } = req.body;
+
     let { tripId } = req.body;
     if (!tripId) {
         res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
         return;
     }
     tripId = ObjectId.createFromHexString(tripId);
+
+    const userId = extractUserId(res.locals.refreshedJWT);
+    if (!userId) {
+        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+        return;
+    }
 
     let client: MongoClient | undefined;
     try {
@@ -165,11 +173,23 @@ router.post("/update", async (req, res) => {
             await tripCollection.updateOne({ _id: tripId }, { $set: { notes: req.body.notes } });
         }
 
-        // Return the tripId
-        res.json({
-            tripId: tripId,
-            jwt: res.locals.refreshedJWT,
-        });
+        const result = await tripCollection.updateOne(
+            { _id: tripId, leaderId: userId },
+            // only update values passed in as params
+            {
+                $set: {
+                    ...(name && { name }),
+                    ...(notes && { notes }),
+                },
+            }
+        );
+        if (result.acknowledged) {
+            res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
+        } else {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Failed to update trip" });
+        }
+    } catch (error) {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
     }
