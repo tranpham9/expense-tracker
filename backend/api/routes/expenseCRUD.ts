@@ -138,7 +138,7 @@ router.post("/get", async (req, res) => {
 });
 
 /*
- * Updates the name, notes, cost of an expense
+ * Updates the name, description, cost of an expense
  */
 router.post("/update", async (req, res) => {
     // NOTE: for now, payer id can't be changed (implementing that might cause some issues; we can add it down the line if we have time [we probaly won't])

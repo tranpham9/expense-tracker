@@ -32,12 +32,12 @@ router.use(AUTHENTICATED_ROUTES, authenticationRouteHandler);
  */
 
 /*
- * Creates a new empty Trip, with the name, notes, and leaderId provided.
+ * Creates a new empty Trip, with the name, description, and leaderId provided.
  */
 router.post("/create", async (req, res) => {
-    let { notes } = req.body;
+    let { description } = req.body;
     // default values for non-required fields
-    notes ??= "";
+    description ??= "";
 
     const { name } = req.body;
     if (!name) {
@@ -69,7 +69,7 @@ router.post("/create", async (req, res) => {
 
         const result = await tripCollection.insertOne({
             name,
-            notes,
+            description,
             memberIds: [],
             leaderId: userId,
             inviteCode: inviteCode,
@@ -137,10 +137,10 @@ router.post("/get", async (req, res) => {
 });
 
 /*
- * Updates the name, notes of a trip.
+ * Updates the name + description of a trip.
  */
 router.post("/update", async (req, res) => {
-    const { name, notes } = req.body;
+    const { name, description } = req.body;
 
     let { tripId } = req.body;
     if (!tripId) {
@@ -172,8 +172,8 @@ router.post("/update", async (req, res) => {
         if (req.body.name) {
             await tripCollection.updateOne({ _id: tripId }, { $set: { name: req.body.name } });
         }
-        if (req.body.notes) {
-            await tripCollection.updateOne({ _id: tripId }, { $set: { notes: req.body.notes } });
+        if (req.body.description) {
+            await tripCollection.updateOne({ _id: tripId }, { $set: { description: req.body.description } });
         }
 
         const result = await tripCollection.updateOne(
@@ -182,7 +182,7 @@ router.post("/update", async (req, res) => {
             {
                 $set: {
                     ...(name && { name }),
-                    ...(notes && { notes }),
+                    ...(description && { description }),
                 },
             }
         );
@@ -271,7 +271,7 @@ router.post("/listMemberOf", async (req, res) => {
         res.json({
             trips: await tripCollection
                 .find({ memberIds: userId as ObjectId })
-                .project({ name: 1, notes: 1 })
+                .project({ name: 1, description: 1 })
                 .toArray(),
             jwt: res.locals.refreshedJWT,
         });
@@ -304,11 +304,11 @@ router.post("/listOwnerOf", async (req, res) => {
             return;
         }
 
-        // Return a list that this of trip ids (only include id + trip name + notes)
+        // Return a list that this of trip ids (only include id + trip name + description)
         res.json({
             trips: await tripCollection
                 .find({ leaderId: userId as ObjectId })
-                .project({ name: 1, notes: 1 })
+                .project({ name: 1, description: 1 })
                 .toArray(),
             jwt: res.locals.refreshedJWT,
         });

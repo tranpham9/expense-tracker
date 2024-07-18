@@ -90,7 +90,7 @@ export type Expense = {
 
 export type Trip = {
     name: string;
-    notes: string;
+    description: string;
     memberIds: ObjectId[];
     leaderId: ObjectId;
     inviteCode: string;
