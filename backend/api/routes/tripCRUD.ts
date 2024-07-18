@@ -128,6 +128,8 @@ router.post("/get", async (req, res) => {
         // or something like that
 
         res.json({ trip: { ...trip, allExpenses, allMembers }, jwt: res.locals.refreshedJWT });
+    } catch (error) {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
     }
@@ -235,6 +237,8 @@ router.post("/delete", async (req, res) => {
         expenseCollection.deleteMany({ tripId });
 
         res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
+    } catch (error) {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
     }
@@ -269,6 +273,8 @@ router.post("/listMemberOf", async (req, res) => {
                 .toArray(),
             jwt: res.locals.refreshedJWT,
         });
+    } catch (error) {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
     }
@@ -303,6 +309,8 @@ router.post("/listOwnerOf", async (req, res) => {
                 .toArray(),
             jwt: res.locals.refreshedJWT,
         });
+    } catch (error) {
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
     }
