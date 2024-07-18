@@ -6,7 +6,7 @@ const request = supertest(app);
 
 describe("test", () => {
     // eslint-disable-next-line no-var
-    var jwt = null;
+    let jwt: string = "";
     describe("loginHandler", () => {
         describe("given no request", () => {
             it("should return a 400", async () => {
