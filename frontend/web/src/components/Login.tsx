@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { request } from "../utility/api/API";
 import { AccountContext, AccountOverlayContext, LoginContext } from "../Contexts/Account";
 import { saveAccountInfo } from "../utility/Persist";
+import md5 from "md5";
 
 // TODO: make pressing enter in a field click submit button
 export default function Login() {
@@ -35,7 +36,7 @@ export default function Login() {
 
         request(
             "login",
-            { email, password },
+            { email, password: md5(password) },
             (response) => {
                 console.log(response);
                 setAccount(response);

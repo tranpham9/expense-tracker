@@ -6,6 +6,7 @@ import NameInput from "./inputs/NameInput";
 import EmailInput from "./inputs/EmailInput";
 import PasswordInput from "./inputs/PasswordInput";
 import { request } from "../utility/api/API";
+import md5 from "md5";
 
 export default function Signup({ onSuccessfulSignup = () => {} }) {
     const [name, setName] = useState("");
@@ -30,7 +31,7 @@ export default function Signup({ onSuccessfulSignup = () => {} }) {
 
         request(
             "registerUser",
-            { name, email, password },
+            { name, email, password: md5(password) },
             (response) => {
                 console.log(response.message);
                 setIsProcessing(false);
