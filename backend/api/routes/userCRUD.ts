@@ -95,7 +95,7 @@ router.post("/login", async (req, res) => {
     }
 });
 
-router.put("/update", async (req, res) => {
+router.post("/update", async (req, res) => {
     let client: MongoClient | undefined;
     try {
         const { name, bio } = req.body;
