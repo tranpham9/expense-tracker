@@ -1,9 +1,9 @@
 import { computed, signal } from "@preact/signals-react";
 import { clearAccountInfo, loadAccountInfo, saveAccountInfo } from "../utility/Persist";
-import { LoginResponse } from "../utility/api/types/Responses";
+import { UsersLoginResponse } from "../utility/api/types/Responses";
 
 const account = loadAccountInfo();
-export const userInfo = signal<Omit<LoginResponse, "jwt"> | null>(account); // the jwt will still be there, but it shouldn't be taken into account
+export const userInfo = signal<Omit<UsersLoginResponse, "jwt"> | null>(account); // the jwt will still be there, but it shouldn't be taken into account
 // split into separate variable to avoid unnecessary updating
 export const userJWT = signal(account && account.jwt);
 

@@ -1,7 +1,7 @@
 // import { decode, JwtPayload } from "jsonwebtoken";
-import { LoginResponse } from "./api/types/Responses";
+import { UsersLoginResponse } from "./api/types/Responses";
 
-export function saveAccountInfo(account: LoginResponse) {
+export function saveAccountInfo(account: UsersLoginResponse) {
     localStorage.setItem("account", JSON.stringify(account));
 }
 
@@ -19,7 +19,7 @@ export function loadAccountInfo() {
         return null;
     }
 
-    return JSON.parse(accountString) as LoginResponse;
+    return JSON.parse(accountString) as UsersLoginResponse;
     // NOTE: unfortunately, the decode() function doesn't work locally hosted it seems: https://github.com/auth0/node-jsonwebtoken/issues/954
     /*
     const account = JSON.parse(accountString) as LoginResponse;

@@ -1,7 +1,7 @@
-type RegisterUserResponse = {
+type UsersRegisterResponse = {
     message: string;
 };
-export type LoginResponse = {
+export type UsersLoginResponse = {
     userId: string;
     name: string;
     email: string;
@@ -9,6 +9,6 @@ export type LoginResponse = {
 };
 
 export type Responses = {
-    "users/register": RegisterUserResponse;
-    "users/login": LoginResponse;
+    "users/register": UsersRegisterResponse;
+    "users/login": UsersLoginResponse;
 };
