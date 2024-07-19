@@ -6,7 +6,6 @@ import Trips from "./pages/Trips";
 import Expenses from "./pages/Expenses";
 
 import "./App.css";
-import { AccountContextProvider, AccountOverlayContextProvider, LoginContextProvider } from "./Contexts/Account";
 import { ThemeProvider } from "@emotion/react";
 import { CssBaseline } from "@mui/material";
 import { theme } from "./Theme";
@@ -24,32 +23,26 @@ export default function App() {
             <CssBaseline />
 
             <BrowserRouter>
-                <LoginContextProvider>
-                    <AccountContextProvider>
-                        <AccountOverlayContextProvider>
-                            <Navbar />
-                        </AccountOverlayContextProvider>
-                        <Routes>
-                            <Route
-                                path={"/home?"}
-                                element={<Home />}
-                            />
-                            <Route
-                                path={"/trips"}
-                                element={<Trips />}
-                            />
-                            <Route
-                                path={"/expenses"}
-                                element={<Expenses />}
-                            />
-                            {/* TODO: properly impl */}
-                            <Route
-                                path={"/reset/:jwt"}
-                                element={<Test />}
-                            />
-                        </Routes>
-                    </AccountContextProvider>
-                </LoginContextProvider>
+                <Navbar />
+                <Routes>
+                    <Route
+                        path={"/home?"}
+                        element={<Home />}
+                    />
+                    <Route
+                        path={"/trips"}
+                        element={<Trips />}
+                    />
+                    <Route
+                        path={"/expenses"}
+                        element={<Expenses />}
+                    />
+                    {/* TODO: properly impl */}
+                    <Route
+                        path={"/reset/:jwt"}
+                        element={<Test />}
+                    />
+                </Routes>
             </BrowserRouter>
         </ThemeProvider>
     );

@@ -33,24 +33,24 @@ router.use(AUTHENTICATED_ROUTES, authenticationRouteHandler);
  * Creates a new empty Trip, with the name, description, and leaderId provided.
  */
 router.post("/create", async (req, res) => {
-    let { description } = req.body;
-    // default values for non-required fields
-    description ??= "";
-
-    const { name } = req.body;
-    if (!name) {
-        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
-        return;
-    }
-
-    const userId = extractUserId(res.locals.refreshedJWT);
-    if (!userId) {
-        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
-        return;
-    }
-
     let client: MongoClient | undefined;
     try {
+        let { description } = req.body;
+        // default values for non-required fields
+        description ??= "";
+
+        const { name } = req.body;
+        if (!name) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
+            return;
+        }
+
+        const userId = extractUserId(res.locals.refreshedJWT);
+        if (!userId) {
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+            return;
+        }
+
         client = await getMongoClient();
 
         const db = client.db(DB_NAME);
@@ -78,6 +78,7 @@ router.post("/create", async (req, res) => {
             jwt: res.locals.refreshedJWT,
         });
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
@@ -88,23 +89,23 @@ router.post("/create", async (req, res) => {
  * Updates the name + description of a trip.
  */
 router.post("/update", async (req, res) => {
-    const { name, description } = req.body;
-
-    let { tripId } = req.body;
-    if (!tripId) {
-        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
-        return;
-    }
-    tripId = ObjectId.createFromHexString(tripId);
-
-    const userId = extractUserId(res.locals.refreshedJWT);
-    if (!userId) {
-        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
-        return;
-    }
-
     let client: MongoClient | undefined;
     try {
+        const { name, description } = req.body;
+
+        let { tripId } = req.body;
+        if (!tripId) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
+            return;
+        }
+        tripId = ObjectId.createFromHexString(tripId);
+
+        const userId = extractUserId(res.locals.refreshedJWT);
+        if (!userId) {
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+            return;
+        }
+
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
@@ -140,6 +141,7 @@ router.post("/update", async (req, res) => {
             res.status(STATUS_BAD_REQUEST).json({ error: "Failed to update trip" });
         }
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
@@ -150,21 +152,21 @@ router.post("/update", async (req, res) => {
  * Deletes a trip and all associated expenses.
  */
 router.post("/delete", async (req, res) => {
-    let { tripId } = req.body;
-    if (!tripId) {
-        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
-        return;
-    }
-    tripId = ObjectId.createFromHexString(tripId);
-
-    const userId = extractUserId(res.locals.refreshedJWT);
-    if (!userId) {
-        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
-        return;
-    }
-
     let client: MongoClient | undefined;
     try {
+        let { tripId } = req.body;
+        if (!tripId) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
+            return;
+        }
+        tripId = ObjectId.createFromHexString(tripId);
+
+        const userId = extractUserId(res.locals.refreshedJWT);
+        if (!userId) {
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+            return;
+        }
+
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
@@ -187,6 +189,7 @@ router.post("/delete", async (req, res) => {
 
         res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
@@ -194,20 +197,20 @@ router.post("/delete", async (req, res) => {
 });
 
 router.post("/join", async (req, res) => {
-    const { inviteCode } = req.body;
-    if (!inviteCode) {
-        res.status(STATUS_BAD_REQUEST).json({ error: "inviteCode required" });
-        return;
-    }
-
-    const userId = extractUserId(res.locals.refreshedJWT);
-    if (!userId) {
-        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
-        return;
-    }
-
     let client: MongoClient | undefined;
     try {
+        const { inviteCode } = req.body;
+        if (!inviteCode) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "inviteCode required" });
+            return;
+        }
+
+        const userId = extractUserId(res.locals.refreshedJWT);
+        if (!userId) {
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+            return;
+        }
+
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
@@ -225,6 +228,7 @@ router.post("/join", async (req, res) => {
             res.status(STATUS_BAD_REQUEST).json({ error: "Invalid invite code" });
         }
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
@@ -238,20 +242,20 @@ router.post("/leave", async (req, res) => {
 });
 
 router.post("/search", async (req, res) => {
-    const { page } = req.body;
-    const pageNumber = parseInt(page?.toString()) || 1;
-
-    let { query } = req.body;
-    query ??= "";
-
-    const userId = extractUserId(res.locals.refreshedJWT);
-    if (!userId) {
-        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
-        return;
-    }
-
     let client: MongoClient | undefined;
     try {
+        const { page } = req.body;
+        const pageNumber = Math.max(parseInt(page?.toString()) || 1, 1); // ensure number is always >= 1
+
+        let { query } = req.body;
+        query ??= "";
+
+        const userId = extractUserId(res.locals.refreshedJWT);
+        if (!userId) {
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+            return;
+        }
+
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
@@ -275,6 +279,7 @@ router.post("/search", async (req, res) => {
 
         res.status(STATUS_OK).json({ trips, jwt: res.locals.refreshedJWT });
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
@@ -283,20 +288,20 @@ router.post("/search", async (req, res) => {
 
 // NOTE: this is in tripCRUD since we are listing the expenses for a particular trip ("/api/trip/listExpenses" makes the most sense)
 router.post("/listExpenses", async (req, res) => {
-    const { tripId } = req.body;
-    if (!tripId) {
-        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
-        return;
-    }
-
-    const userId = extractUserId(res.locals.refreshedJWT);
-    if (!userId) {
-        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
-        return;
-    }
-
     let client: MongoClient | undefined;
     try {
+        const { tripId } = req.body;
+        if (!tripId) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
+            return;
+        }
+
+        const userId = extractUserId(res.locals.refreshedJWT);
+        if (!userId) {
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+            return;
+        }
+
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
@@ -320,6 +325,7 @@ router.post("/listExpenses", async (req, res) => {
 
         res.status(STATUS_OK).json({ expenses, jwt: res.locals.refreshedJWT });
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();

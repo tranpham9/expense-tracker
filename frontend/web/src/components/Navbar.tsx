@@ -1,4 +1,4 @@
-import { useContext, useState, type MouseEvent } from "react";
+import { useState, type MouseEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import AppBar from "@mui/material/AppBar";
@@ -15,9 +15,10 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import AccountOverlay from "./AccountOverlay";
-import { AccountContext, AccountOverlayContext, LoginContext } from "../Contexts/Account";
 import { getInitials } from "../utility/Manipulation";
-import { clearAccountInfo } from "../utility/Persist";
+import { isLoggedIn, userInfo, userJWT } from "../Signals/Account";
+import { useSignals } from "@preact/signals-react/runtime";
+// import { signal } from "@preact/signals-react";
 
 type Page = {
     name: string;
@@ -30,8 +31,12 @@ type Option = {
     action: () => void;
 };
 
+// const isAccountOverlayVisible = signal(false);
+
 // TODO: make all navbar buttons (when in the widest layout) the same width
 export default function Navbar() {
+    useSignals();
+
     const navigate = useNavigate();
     const location = useLocation();
     const isCurrentPage = (page: Page) => {
@@ -42,9 +47,8 @@ export default function Navbar() {
         return (pageName === "home" && !currentPage.length) || pageName === currentPage;
     };
 
-    const { isLoggedIn, setIsLoggedIn } = useContext(LoginContext);
-    const { setIsAccountOverlayVisible } = useContext(AccountOverlayContext);
-    const { account } = useContext(AccountContext);
+    // TODO: check if useSignals() allows converting this to a signal (I don't think so)
+    const [isAccountOverlayVisible, setIsAccountOverlayVisible] = useState(false);
 
     /*
     const [shouldShowAccountOverlay, setShouldShowAccountOverlay] = useState(false);
@@ -110,9 +114,7 @@ export default function Navbar() {
         {
             name: "Logout",
             action: () => {
-                clearAccountInfo();
-                setIsLoggedIn(false);
-                // navigate("/home"); // this is done automatically with a useEffect
+                userJWT.value = null;
             },
         },
     ];
@@ -189,6 +191,7 @@ export default function Navbar() {
                                         key={page.name}
                                         selected={isCurrentPage(page)}
                                         onClick={() => navigateToPage(page)}
+                                        // disabled={page.requiresLoggedIn && !userJWT.value}
                                         disabled={page.requiresLoggedIn && !isLoggedIn}
                                     >
                                         <Typography textAlign="center">{page.name}</Typography>
@@ -232,7 +235,7 @@ export default function Navbar() {
                                     key={page.name}
                                     variant="contained"
                                     onClick={() => navigateToPage(page)}
-                                    disabled={page.requiresLoggedIn && !isLoggedIn}
+                                    disabled={page.requiresLoggedIn && !isLoggedIn.value}
                                     sx={{
                                         mx: 0.5,
                                         my: 2,
@@ -245,14 +248,14 @@ export default function Navbar() {
                             ))}
                         </Box>
 
-                        {isLoggedIn ? (
+                        {isLoggedIn.value ? (
                             <Box sx={{ flexGrow: 0 }}>
                                 <Tooltip title="Open options">
                                     <IconButton
                                         onClick={handleOpenUserMenu}
                                         sx={{ p: 0 }}
                                     >
-                                        <Avatar alt="Account">{account && getInitials(account.name)}</Avatar>
+                                        <Avatar alt="Account">{userInfo.value && getInitials(userInfo.value.name)}</Avatar>
                                     </IconButton>
                                 </Tooltip>
                                 <Menu
@@ -284,7 +287,9 @@ export default function Navbar() {
                         ) : (
                             <Button
                                 variant="contained"
-                                onClick={() => setIsAccountOverlayVisible(true)}
+                                onClick={() => {
+                                    setIsAccountOverlayVisible(true);
+                                }}
                                 sx={{ mx: 0.5, my: 2, display: "block" }}
                             >
                                 Login/Signup
@@ -293,7 +298,10 @@ export default function Navbar() {
                     </Toolbar>
                 </Container>
             </AppBar>
-            <AccountOverlay />
+            <AccountOverlay
+                isAccountOverlayVisible={isAccountOverlayVisible}
+                setIsAccountOverlayVisible={setIsAccountOverlayVisible}
+            />
         </>
     );
 }

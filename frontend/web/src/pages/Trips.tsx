@@ -1,20 +1,41 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LoginContext } from "../Contexts/Account";
 import SearchBar from "../components/inputs/SearchBar";
 import { Box, Grid, Pagination, Paper, Skeleton, Stack } from "@mui/material";
+import { isLoggedIn } from "../Signals/Account";
+import { useSignals } from "@preact/signals-react/runtime";
 
 export default function Trips() {
+    useSignals();
+
     const navigate = useNavigate();
 
-    const { isLoggedIn } = useContext(LoginContext);
     // https://stackoverflow.com/questions/74413650/what-is-difference-between-usenavigate-and-redirect-in-react-route-v6
+    /*
     useEffect(() => {
         if (!isLoggedIn) {
             console.log("<not logged in>");
             navigate("/home");
         }
     }, [isLoggedIn, navigate]); // always trigger when navigating to here (navigate changes when path changes)
+    */
+    /*
+    useEffect(() => {
+        isLoggedIn.subscribe(() => {
+            if (!isLoggedIn.value) {
+                console.log("<not logged in>");
+                navigate("/home");
+            }
+        });
+    }, []);
+    */
+
+    useEffect(() => {
+        if (!isLoggedIn.value) {
+            console.log("<not logged in>");
+            navigate("/home");
+        }
+    });
 
     // TODO: extract this to its own file once pagination isproperly set up in api
     const [page, setPage] = useState(1);

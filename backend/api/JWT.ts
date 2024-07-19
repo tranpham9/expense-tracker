@@ -20,7 +20,7 @@ export function isExpired(token: string): boolean {
     try {
         verify(token, process.env.ACCESS_TOKEN_SECRET!);
         return false; // Token is valid
-    } catch (TokenExpiredError) {
+    } catch (error) {
         return true; // Token has expired
     }
 }

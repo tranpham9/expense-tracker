@@ -1,22 +1,22 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 
 import EmailInput from "./inputs/EmailInput";
 import PasswordInput from "./inputs/PasswordInput";
 import { useNavigate } from "react-router-dom";
 import { request } from "../utility/api/API";
-import { AccountContext, AccountOverlayContext, LoginContext } from "../Contexts/Account";
-import { saveAccountInfo } from "../utility/Persist";
+import md5 from "md5";
+import { userInfo, userJWT } from "../Signals/Account";
+import { useSignal, useSignals } from "@preact/signals-react/runtime";
 
 // TODO: make pressing enter in a field click submit button
 export default function Login() {
+    useSignals();
+
+    const errorMessage = useSignal("");
+
     const navigate = useNavigate();
-
-    const { setIsAccountOverlayVisible } = useContext(AccountOverlayContext);
-    const { setAccount } = useContext(AccountContext);
-
-    const { setIsLoggedIn } = useContext(LoginContext);
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -34,20 +34,20 @@ export default function Login() {
         console.log(email, password);
 
         request(
-            "login",
-            { email, password },
+            "users/login",
+            { email, password: md5(password) },
             (response) => {
                 console.log(response);
-                setAccount(response);
-                saveAccountInfo(response);
+                userInfo.value = response;
+                userJWT.value = response.jwt;
 
-                setIsLoggedIn(true);
-                setIsAccountOverlayVisible(false);
-
-                navigate("/trips");
+                if (response.jwt) {
+                    navigate("/trips");
+                }
             },
-            (errorMessage) => {
-                console.log(errorMessage);
+            (currentErrorMessage) => {
+                console.log(currentErrorMessage);
+                errorMessage.value = currentErrorMessage;
             }
         );
     };
@@ -69,6 +69,15 @@ export default function Login() {
                 onEnterKey={attemptLogin}
             />
             <br />
+            {errorMessage.value && (
+                <Typography
+                    variant="body1"
+                    mt={1}
+                    color="error.main"
+                >
+                    {errorMessage.value}
+                </Typography>
+            )}
             <Button
                 variant="contained"
                 disabled={!hasValidLogin}

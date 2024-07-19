@@ -1,3 +1,4 @@
+import { userJWT } from "../../Signals/Account";
 import { Payloads } from "./types/Payloads";
 import { Responses } from "./types/Responses";
 
@@ -11,14 +12,22 @@ export async function request<T extends keyof Payloads>(type: T, payload: Payloa
             body: JSON.stringify(payload),
         });
         switch (response.status) {
+            // status OK
             case 200: {
                 const json = JSON.parse(await response.text());
                 success(json);
                 break;
             }
+            // status UNAUTHENTICATED
+            case 401: {
+                userJWT.value = null;
+
+                const json = JSON.parse(await response.text());
+                fail(json.error);
+                break;
+            }
             default: {
-                // TODO: properly impl
-                fail("ERROR");
+                fail("Operation failed");
                 break;
             }
         }
