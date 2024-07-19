@@ -78,6 +78,7 @@ router.post("/create", async (req, res) => {
             jwt: res.locals.refreshedJWT,
         });
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
@@ -140,6 +141,7 @@ router.post("/update", async (req, res) => {
             res.status(STATUS_BAD_REQUEST).json({ error: "Failed to update trip" });
         }
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
@@ -187,6 +189,7 @@ router.post("/delete", async (req, res) => {
 
         res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
@@ -225,6 +228,7 @@ router.post("/join", async (req, res) => {
             res.status(STATUS_BAD_REQUEST).json({ error: "Invalid invite code" });
         }
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
@@ -275,6 +279,7 @@ router.post("/search", async (req, res) => {
 
         res.status(STATUS_OK).json({ trips, jwt: res.locals.refreshedJWT });
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
@@ -320,6 +325,7 @@ router.post("/listExpenses", async (req, res) => {
 
         res.status(STATUS_OK).json({ expenses, jwt: res.locals.refreshedJWT });
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();

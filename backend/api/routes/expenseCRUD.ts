@@ -75,6 +75,7 @@ router.post("/create", async (req, res) => {
             res.status(STATUS_BAD_REQUEST).json({ error: "Failed to create expense" });
         }
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
@@ -133,6 +134,7 @@ router.post("/get", async (req, res) => {
 
         res.status(STATUS_OK).json({ expense, jwt: res.locals.refreshedToken });
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
@@ -204,6 +206,7 @@ router.post("/update", async (req, res) => {
             res.status(STATUS_BAD_REQUEST).json({ error: "Failed to update expense" });
         }
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
@@ -262,6 +265,7 @@ router.post("/delete", async (req, res) => {
             res.status(STATUS_BAD_REQUEST).json({ error: "Failed to delete expense" });
         }
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();

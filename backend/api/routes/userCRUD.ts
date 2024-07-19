@@ -53,6 +53,7 @@ router.post("/register", async (req, res) => {
         // console.log("A user was registered successfully");
         res.status(STATUS_OK).json({ message: "Successfully sent register verification email" });
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
@@ -89,6 +90,7 @@ router.post("/login", async (req, res) => {
             res.status(STATUS_UNAUTHENTICATED).json({ error: "Invalid login credentials" });
         }
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
@@ -123,6 +125,7 @@ router.post("/update", async (req, res) => {
         // it isn't guaranteed that anything will be modified, so we just return STATUS_OK uncodnitionally
         res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
@@ -154,6 +157,7 @@ router.post("/forgotPassword", async (req, res) => {
 
         res.status(STATUS_OK).json({ message: "Successfully sent reset password email" });
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
@@ -204,6 +208,7 @@ router.post("/resetPassword", async (req, res) => {
             res.status(STATUS_BAD_REQUEST).json({ error: "Failed to update password" });
         }
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
         await client?.close();
@@ -265,6 +270,7 @@ router.get("/verify/:token", async (req, res) => {
                 await tripCollection.updateOne({ _id: ObjectId.createFromHexString(tripId) }, { $push: { memberIds: insertionResult.insertedId } });
             }*/
     } catch (error) {
+        console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).send(getHTMLTemplate("Something went wrong."));
     } finally {
         await client?.close();
