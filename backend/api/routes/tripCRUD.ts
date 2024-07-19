@@ -245,7 +245,7 @@ router.post("/search", async (req, res) => {
         const db = client.db(DB_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
         // await tripCollection.createIndex({ name: "text", description: "text" });
-        console.log("1");
+        /*
         await tripCollection.createSearchIndex({
             // name: "searchIndex",
             definition: {
@@ -262,7 +262,7 @@ router.post("/search", async (req, res) => {
                 },
             },
         });
-        console.log("2");
+        */
 
         // https://www.mongodb.com/docs/manual/tutorial/query-arrays/#query-an-array-for-an-element
         // TODO: might want to search for exact phrase instead ( https://www.mongodb.com/docs/manual/reference/operator/query/text/#definition )
@@ -279,6 +279,7 @@ router.post("/search", async (req, res) => {
                 },
                 {
                     $search: {
+                        index: "searchIndex",
                         autocomplete: {
                             query,
                             tokenOrder: "any",
@@ -298,7 +299,6 @@ router.post("/search", async (req, res) => {
                 },
             ])
             .toArray();
-        console.log("3");
         /*
         const trips = await tripCollection
             .find(
