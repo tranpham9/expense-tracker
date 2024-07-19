@@ -291,11 +291,12 @@ router.post("/search", async (req, res) => {
 router.post("/listExpenses", async (req, res) => {
     let client: MongoClient | undefined;
     try {
-        const { tripId } = req.body;
+        let { tripId } = req.body;
         if (!tripId) {
             res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
             return;
         }
+        tripId = ObjectId.createFromHexString(tripId);
 
         const userId = extractUserId(res.locals.refreshedJWT);
         if (!userId) {

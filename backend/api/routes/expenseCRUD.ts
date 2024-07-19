@@ -24,9 +24,9 @@ router.use(AUTHENTICATED_ROUTES, authenticationRouteHandler);
 router.post("/create", async (req, res) => {
     let client: MongoClient | undefined;
     try {
-        const { name, cost, memberIds } = req.body;
+        const { name, cost } = req.body;
 
-        let { tripId, description } = req.body;
+        let { tripId, memberIds, description } = req.body;
         description ??= ""; // description not required
 
         // TODO: figure out if cost will come in as a number vs a string
@@ -35,6 +35,7 @@ router.post("/create", async (req, res) => {
             return;
         }
         tripId = ObjectId.createFromHexString(tripId);
+        memberIds = memberIds.map(ObjectId.createFromHexString);
 
         const userId = extractUserId(res.locals.refreshedToken);
         if (!userId) {
@@ -90,8 +91,6 @@ router.post("/get", async (req, res) => {
     let client: MongoClient | undefined;
     try {
         let { expenseId } = req.body;
-
-        // expenseId is required
         if (!expenseId) {
             res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
             return;
@@ -148,13 +147,14 @@ router.post("/update", async (req, res) => {
     let client: MongoClient | undefined;
     try {
         // NOTE: for now, payer id can't be changed (implementing that might cause some issues; we can add it down the line if we have time [we probaly won't])
-        let { expenseId } = req.body;
-        const { name, description, cost, memberIds } = req.body;
+        let { expenseId, memberIds } = req.body;
+        const { name, description, cost } = req.body;
         if (!expenseId || !(memberIds instanceof Array)) {
             res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
             return;
         }
         expenseId = ObjectId.createFromHexString(expenseId);
+        memberIds = memberIds.map(ObjectId.createFromHexString);
 
         const userId = extractUserId(res.locals.refreshedJWT);
         if (!userId) {
