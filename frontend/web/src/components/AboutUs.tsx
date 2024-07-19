@@ -7,46 +7,79 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import { getInitials } from "../utility/Manipulation";
-import { Divider } from "@mui/material";
+import { Divider, Link } from "@mui/material";
 
-type Developer = { name: string; role: string; about: string[] };
+type Developer = { name: string; role: string; about: (string | { link: string; text: string })[] };
 
 // TODO: add github link (and potentially linkedin) for everyone; maybe also make profile avatar link to it (either github or linkedin).
 const developers: Developer[] = [
     {
         name: "Jacob Gadberry",
         role: "Project Manager + Frontend (Mobile)",
-        about: ["sample item 1", "sample item 2"],
+        about: [
+            //[wrap]
+            "Helped manage team meetings and coordinate group work",
+            "Led main development of the native Android app",
+            "Aided with API documentation",
+        ],
     },
     {
         name: "Jason Helman",
         role: "Frontend (Web) + some API",
-        about: ["sample item 1", "sample item 2"],
+        about: [
+            //[wrap]
+            "Led development of the website",
+            "Helped refactor and catch bugs in API",
+            "Provided resources and libraries for both frontend and backend",
+            "Computer Science Major and Math Computational Track Major",
+        ],
     },
     {
         name: "Ian Ordonez",
         role: "Frontend (Mobile)",
-        about: ["sample item 1", "sample item 2"],
+        about: [
+            //[wrap]
+            "Helped with Figma designs and wire framing",
+            "Helped with mobile UI development",
+        ],
     },
     {
         name: "Tran Pham",
         role: "Frontend (Web)",
-        about: ["sample item 1", "sample item 2"],
+        about: [
+            //[wrap]
+            "Helped with the website",
+            "Helped prepare presentation materials",
+        ],
     },
     {
         name: "Pablo Rodriguez",
         role: "API",
-        about: ["sample item 1", "sample item 2"],
+        about: [
+            //[wrap]
+            "Computer Engineering major",
+            "Helped with the ExpressJS backend and production deployment to Heroku",
+            "Helped document the API specification",
+        ],
     },
     {
         name: "John Tran",
         role: "API",
-        about: ["sample item 1", "sample item 2"],
+        about: [
+            //[wrap]
+            "Undergrad Computer Science Major",
+            "Worked on Unit Testing for the API",
+            { link: "https://www.linkedin.com/in/jtran6796/", text: "LinkedIn" },
+        ],
     },
     {
         name: "Landon Wright",
         role: "Database",
-        about: ["sample item 1", "sample item 2"],
+        about: [
+            //[wrap]
+            "Computer Engineering Major",
+            "Created and mantained on Database",
+        ],
     },
 ];
 
@@ -109,7 +142,7 @@ export default function AboutUs() {
                                 />
                             </Box>
                             <Divider />
-                            <CardContent>
+                            <CardContent sx={{ height: 200 }}>
                                 <Typography
                                     variant="body2"
                                     component="div"
@@ -121,7 +154,16 @@ export default function AboutUs() {
                                                 key={i}
                                                 style={{ margin: 5 }}
                                             >
-                                                {entry}
+                                                {typeof entry === "string" ? (
+                                                    <>{entry}</>
+                                                ) : (
+                                                    <Link
+                                                        href={entry.link}
+                                                        target="_blank"
+                                                    >
+                                                        {entry.text}
+                                                    </Link>
+                                                )}
                                             </li>
                                         ))}
                                     </ul>

@@ -8,6 +8,8 @@ export const userInfo = signal<Omit<UsersLoginResponse, "jwt"> | null>(account);
 export const userJWT = signal(account && account.jwt);
 
 userJWT.subscribe((newJWT) => {
+    console.log("jwt changed to", newJWT);
+
     if (newJWT && userInfo.value) {
         saveAccountInfo({ ...userInfo.value, jwt: newJWT });
     } else {
