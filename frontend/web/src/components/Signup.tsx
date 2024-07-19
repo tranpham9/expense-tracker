@@ -30,7 +30,7 @@ export default function Signup({ onSuccessfulSignup = () => {} }) {
         setIsProcessing(true);
 
         request(
-            "registerUser",
+            "users/register",
             { name, email, password: md5(password) },
             (response) => {
                 console.log(response.message);

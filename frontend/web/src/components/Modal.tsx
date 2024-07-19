@@ -7,6 +7,7 @@ import Fade from "@mui/material/Fade";
 import CloseIcon from "@mui/icons-material/Close";
 import { IconButton } from "@mui/material";
 
+// export default function TransitionModal({ isOpen, shouldCloseOnLostFocus = false, children }: { isOpen: Signal<boolean>; shouldCloseOnLostFocus?: boolean; children: ReactElement }) {
 export default function TransitionModal({
     isOpen,
     setIsOpen,
@@ -23,7 +24,9 @@ export default function TransitionModal({
     };
 
     const handleClose = () => {
-        if (shouldCloseOnLostFocus) close();
+        if (shouldCloseOnLostFocus) {
+            close();
+        }
     };
 
     return (

@@ -1,20 +1,18 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 
 import { Box, Tab, Tabs } from "@mui/material";
 
 import Modal from "./Modal";
 import Signup from "./Signup";
 import Login from "./Login";
-import { AccountOverlayContext } from "../Contexts/Account";
 
-export default function AccountOverlay() {
-    const { isAccountOverlayVisible, setIsAccountOverlayVisible } = useContext(AccountOverlayContext);
-
+// export default function AccountOverlay({ isAccountOverlayVisible }: { isAccountOverlayVisible: Signal<boolean> }) {
+export default function AccountOverlay({ isAccountOverlayVisible, setIsAccountOverlayVisible }: { isAccountOverlayVisible: boolean; setIsAccountOverlayVisible: (isVisible: boolean) => void }) {
     const [activeTab, setActiveTab] = useState(0);
     const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
         setActiveTab(newValue);
     };
-
+    
     return (
         <Modal
             isOpen={isAccountOverlayVisible}
