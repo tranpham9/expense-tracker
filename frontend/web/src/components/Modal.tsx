@@ -51,8 +51,9 @@ export default function TransitionModal({
                             transform: "translate(-50%, -50%)",
                             width: { xs: "60%", sm: "400px" },
                             bgcolor: "background.paper",
-                            border: "2px solid #000",
-                            boxShadow: 24,
+                            border: "2px solid",
+                            borderColor: "secondary.main",
+                            boxShadow: "0px 0px 10px 10px #0001",
                             p: 4,
                             ":focus": {
                                 // disables outline when modal first takes/traps focus
