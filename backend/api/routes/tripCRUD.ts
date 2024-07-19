@@ -245,79 +245,30 @@ router.post("/search", async (req, res) => {
         const db = client.db(DB_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
         // await tripCollection.createIndex({ name: "text", description: "text" });
-        /*
-        await tripCollection.createSearchIndex({
-            // name: "searchIndex",
-            definition: {
-                mappings: {
-                    // dynamic: true,
-                    fields: {
-                        name: {
-                            type: "string",
-                        },
-                        description: {
-                            type: "string",
-                        },
-                    },
-                },
-            },
-        });
-        */
+        query = query.replace(/[~!@#$%^&*()_|+\-=?;:'",.<>{}[\]\\/]/g, '');
+        console.log(query);
 
         // https://www.mongodb.com/docs/manual/tutorial/query-arrays/#query-an-array-for-an-element
         // TODO: might want to search for exact phrase instead ( https://www.mongodb.com/docs/manual/reference/operator/query/text/#definition )
         const trips = await tripCollection
-            .aggregate([
-                {
-                    $search: {
-                        index: "searchIndex",
-                        autocomplete: {
-                            query,
-                            tokenOrder: "any",
-                            fuzzy: {
-                                maxEdits: 2,
-                                prefixLength: 1,
-                                maxExpansions: 256,
-                            },
-                        },
-                    },
-                },
-                {
-                    $match: {
-                        $or: [
-                            //[wrap]
-                            { leaderId: userId },
-                            { memberIds: userId },
-                        ],
-                    },
-                },
-                {
-                    $skip: (pageNumber - 1) * 10,
-                },
-                {
-                    $limit: 10,
-                },
-            ])
-            .toArray();
-        /*
-        const trips = await tripCollection
             .find(
                 {
-                    $or: [
-                        //[wrap]
-                        { leaderId: userId },
-                        { memberIds: userId },
-                    ],
-                    // $text: { $search: query },
-                    $search: {
-                        query,
-                    },
+                    // The user must exist in the trip and there must be some matching of the text
+                    $and:[
+                        {$or:[
+                            {leaderId: userId},
+                            {memberIds: userId},
+                        ]},
+                        {$or:[
+                            {name: {$regex: new RegExp(query, 'i')}},
+                            {description: {$regex: new RegExp(query, 'i')}},
+                        ]}
+                        ]
                 },
                 // if needed, can add "projection: {<field_name>: 1}" within options to isolate specific fields
                 { skip: (pageNumber - 1) * 10, limit: 10 }
             )
             .toArray();
-        */
 
         res.status(STATUS_OK).json({ trips, jwt: res.locals.refreshedJWT });
     } catch (error) {
