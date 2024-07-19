@@ -135,7 +135,7 @@ router.post("/get", async (req, res) => {
     } catch (error) {
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
     } finally {
-        await client.close();
+        await client?.close();
     }
 });
 
