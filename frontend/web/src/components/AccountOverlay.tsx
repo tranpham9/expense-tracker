@@ -29,7 +29,7 @@ export default function AccountOverlay({ isAccountOverlayVisible, setIsAccountOv
                         <Tab label="Signup" />
                     </Tabs>
                 </Box>
-                {activeTab ? <Signup onSuccessfulSignup={() => setActiveTab(0)} /> : <Login />}
+                {activeTab ? <Signup onSuccessfulSignup={() => setActiveTab(0)} /> : <Login onSuccessFulLogin={() => setIsAccountOverlayVisible(false)} />}
             </>
         </Modal>
     );

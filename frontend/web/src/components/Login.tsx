@@ -11,7 +11,7 @@ import { userInfo, userJWT } from "../Signals/Account";
 import { useSignal, useSignals } from "@preact/signals-react/runtime";
 
 // TODO: make pressing enter in a field click submit button
-export default function Login() {
+export default function Login({ onSuccessFulLogin = () => {} }) {
     useSignals();
 
     const errorMessage = useSignal("");
@@ -40,6 +40,8 @@ export default function Login() {
                 console.log(response);
                 userInfo.value = response;
                 userJWT.value = response.jwt;
+
+                onSuccessFulLogin();
 
                 if (response.jwt) {
                     navigate("/trips");
