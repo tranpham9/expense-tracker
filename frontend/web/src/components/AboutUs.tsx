@@ -21,6 +21,7 @@ const developers: Developer[] = [
             "Helped manage team meetings and coordinate group work",
             "Led main development of the native Android app",
             "Aided with API documentation",
+            { link: "https://www.linkedin.com/in/jacob-gadberry-2905a6311/", text: "LinkedIn" },
         ],
     },
     {
@@ -32,6 +33,7 @@ const developers: Developer[] = [
             "Helped refactor and catch bugs in API",
             "Provided resources and libraries for both frontend and backend",
             "Computer Science Major and Math Computational Track Major",
+            { link: "https://www.linkedin.com/in/jason-helman/", text: "LinkedIn" },
         ],
     },
     {
@@ -60,6 +62,7 @@ const developers: Developer[] = [
             "Computer Engineering major",
             "Helped with the ExpressJS backend and production deployment to Heroku",
             "Helped document the API specification",
+            { link: "https://www.linkedin.com/in/pablo-rodriguez-a23780250/", text: "LinkedIn" },
         ],
     },
     {
@@ -142,7 +145,7 @@ export default function AboutUs() {
                                 />
                             </Box>
                             <Divider />
-                            <CardContent sx={{ height: 200 }}>
+                            <CardContent sx={{ height: 220 }}>
                                 <Typography
                                     variant="body2"
                                     component="div"
