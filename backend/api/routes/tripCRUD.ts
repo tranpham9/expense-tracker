@@ -110,21 +110,6 @@ router.post("/update", async (req, res) => {
         const db = client.db(DB_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
 
-        // verify that trip exists
-        if ((await tripCollection.findOne({ _id: tripId })) === null) {
-            res.statusCode = STATUS_BAD_REQUEST;
-            res.json({ error: "trip does not exist" });
-            return;
-        }
-
-        // Update the fields if they were provided in the request
-        if (req.body.name) {
-            await tripCollection.updateOne({ _id: tripId }, { $set: { name: req.body.name } });
-        }
-        if (req.body.description) {
-            await tripCollection.updateOne({ _id: tripId }, { $set: { description: req.body.description } });
-        }
-
         const result = await tripCollection.updateOne(
             { _id: tripId, leaderId: userId },
             // only update values passed in as params
