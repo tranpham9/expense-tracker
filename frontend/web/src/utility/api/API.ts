@@ -9,12 +9,16 @@ export async function request<T extends keyof Payloads>(type: T, payload: Payloa
         const response = await fetch(`${BASE_API_PATH}/${type}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
+            // always pass in jwt where possible (api will ignore it if it's not needed)
+            body: JSON.stringify({ ...payload, jwt: userJWT.value }),
         });
         switch (response.status) {
             // status OK
             case 200: {
                 const json = JSON.parse(await response.text());
+                if (json.jwt) {
+                    userJWT.value = json.jwt;
+                }
                 success(json);
                 break;
             }
