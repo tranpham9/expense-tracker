@@ -51,6 +51,10 @@ export default function Login() {
             }
         );
     };
+    
+    const handleForgotPassword = () => {
+        // TODO: impl
+    };
 
     return (
         <Box
@@ -69,10 +73,19 @@ export default function Login() {
                 onEnterKey={attemptLogin}
             />
             <br />
+            <Button
+                variant="text"
+                sx={{ m: 1 }}
+                onClick={handleForgotPassword}
+            >
+                Forgot Password
+            </Button>
+            <br />
             {errorMessage.value && (
                 <Typography
                     variant="body1"
-                    mt={1}
+                    mt={0}
+                    mb={1}
                     color="error.main"
                 >
                     {errorMessage.value}
