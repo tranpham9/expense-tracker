@@ -269,15 +269,6 @@ router.post("/search", async (req, res) => {
         const trips = await tripCollection
             .aggregate([
                 {
-                    $match: {
-                        $or: [
-                            //[wrap]
-                            { leaderId: userId },
-                            { memberIds: userId },
-                        ],
-                    },
-                },
-                {
                     $search: {
                         index: "searchIndex",
                         autocomplete: {
@@ -289,6 +280,15 @@ router.post("/search", async (req, res) => {
                                 maxExpansions: 256,
                             },
                         },
+                    },
+                },
+                {
+                    $match: {
+                        $or: [
+                            //[wrap]
+                            { leaderId: userId },
+                            { memberIds: userId },
+                        ],
                     },
                 },
                 {
