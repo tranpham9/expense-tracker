@@ -245,7 +245,7 @@ router.post("/search", async (req, res) => {
     let client: MongoClient | undefined;
     try {
         const { page } = req.body;
-        const pageNumber = parseInt(page?.toString()) || 1;
+        const pageNumber = Math.max(parseInt(page?.toString()) || 1, 1); // ensure number is always >= 1
 
         let { query } = req.body;
         query ??= "";
