@@ -259,6 +259,7 @@ router.post("/search", async (req, res) => {
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
+        await tripCollection.createIndex({name: "text", description: "text"});
 
         // https://www.mongodb.com/docs/manual/tutorial/query-arrays/#query-an-array-for-an-element
         // TODO: might want to search for exact phrase instead ( https://www.mongodb.com/docs/manual/reference/operator/query/text/#definition )
