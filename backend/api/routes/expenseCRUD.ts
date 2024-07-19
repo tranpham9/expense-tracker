@@ -131,7 +131,7 @@ router.post("/get", async (req, res) => {
             return;
         }
 
-        res.status(STATUS_OK).json({ expense: expense, jwt: res.locals.refreshedToken});
+        res.status(STATUS_OK).json({ expense, jwt: res.locals.refreshedJWT});
     } catch (error) {
         console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
