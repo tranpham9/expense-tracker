@@ -22,26 +22,26 @@ router.use(AUTHENTICATED_ROUTES, authenticationRouteHandler);
  * Create a new expense, that belongs to a trip.
  */
 router.post("/create", async (req, res) => {
-    const { name, cost, memberIds } = req.body;
-
-    let { tripId, description } = req.body;
-    description ??= ""; // description not required
-
-    // TODO: figure out if cost will come in as a number vs a string
-    if (!tripId || !name || (!cost && cost !== 0) || !(memberIds instanceof Array)) {
-        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
-        return;
-    }
-    tripId = ObjectId.createFromHexString(tripId);
-
-    const userId = extractUserId(res.locals.refreshedToken);
-    if (!userId) {
-        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
-        return;
-    }
-
     let client: MongoClient | undefined;
     try {
+        const { name, cost, memberIds } = req.body;
+
+        let { tripId, description } = req.body;
+        description ??= ""; // description not required
+
+        // TODO: figure out if cost will come in as a number vs a string
+        if (!tripId || !name || (!cost && cost !== 0) || !(memberIds instanceof Array)) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
+            return;
+        }
+        tripId = ObjectId.createFromHexString(tripId);
+
+        const userId = extractUserId(res.locals.refreshedToken);
+        if (!userId) {
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+            return;
+        }
+
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
@@ -86,23 +86,25 @@ router.post("/create", async (req, res) => {
  * will return all the expenses for a single trip.
  */
 router.post("/get", async (req, res) => {
-    let { expenseId } = req.body;
-
-    // expenseId is required
-    if (!expenseId) {
-        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
-        return;
-    }
-    expenseId = ObjectId.createFromHexString(expenseId);
-
-    const userId = extractUserId(res.locals.refreshedJWT);
-    if (!userId) {
-        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
-        return;
-    }
-
-    const client = await getMongoClient();
+    let client: MongoClient | undefined;
     try {
+        let { expenseId } = req.body;
+
+        // expenseId is required
+        if (!expenseId) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
+            return;
+        }
+        expenseId = ObjectId.createFromHexString(expenseId);
+
+        const userId = extractUserId(res.locals.refreshedJWT);
+        if (!userId) {
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+            return;
+        }
+
+        client = await getMongoClient();
+
         const db = client.db(DB_NAME);
         const expenseCollection = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
@@ -141,23 +143,23 @@ router.post("/get", async (req, res) => {
  * Updates the name, description, cost of an expense
  */
 router.post("/update", async (req, res) => {
-    // NOTE: for now, payer id can't be changed (implementing that might cause some issues; we can add it down the line if we have time [we probaly won't])
-    let { expenseId } = req.body;
-    const { name, description, cost, memberIds } = req.body;
-    if (!expenseId || !(memberIds instanceof Array)) {
-        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
-        return;
-    }
-    expenseId = ObjectId.createFromHexString(expenseId);
-
-    const userId = extractUserId(res.locals.refreshedJWT);
-    if (!userId) {
-        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
-        return;
-    }
-
     let client: MongoClient | undefined;
     try {
+        // NOTE: for now, payer id can't be changed (implementing that might cause some issues; we can add it down the line if we have time [we probaly won't])
+        let { expenseId } = req.body;
+        const { name, description, cost, memberIds } = req.body;
+        if (!expenseId || !(memberIds instanceof Array)) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
+            return;
+        }
+        expenseId = ObjectId.createFromHexString(expenseId);
+
+        const userId = extractUserId(res.locals.refreshedJWT);
+        if (!userId) {
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+            return;
+        }
+
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const expenseCollection = db.collection<Expense>(EXPENSE_COLLECTION_NAME);
@@ -212,21 +214,21 @@ router.post("/update", async (req, res) => {
  * Delete an expense
  */
 router.post("/delete", async (req, res) => {
-    let { expenseId } = req.body;
-    if (!expenseId) {
-        res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
-        return;
-    }
-    expenseId = ObjectId.createFromHexString(expenseId);
-
-    const userId = extractUserId(res.locals.refreshedJWT);
-    if (!userId) {
-        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
-        return;
-    }
-
     let client: MongoClient | undefined;
     try {
+        let { expenseId } = req.body;
+        if (!expenseId) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
+            return;
+        }
+        expenseId = ObjectId.createFromHexString(expenseId);
+
+        const userId = extractUserId(res.locals.refreshedJWT);
+        if (!userId) {
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+            return;
+        }
+
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const expenseCollection = db.collection<Expense>(EXPENSE_COLLECTION_NAME);

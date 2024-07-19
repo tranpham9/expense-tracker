@@ -96,16 +96,16 @@ router.post("/login", async (req, res) => {
 });
 
 router.put("/update", async (req, res) => {
-    const { name, bio } = req.body;
-
-    const userId = extractUserId(res.locals.refreshedJWT);
-    if (!userId) {
-        res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
-        return;
-    }
-
     let client: MongoClient | undefined;
     try {
+        const { name, bio } = req.body;
+
+        const userId = extractUserId(res.locals.refreshedJWT);
+        if (!userId) {
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+            return;
+        }
+
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const userCollection = db.collection<User>(USER_COLLECTION_NAME);
