@@ -2,6 +2,8 @@ import 'package:accountability_mobile_app/ui/trips_page/tripspages.dart';
 import 'package:flutter/material.dart';
 import '../../models/Trip.dart';
 import 'tripcrud.dart';
+import '../../models/Expense.dart';
+import '../../models/User.dart';
 
 class ViewTripPage extends StatefulWidget {
   final Trip trip;
@@ -13,6 +15,15 @@ class ViewTripPage extends StatefulWidget {
 }
 
 class _ViewTripsPage extends State<ViewTripPage> {
+  List<User> members = []; // Placeholder for member list
+  List<Expense> expenses = []; // Placeholder for expenses list
+
+  @override
+  void initState() {
+    super.initState();
+    // TODO: Fetch members and expenses from the API
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,35 +37,28 @@ class _ViewTripsPage extends State<ViewTripPage> {
           ListTile(
             title: Text('${widget.trip.notes}'),
             subtitle: Text('Notes'),
-            // List the edit button
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton(
-                    onPressed: () {
-                      // TODO: Call API to edit the notes of an app (Overlay/Pop up to fill in)
-                      // Navigate to the name and notes edit page
-                      Navigator.push(
-                          context,
-                          // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  EditNameNotesPage(widget.trip)));
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                    ),
-                    child: Text(
-                      "Edit",
-                      style: TextStyle(color: Colors.white),
-                    )),
-              ],
+            trailing: ElevatedButton(
+              onPressed: () {
+                // Navigate to the name and notes edit page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditNameNotesPage(widget.trip),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).primaryColor,
+              ),
+              child: Text(
+                "Edit",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ),
           ListTile(
             title: Text("${widget.trip.inviteCode}"),
             subtitle: Text('Trip Code'),
-            // List the edit button
           ),
           ListTile(
             title: Text(
@@ -63,43 +67,33 @@ class _ViewTripsPage extends State<ViewTripPage> {
             ),
           ),
           // Display the members of the trip
-          Row(
-            children: [
-              // Display the members of the trip in a horizontal scroll format
-              // TODO: Apply skeletonizer here for loading animation and load all members of this trip (horizontal scroll)
-              Expanded(
-                child: SizedBox(
-                  width: 75,
-                  height: 75,
-                  // child: ListView.builder(
-                  //   scrollDirection: Axis.horizontal,
-                  //   itemCount: members.length,
-                  //   itemBuilder: (context, index) {
-                  //     User member = members[index];
-                  //     return SizedBox(
-                  //       width: 100,
-                  //       height: 100,
-                  //       child: ElevatedButton(
-                  //         onPressed: () {
-                  //           Navigator.push(
-                  //               context,
-                  //               // Display the information of the member that was clicked on
-                  //               MaterialPageRoute(
-                  //                   builder: (context) =>
-                  //                       ViewMemberPage(member)));
-                  //         },
-                  //         style: ElevatedButton.styleFrom(
-                  //           shape: CircleBorder(),
-                  //           padding: EdgeInsets.all(10),
-                  //         ),
-                  //         child: Text('${member.name}'),
-                  //       ),
-                  //     );
-                  //   },
-                  // ),
-                ),
-              ),
-            ],
+          Expanded(
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: members.length,
+              itemBuilder: (context, index) {
+                User member = members[index];
+                return SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ViewMemberPage(member),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: CircleBorder(),
+                      padding: EdgeInsets.all(10),
+                    ),
+                    child: Text('${member.name}'),
+                  ),
+                );
+              },
+            ),
           ),
           ListTile(
             title: Text(
@@ -110,12 +104,11 @@ class _ViewTripsPage extends State<ViewTripPage> {
           // Add a new expense
           ElevatedButton(
             onPressed: () {
-              // TODO: Navigate to add expense page. Will probably need to pass the current tripId so we can call the API
-              // Pop up or overlay
-              // Navigator.push(
-              //     context,
-              //     // Add a new expense to the trip
-              //     MaterialPageRoute(builder: (context) => AddExpensePage()));
+              // Navigate to add expense page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddExpensePage()),
+              );
             },
             style: ElevatedButton.styleFrom(
               shape: RoundedRectangleBorder(
@@ -132,48 +125,45 @@ class _ViewTripsPage extends State<ViewTripPage> {
           ),
           // Display a ListView of the expenses associated with the trip
           Expanded(
-              child: SizedBox(
-            width: double.infinity,
-            height: 100,
-            // TODO: Skeletonizer here too to display all expenses.
-            // Display all expenses by getting all of the expenses for a related trip
-            // child: ListView.builder(
-            //   scrollDirection: Axis.vertical,
-            //   // Callback to determine how to format each trip in the list
-            //   itemBuilder: (context, index) {
-            //     Expense expense = expenses[index];
-            //     return ListTile(
-            //       title: Text(expense.name),
-            //       subtitle: Text(expense.description),
-            //       trailing: Text('\$${expense.cost}'),
-            //       onTap: () {
-            //         Navigator.push(
-            //             context,
-            //             // Display the information of the member that was clicked on
-            //             MaterialPageRoute(
-            //                 builder: (context) => ViewExpensePage(expense)));
-            //       },
-            //     );
-            //   },
-            //   itemCount: expenses.length,
-            // ),
-          )),
-          ElevatedButton(
-              onPressed: () {
-                // Generate a receipt for a given trip, simply passing the trip will allow us to get more info to display
-                Navigator.push(
-                    context,
-                    // Generate a receipt for the current trip
-                    MaterialPageRoute(
-                        builder: (context) => ReceiptPage(trip: widget.trip)));
+            child: ListView.builder(
+              scrollDirection: Axis.vertical,
+              itemCount: expenses.length,
+              itemBuilder: (context, index) {
+                Expense expense = expenses[index];
+                return ListTile(
+                  title: Text(expense.name),
+                  subtitle: Text(expense.description),
+                  trailing: Text('\$${expense.cost}'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ViewExpensePage(expense),
+                      ),
+                    );
+                  },
+                );
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
-              ),
-              child: Text(
-                "Generate Receipt",
-                style: TextStyle(color: Colors.white),
-              )),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // Generate a receipt for the current trip
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ReceiptPage(trip: widget.trip),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).primaryColor,
+            ),
+            child: Text(
+              "Generate Receipt",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
         ],
       ),
     );
