@@ -244,10 +244,53 @@ router.post("/search", async (req, res) => {
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
-        await tripCollection.createIndex({ name: "text", description: "text" });
+        // await tripCollection.createIndex({ name: "text", description: "text" });
+        await tripCollection.createSearchIndex({
+            // name: "searchIndex",
+            definition: {
+                mappings: {
+                    // dynamic: true,
+                    fields: {
+                        name: {
+                            type: "string",
+                        },
+                        description: {
+                            type: "string",
+                        },
+                    },
+                },
+            },
+        });
 
         // https://www.mongodb.com/docs/manual/tutorial/query-arrays/#query-an-array-for-an-element
         // TODO: might want to search for exact phrase instead ( https://www.mongodb.com/docs/manual/reference/operator/query/text/#definition )
+        const trips = await tripCollection.aggregate([
+            {
+                $or: [
+                    //[wrap]
+                    { leaderId: userId },
+                    { memberIds: userId },
+                ],
+            },
+            {
+                $search: {
+                    autocomplete: {
+                        query,
+                        tokenOrder: "any",
+                        fuzzy: {
+                            maxEdits: 2,
+                            prefixLength: 1,
+                            maxExpansions: 256,
+                        },
+                    },
+                },
+            },
+            {
+                $skip: (pageNumber - 1) * 10,
+                $limit: 10,
+            },
+        ]).toArray();
+        /*
         const trips = await tripCollection
             .find(
                 {
@@ -256,12 +299,16 @@ router.post("/search", async (req, res) => {
                         { leaderId: userId },
                         { memberIds: userId },
                     ],
-                    $text: { $search: query },
+                    // $text: { $search: query },
+                    $search: {
+                        query,
+                    },
                 },
                 // if needed, can add "projection: {<field_name>: 1}" within options to isolate specific fields
                 { skip: (pageNumber - 1) * 10, limit: 10 }
             )
             .toArray();
+        */
 
         res.status(STATUS_OK).json({ trips, jwt: res.locals.refreshedJWT });
     } catch (error) {
