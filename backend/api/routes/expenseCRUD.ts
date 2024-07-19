@@ -37,7 +37,7 @@ router.post("/create", async (req, res) => {
         tripId = ObjectId.createFromHexString(tripId);
         memberIds = memberIds.map(ObjectId.createFromHexString);
 
-        const userId = extractUserId(res.locals.refreshedToken);
+        const userId = extractUserId(res.locals.refreshedJWT);
         if (!userId) {
             res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
             return;
@@ -131,7 +131,7 @@ router.post("/get", async (req, res) => {
             return;
         }
 
-        res.status(STATUS_OK).json({ expense, jwt: res.locals.refreshedToken });
+        res.status(STATUS_OK).json({ expense, jwt: res.locals.refreshedJWT });
     } catch (error) {
         console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
