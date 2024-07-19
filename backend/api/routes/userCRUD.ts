@@ -149,7 +149,7 @@ router.post("/forgotPassword", async (req, res) => {
 
         const user = await userCollection.findOne({ email: properEmail });
         if (!user) {
-            res.status(STATUS_BAD_REQUEST).send("Invalid email");
+            res.status(STATUS_BAD_REQUEST).json({ error: "Invalid email" });
             return;
         }
 
@@ -175,7 +175,7 @@ router.post("/resetPassword", async (req, res) => {
         }
 
         if (isExpired(jwt)) {
-            res.status(STATUS_UNAUTHENTICATED).send("Reset code has expired");
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Reset code has expired" });
             return;
         }
 
@@ -197,7 +197,7 @@ router.post("/resetPassword", async (req, res) => {
         }
 
         if (hashedPassword !== md5(user.password)) {
-            res.status(STATUS_UNAUTHENTICATED).send("Reset code is no longer valid");
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Reset code is no longer valid" });
             return;
         }
 
