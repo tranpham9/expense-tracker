@@ -9,6 +9,6 @@ type LoginPayload = {
 };
 
 export type Payloads = {
-    registerUser: RegisterUserPayload;
-    login: LoginPayload;
+    "users/register": RegisterUserPayload;
+    "users/login": LoginPayload;
 };

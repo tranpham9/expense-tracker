@@ -9,6 +9,6 @@ export type LoginResponse = {
 };
 
 export type Responses = {
-    registerUser: RegisterUserResponse;
-    login: LoginResponse;
+    "users/register": RegisterUserResponse;
+    "users/login": LoginResponse;
 };
