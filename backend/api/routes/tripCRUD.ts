@@ -264,32 +264,38 @@ router.post("/search", async (req, res) => {
 
         // https://www.mongodb.com/docs/manual/tutorial/query-arrays/#query-an-array-for-an-element
         // TODO: might want to search for exact phrase instead ( https://www.mongodb.com/docs/manual/reference/operator/query/text/#definition )
-        const trips = await tripCollection.aggregate([
-            {
-                $or: [
-                    //[wrap]
-                    { leaderId: userId },
-                    { memberIds: userId },
-                ],
-            },
-            {
-                $search: {
-                    autocomplete: {
-                        query,
-                        tokenOrder: "any",
-                        fuzzy: {
-                            maxEdits: 2,
-                            prefixLength: 1,
-                            maxExpansions: 256,
+        const trips = await tripCollection
+            .aggregate([
+                {
+                    $match: {
+                        $or: [
+                            //[wrap]
+                            { leaderId: userId },
+                            { memberIds: userId },
+                        ],
+                    },
+                },
+                {
+                    $search: {
+                        autocomplete: {
+                            query,
+                            tokenOrder: "any",
+                            fuzzy: {
+                                maxEdits: 2,
+                                prefixLength: 1,
+                                maxExpansions: 256,
+                            },
                         },
                     },
                 },
-            },
-            {
-                $skip: (pageNumber - 1) * 10,
-                $limit: 10,
-            },
-        ]).toArray();
+                {
+                    $skip: (pageNumber - 1) * 10,
+                },
+                {
+                    $limit: 10,
+                },
+            ])
+            .toArray();
         /*
         const trips = await tripCollection
             .find(
