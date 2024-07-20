@@ -4,8 +4,8 @@ import { useSignal, useSignals } from "@preact/signals-react/runtime";
 import StyledInput from "./inputs/StyledInput";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { request } from "../utility/api/API";
-import { currentTripId } from "../pages/Expenses";
 import { useNavigate } from "react-router-dom";
+import { currentTripId } from "../Signals/Trip";
 
 export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCreateTripOverlayVisible: Signal<boolean> }) {
     useSignals();

@@ -4,11 +4,9 @@ import { getInitials } from "../utility/Manipulation";
 import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import { useNavigate } from "react-router-dom";
 import { isLoggedIn } from "../Signals/Account";
-import { signal } from "@preact/signals-react";
 import { request } from "../utility/api/API";
 import { Member } from "../utility/api/types/Responses";
-
-export const currentTripId = signal("");
+import { currentTripId } from "../Signals/Trip";
 
 // TODO: probably remove avatar group and turn them into cards and have cards to include $ owe to friends
 export default function Expenses() {
