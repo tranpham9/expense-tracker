@@ -2,6 +2,7 @@
 import { UsersLoginResponse } from "./api/types/Responses";
 
 export function saveAccountInfo(account: UsersLoginResponse) {
+    console.log("Account info updated to", account);
     localStorage.setItem("account", JSON.stringify(account));
 }
 

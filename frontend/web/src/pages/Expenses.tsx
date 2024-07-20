@@ -1,7 +1,7 @@
 import { Avatar, AvatarGroup, Box, Button, Grid, Paper, Skeleton, Stack, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { getInitials } from "../utility/Manipulation";
-import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
+import { useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import { useNavigate } from "react-router-dom";
 import { isLoggedIn } from "../Signals/Account";
 

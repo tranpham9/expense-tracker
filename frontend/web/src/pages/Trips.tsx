@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/inputs/SearchBar";
-import { Box, Grid, Pagination, Paper, Skeleton, Stack, Typography } from "@mui/material";
+import { Box, Grid, IconButton, Pagination, Paper, Skeleton, Stack, Typography } from "@mui/material";
 import { isLoggedIn } from "../Signals/Account";
 import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import { request } from "../utility/api/API";
 import { Trip } from "../utility/api/types/Responses";
 import { untracked } from "@preact/signals-react";
+import AddIcon from "@mui/icons-material/Add";
 
 export default function Trips() {
     useSignals();
@@ -16,6 +17,7 @@ export default function Trips() {
 
     const trips = useSignal<Trip[] | null>(null);
 
+    /*
     const defaultSearch = () => {
         request(
             "trips/search",
@@ -28,12 +30,36 @@ export default function Trips() {
             }
         );
     };
+    */
+
+    const performSearch = (query = "", page = 1) => {
+        console.log("searching for", query);
+
+        isBuffering.value = true;
+
+        request(
+            "trips/search",
+            { query, page },
+            (response) => {
+                trips.value = response.trips;
+                setPage(page);
+                console.log(response.trips, trips.value);
+
+                isBuffering.value = false;
+            },
+            (errorMessage) => {
+                console.log(errorMessage);
+
+                isBuffering.value = false;
+            }
+        );
+    };
 
     // NOTE: this also runs when isLoggedIn is first computed
     useSignalEffect(() => {
         if (isLoggedIn.value) {
             console.log("<loaded trips page while logged in>");
-            untracked(defaultSearch);
+            untracked(performSearch);
         } else {
             // console.log("<no longer logged in>");
             console.log("<not logged in>");
@@ -61,7 +87,10 @@ export default function Trips() {
                 color="primary"
                 page={page}
                 disabled={!isEnabled}
-                onChange={(_event, page) => setPage(page)}
+                onChange={(_event, page) => {
+                    setPage(page);
+                    performSearch(searchInputText.value, page);
+                }}
             />
         </Box>
     );
@@ -157,6 +186,7 @@ export default function Trips() {
     );
 
     const isBuffering = useSignal(false);
+    const searchInputText = useSignal("");
 
     return (
         <>
@@ -170,28 +200,10 @@ export default function Trips() {
             >
                 <SearchBar
                     isBuffering={isBuffering.value}
-                    onSearch={(query) => {
-                        console.log("searching for", query);
-
-                        isBuffering.value = true;
-
-                        request(
-                            "trips/search",
-                            { query, page: 1 },
-                            (response) => {
-                                trips.value = response.trips;
-                                setPage(1);
-                                console.log(response.trips, trips.value);
-
-                                isBuffering.value = false;
-                            },
-                            (errorMessage) => {
-                                console.log(errorMessage);
-
-                                isBuffering.value = false;
-                            }
-                        );
+                    onChange={(event) => {
+                        searchInputText.value = event.target.value;
                     }}
+                    onSearch={(query) => performSearch(query, 1)}
                 />
                 <IconButton
                     type="button"

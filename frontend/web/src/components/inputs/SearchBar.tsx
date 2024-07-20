@@ -8,9 +8,16 @@ import { CircularProgress } from "@mui/material";
 /* TODO: should this clear on submit or not? */
 export default function SearchBar({
     isBuffering = false,
+    onChange = (event) => {
+        event; // no-op for ESLint
+    },
     onSearch = (query: string) => {
         query; // no-op for ESLint
     },
+}: {
+    isBuffering?: boolean;
+    onChange?: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>;
+    onSearch?: (query: string) => void;
 }) {
     const inputRef = useRef<HTMLInputElement>();
 
@@ -39,6 +46,7 @@ export default function SearchBar({
                 placeholder="Search Trips"
                 inputProps={{ "aria-label": "search trips" }}
                 inputRef={inputRef}
+                onChange={onChange}
                 onKeyDown={(event) => {
                     if (event.key === "Enter") {
                         event.preventDefault();
