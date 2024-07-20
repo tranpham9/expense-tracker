@@ -1,3 +1,5 @@
+type RefreshJWTResponse = object;
+
 type UsersRegisterResponse = { message: string };
 export type UsersLoginResponse = {
     userId: string;
@@ -21,6 +23,8 @@ export type Trip = {
 type TripsSearchResponse = { trips: Trip[] };
 
 export type Responses = {
+    refreshJWT: RefreshJWTResponse;
+
     "users/register": UsersRegisterResponse;
     "users/login": UsersLoginResponse;
     "users/update": UsersUpdateResponse;

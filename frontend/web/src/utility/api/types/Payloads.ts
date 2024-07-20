@@ -1,3 +1,5 @@
+type RefreshJWTPayload = object;
+
 type UsersRegisterPayload = {
     name: string;
     email: string;
@@ -21,7 +23,10 @@ type TripsSearchPaylod = {
     page?: number;
 };
 
+
 export type Payloads = {
+    "refreshJWT": RefreshJWTPayload;
+
     "users/register": UsersRegisterPayload;
     "users/login": UsersLoginPayload;
     "users/update": UsersUpdatePayload;
