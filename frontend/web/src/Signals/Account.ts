@@ -3,10 +3,18 @@ import { clearAccountInfo, loadAccountInfo, saveAccountInfo } from "../utility/P
 import { UsersLoginResponse } from "../utility/api/types/Responses";
 
 const account = loadAccountInfo();
-export const userInfo = signal<Omit<UsersLoginResponse, "jwt"> | null>(account); // the jwt will still be there, but it shouldn't be taken into account
+export const userInfo = signal<UsersLoginResponse | null>(account);
 // split into separate variable to avoid unnecessary updating
-export const userJWT = signal(account && account.jwt);
+// export const userJWT = signal(account && account.jwt);
+export const userJWT = computed(() => userInfo.value?.jwt || null);
 
+/*
+userInfo.subscribe((newUserInfo) => {
+    userJWT.value = newUserInfo?.jwt || null;
+});
+*/
+
+/*
 userJWT.subscribe((newJWT) => {
     console.log("jwt changed to", newJWT);
 
@@ -17,5 +25,13 @@ userJWT.subscribe((newJWT) => {
         userInfo.value = null;
     }
 });
+*/
+userInfo.subscribe((newUserInfo) => {
+    if (newUserInfo) {
+        saveAccountInfo(newUserInfo);
+    } else {
+        clearAccountInfo();
+    }
+});
 
-export const isLoggedIn = computed(() => !!userJWT.value);
+export const isLoggedIn = computed(() => !!userInfo.value);

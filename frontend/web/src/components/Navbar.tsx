@@ -16,7 +16,7 @@ import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import AccountOverlay from "./AccountOverlay";
 import { getInitials } from "../utility/Manipulation";
-import { isLoggedIn, userInfo, userJWT } from "../Signals/Account";
+import { isLoggedIn, userInfo } from "../Signals/Account";
 import { useSignals } from "@preact/signals-react/runtime";
 // import { signal } from "@preact/signals-react";
 
@@ -96,6 +96,10 @@ export default function Navbar() {
             name: "Trips",
             requiresLoggedIn: true,
         },
+        {
+            name: "Expenses",
+            requiresLoggedIn: true,
+        },
     ];
 
     const options: Option[] = [
@@ -114,7 +118,8 @@ export default function Navbar() {
         {
             name: "Logout",
             action: () => {
-                userJWT.value = null;
+                // userJWT.value = null;
+                userInfo.value = null;
             },
         },
     ];

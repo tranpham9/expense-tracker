@@ -97,22 +97,22 @@ router.post("/login", async (req, res) => {
     }
 });
 
-router.post("/get", async(req, res) => {
+router.post("/get", async (req, res) => {
     let client: MongoClient | undefined;
     try {
         // (This is the userId of the user to look up for, not the logged in user)
         const { userId } = req.body;
-        if(!userId) {
-            res.status(STATUS_BAD_REQUEST).json({error: "userId required"});
+        if (!userId) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "userId required" });
         }
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const userCollection = db.collection<User>(USER_COLLECTION_NAME);
-        
-        const result = await userCollection.findOne({_id: ObjectId.createFromHexString(userId)});
-        if(!result) {
-            res.status(STATUS_NOT_FOUND).json({error: "userId not found"});
+
+        const result = await userCollection.findOne({ _id: ObjectId.createFromHexString(userId) });
+        if (!result) {
+            res.status(STATUS_NOT_FOUND).json({ error: "userId not found" });
             return;
         }
 
@@ -122,7 +122,7 @@ router.post("/get", async(req, res) => {
             name: result.name,
             email: result.email,
             bio: result.bio,
-            jwt: res.locals.refreshedJWT
+            jwt: res.locals.refreshedJWT,
         });
     } catch (error) {
         console.trace(error);
@@ -203,11 +203,13 @@ router.post("/forgotPassword", async (req, res) => {
 router.post("/resetPassword", async (req, res) => {
     let client: MongoClient | undefined;
     try {
-        const { newPassword, jwt } = req.body;
+        let { newPassword } = req.body;
+        const { jwt } = req.body;
         if (!newPassword || !jwt) {
             res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
             return;
         }
+        newPassword = md5(newPassword);
 
         if (isExpired(jwt)) {
             res.status(STATUS_UNAUTHENTICATED).json({ error: "Reset code has expired" });
@@ -215,8 +217,8 @@ router.post("/resetPassword", async (req, res) => {
         }
 
         const userId = extractUserId(jwt);
-        const hashedPassword = extract("hashedPassword", jwt);
-        if (!userId || !hashedPassword) {
+        const oldHashedPassword = extract("hashedPassword", jwt);
+        if (!userId || !oldHashedPassword) {
             res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
             return;
         }
@@ -231,13 +233,13 @@ router.post("/resetPassword", async (req, res) => {
             return;
         }
 
-        if (hashedPassword !== md5(user.password)) {
+        if (oldHashedPassword !== md5(user.password)) {
             res.status(STATUS_UNAUTHENTICATED).json({ error: "Reset code is no longer valid" });
             return;
         }
 
         const result = await userCollection.updateOne({ _id: userId }, { $set: { password: newPassword } });
-        if (result.acknowledged) {
+        if (result.acknowledged && result.matchedCount) {
             res.status(STATUS_OK).json({ message: "Successfully reset password" });
         } else {
             res.status(STATUS_BAD_REQUEST).json({ error: "Failed to update password" });
@@ -284,7 +286,7 @@ router.get("/verify/:token", async (req, res) => {
 
         // insert new user
         const result = await userCollection.insertOne(verified);
-        if (!result.acknowledged) {
+        if (!result.acknowledged || !result.insertedId) {
             res.status(STATUS_BAD_REQUEST).send(getHTMLTemplate("Failed to register user."));
             return;
         }

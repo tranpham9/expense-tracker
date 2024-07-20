@@ -1,12 +1,40 @@
 import { Avatar, AvatarGroup, Box, Button, Grid, Paper, Skeleton, Stack, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { getInitials } from "../utility/Manipulation";
+import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
+import { useNavigate } from "react-router-dom";
+import { isLoggedIn } from "../Signals/Account";
 
 // TODO: get member names from backend
 const members: string[] = ["Joe Bro", "Bob", "Carol", "David", "Emily"];
 
 // TODO: probably remove avatar group and turn them into cards and have cards to include $ owe to friends
 export default function Expenses() {
+    useSignals();
+
+    // https://stackoverflow.com/questions/74413650/what-is-difference-between-usenavigate-and-redirect-in-react-route-v6
+    const navigate = useNavigate();
+
+    // TODO: will need to globally store current tripid or something like that
+    // FIXME: maybe the expenses button should also only be enabled in the navbar if a tripid is specified (otherwise, redirect user to trips page)
+    // const expenses = useSignal<Expense[] | null>(null);
+
+    // NOTE: this also runs when isLoggedIn is first computed
+    useSignalEffect(() => {
+        if (isLoggedIn.value) {
+            console.log("<loaded exenses page while logged in>");
+            // untracked(defaultSearch);
+        } else {
+            // console.log("<no longer logged in>");
+            console.log("<not logged in>");
+            navigate("/home");
+        }
+    });
+
+    // useSignalEffect(() => {
+    //     console.log("Trips changed", trips.value);
+    // });
+
     return (
         <>
             <Grid
