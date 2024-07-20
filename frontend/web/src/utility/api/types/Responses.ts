@@ -6,13 +6,26 @@ export type UsersLoginResponse = {
     jwt: string; // rest of the responses don't need to specify this explicitly
 };
 type UsersUpdateResponse = object; // empty response (when ignoring jwt)
-type UsersForgotPasswordPayload = { message: string };
-type UsersResetPasswordPayload = { message: string };
+type UsersForgotPasswordResponse = { message: string };
+type UsersResetPasswordResponse = { message: string };
+
+export type Trip = {
+    name: string;
+    description: string;
+    inviteCode: string;
+    // leaderId: ObjectId;
+    // memberIds: ObjectId[];
+    leaderId: string;
+    memberIds: string[];
+};
+type TripsSearchResponse = { trips: Trip[] };
 
 export type Responses = {
     "users/register": UsersRegisterResponse;
     "users/login": UsersLoginResponse;
     "users/update": UsersUpdateResponse;
-    "users/forgotPassword": UsersForgotPasswordPayload;
-    "users/resetPassword": UsersResetPasswordPayload;
+    "users/forgotPassword": UsersForgotPasswordResponse;
+    "users/resetPassword": UsersResetPasswordResponse;
+
+    "trips/search": TripsSearchResponse;
 };

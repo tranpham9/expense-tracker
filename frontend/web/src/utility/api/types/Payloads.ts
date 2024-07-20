@@ -16,10 +16,17 @@ type UsersUpdatePayload = {
 type UsersForgotPasswordPayload = { email: string };
 type UsersResetPasswordPayload = { newPassword: string };
 
+type TripsSearchPaylod = {
+    query?: string;
+    page?: number;
+};
+
 export type Payloads = {
     "users/register": UsersRegisterPayload;
     "users/login": UsersLoginPayload;
     "users/update": UsersUpdatePayload;
     "users/forgotPassword": UsersForgotPasswordPayload;
     "users/resetPassword": UsersResetPasswordPayload;
+
+    "trips/search": TripsSearchPaylod;
 };
