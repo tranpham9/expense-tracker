@@ -245,7 +245,7 @@ router.post("/search", async (req, res) => {
         const db = client.db(DB_NAME);
         const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
         // await tripCollection.createIndex({ name: "text", description: "text" });
-        query = query.replace(/[~!@#$%^&*()_|+\-=?;:'",.<>{}[\]\\/]/g, '');
+        query = query.replace(/[~!@#$%^&*()_|+\-=?;:'",.<>{}[\]\\/]/g, "");
         console.log(query);
 
         // https://www.mongodb.com/docs/manual/tutorial/query-arrays/#query-an-array-for-an-element
@@ -254,23 +254,51 @@ router.post("/search", async (req, res) => {
             .find(
                 {
                     // The user must exist in the trip and there must be some matching of the text
-                    $and:[
-                        {$or:[
-                            {leaderId: userId},
-                            {memberIds: userId},
-                        ]},
-                        {$or:[
-                            {name: {$regex: new RegExp(query, 'i')}},
-                            {description: {$regex: new RegExp(query, 'i')}},
-                        ]}
-                        ]
+                    $and: [
+                        {
+                            $or: [
+                                //[wrap]
+                                { leaderId: userId },
+                                { memberIds: userId },
+                            ],
+                        },
+                        {
+                            $or: [
+                                //[wrap]
+                                { name: { $regex: new RegExp(query, "i") } },
+                                { description: { $regex: new RegExp(query, "i") } },
+                            ],
+                        },
+                    ],
                 },
                 // if needed, can add "projection: {<field_name>: 1}" within options to isolate specific fields
                 { skip: (pageNumber - 1) * 10, limit: 10 }
             )
             .toArray();
 
-        res.status(STATUS_OK).json({ trips, jwt: res.locals.refreshedJWT });
+        // unfortunately, there doesn't seem to be much of a better way to do this
+        const unpaginatedTripCount = await tripCollection.countDocuments({
+            // The user must exist in the trip and there must be some matching of the text
+            $and: [
+                {
+                    $or: [
+                        //[wrap]
+                        { leaderId: userId },
+                        { memberIds: userId },
+                    ],
+                },
+                {
+                    $or: [
+                        //[wrap]
+                        { name: { $regex: new RegExp(query, "i") } },
+                        { description: { $regex: new RegExp(query, "i") } },
+                    ],
+                },
+            ],
+        });
+        const pageCount = Math.floor(unpaginatedTripCount / 10);
+
+        res.status(STATUS_OK).json({ trips, unpaginatedTripCount, pageCount, jwt: res.locals.refreshedJWT });
     } catch (error) {
         console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
