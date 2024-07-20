@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/inputs/SearchBar";
 import { Box, Grid, IconButton, Pagination, Paper, Skeleton, Stack, Typography } from "@mui/material";
-import { isLoggedIn } from "../Signals/Account";
+import { isLoggedIn, userInfo } from "../Signals/Account";
 import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import { request } from "../utility/api/API";
 import { Trip } from "../utility/api/types/Responses";
@@ -11,6 +11,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import OpenTripIcon from "@mui/icons-material/Login";
 import CreateTripOverlay from "../components/CreateTripOverlay";
+import { currentTripId } from "../Signals/Trip";
 
 // TODO: potentially make search term and current page persistent by pulling their signals out of the function
 
@@ -170,7 +171,6 @@ export default function Trips() {
                     >
                         <Grid
                             item
-                            // xs={2}
                             xs={5}
                             sm={4}
                             md={2}
@@ -179,9 +179,6 @@ export default function Trips() {
                         </Grid>
                         <Grid
                             item
-                            // xs={5}
-                            // sm={6}
-                            // md={8}
                             xs={2}
                             sm={4}
                             md={8}
@@ -197,22 +194,22 @@ export default function Trips() {
                         >
                             <IconButton
                                 type="button"
-                                // disabled={*}
+                                disabled={trip.leaderId !== userInfo.value?.userId}
                                 sx={{ p: "5px" }}
                                 aria-label="edit"
                                 onClick={() => {
-                                    // *
+                                    // TODO: impl
                                 }}
                             >
                                 <EditIcon />
                             </IconButton>
                             <IconButton
                                 type="button"
-                                // disabled={*}
+                                disabled={trip.leaderId !== userInfo.value?.userId}
                                 sx={{ p: "5px" }}
                                 aria-label="delete"
                                 onClick={() => {
-                                    // *
+                                    // TODO: impl
                                 }}
                             >
                                 <DeleteIcon />
@@ -223,7 +220,8 @@ export default function Trips() {
                                 sx={{ p: "5px" }}
                                 aria-label="open trip"
                                 onClick={() => {
-                                    // *
+                                    currentTripId.value = trip._id;
+                                    navigate("/expenses");
                                 }}
                             >
                                 <OpenTripIcon />
