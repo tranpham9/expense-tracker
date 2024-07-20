@@ -5,19 +5,19 @@ import { Box, Tab, Tabs } from "@mui/material";
 import Modal from "./Modal";
 import Signup from "./Signup";
 import Login from "./Login";
+import { useSignals } from "@preact/signals-react/runtime";
+import { Signal } from "@preact/signals-react";
 
-// export default function AccountOverlay({ isAccountOverlayVisible }: { isAccountOverlayVisible: Signal<boolean> }) {
-export default function AccountOverlay({ isAccountOverlayVisible, setIsAccountOverlayVisible }: { isAccountOverlayVisible: boolean; setIsAccountOverlayVisible: (isVisible: boolean) => void }) {
+export default function AccountOverlay({ isAccountOverlayVisible }: { isAccountOverlayVisible: Signal<boolean> }) {
+    useSignals();
+
     const [activeTab, setActiveTab] = useState(0);
     const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
         setActiveTab(newValue);
     };
 
     return (
-        <Modal
-            isOpen={isAccountOverlayVisible}
-            setIsOpen={setIsAccountOverlayVisible}
-        >
+        <Modal isOpen={isAccountOverlayVisible}>
             <>
                 <Box width="100%">
                     <Tabs
@@ -33,7 +33,7 @@ export default function AccountOverlay({ isAccountOverlayVisible, setIsAccountOv
                     //[wrap]
                     <Signup onSuccessfulSignup={() => setActiveTab(0)} />
                 ) : (
-                    <Login onSuccessfulLogin={() => setIsAccountOverlayVisible(false)} />
+                    <Login onSuccessfulLogin={() => (isAccountOverlayVisible.value = false)} />
                 )}
             </>
         </Modal>

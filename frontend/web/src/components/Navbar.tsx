@@ -17,8 +17,7 @@ import AdbIcon from "@mui/icons-material/Adb";
 import AccountOverlay from "./AccountOverlay";
 import { getInitials } from "../utility/Manipulation";
 import { isLoggedIn, userInfo } from "../Signals/Account";
-import { useSignals } from "@preact/signals-react/runtime";
-// import { signal } from "@preact/signals-react";
+import { useSignal, useSignals } from "@preact/signals-react/runtime";
 
 type Page = {
     name: string;
@@ -30,8 +29,6 @@ type Option = {
     name: string;
     action: () => void;
 };
-
-// const isAccountOverlayVisible = signal(false);
 
 // TODO: make all navbar buttons (when in the widest layout) the same width
 export default function Navbar() {
@@ -48,7 +45,7 @@ export default function Navbar() {
     };
 
     // TODO: check if useSignals() allows converting this to a signal (I don't think so)
-    const [isAccountOverlayVisible, setIsAccountOverlayVisible] = useState(false);
+    const isAccountOverlayVisible = useSignal(false);
 
     /*
     const [shouldShowAccountOverlay, setShouldShowAccountOverlay] = useState(false);
@@ -293,7 +290,7 @@ export default function Navbar() {
                             <Button
                                 variant="contained"
                                 onClick={() => {
-                                    setIsAccountOverlayVisible(true);
+                                    isAccountOverlayVisible.value = true;
                                 }}
                                 sx={{ mx: 0.5, my: 2, display: "block" }}
                             >
@@ -303,10 +300,7 @@ export default function Navbar() {
                     </Toolbar>
                 </Container>
             </AppBar>
-            <AccountOverlay
-                isAccountOverlayVisible={isAccountOverlayVisible}
-                setIsAccountOverlayVisible={setIsAccountOverlayVisible}
-            />
+            <AccountOverlay isAccountOverlayVisible={isAccountOverlayVisible} />
         </>
     );
 }

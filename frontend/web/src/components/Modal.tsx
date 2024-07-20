@@ -6,21 +6,22 @@ import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import CloseIcon from "@mui/icons-material/Close";
 import { IconButton } from "@mui/material";
+import { useSignals } from "@preact/signals-react/runtime";
+import { Signal } from "@preact/signals-react";
 
-// export default function TransitionModal({ isOpen, shouldCloseOnLostFocus = false, children }: { isOpen: Signal<boolean>; shouldCloseOnLostFocus?: boolean; children: ReactElement }) {
 export default function TransitionModal({
     isOpen,
-    setIsOpen,
     shouldCloseOnLostFocus = false,
     children,
 }: {
-    isOpen: boolean;
-    setIsOpen: (newValue: boolean) => void;
+    isOpen: Signal<boolean>;
     shouldCloseOnLostFocus?: boolean;
     children: ReactElement;
 }) {
+    useSignals();
+
     const close = () => {
-        setIsOpen(false);
+        isOpen.value = false;
     };
 
     const handleClose = () => {
@@ -32,7 +33,7 @@ export default function TransitionModal({
     return (
         <div>
             <Modal
-                open={isOpen}
+                open={isOpen.value}
                 onClose={handleClose}
                 closeAfterTransition
                 slots={{ backdrop: Backdrop }}
@@ -42,7 +43,7 @@ export default function TransitionModal({
                     },
                 }}
             >
-                <Fade in={isOpen}>
+                <Fade in={isOpen.value}>
                     <Box
                         sx={{
                             position: "absolute",
