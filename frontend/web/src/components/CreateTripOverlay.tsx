@@ -4,6 +4,8 @@ import { useSignal, useSignals } from "@preact/signals-react/runtime";
 import StyledInput from "./inputs/StyledInput";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { request } from "../utility/api/API";
+import { currentTripId } from "../pages/Expenses";
+import { useNavigate } from "react-router-dom";
 
 export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCreateTripOverlayVisible: Signal<boolean> }) {
     useSignals();
@@ -13,13 +15,16 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
     const description = useSignal("");
     const errorMessage = useSignal("");
 
+    const navigate = useNavigate();
+
     const attemptCreateTrip = () => {
         request(
             "trips/create",
             { name: name.value, description: description.value },
             (response) => {
                 console.log(response);
-                // TODO: set a persistent signal which stores the current trip id (which expenses tab will reference whenever loaded, and this will determine whether the expenses tab is enabled or not)
+                currentTripId.value = response.tripId;
+                navigate("/expenses");
             },
             (currentErrorMessage) => {
                 console.log(currentErrorMessage);
