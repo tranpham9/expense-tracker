@@ -124,4 +124,31 @@ class TripCRUD {
     }
     return null;
   }
+
+  // Get a list of expenses related to a trip
+  static Future<List<Trip>?> listExpenses(String tripId) async {
+    final Dio dio = new Dio();
+
+    try {
+      // Call the API
+      Response response =
+          await dio.post('${Config.remoteApiURL}${Config.listExpenseAPI}',
+              data: jsonEncode(<String, String?>{
+                'jwt': await UserManager.getJwt(),
+                'tripId': tripId,
+              }));
+
+      if (response.statusCode != 200) {
+        throw Exception("Error in Creating a Trip");
+      }
+
+      // Store the jwt
+      await UserManager.saveJwt(response.data['jwt']);
+      // Successfully retrieved expenses
+      return tripListFromJson(jsonEncode(response.data['expenses']));
+    } catch (e) {
+      print('Error: $e');
+    }
+    return null;
+  }
 }

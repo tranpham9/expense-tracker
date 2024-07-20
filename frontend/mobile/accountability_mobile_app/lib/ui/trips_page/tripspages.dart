@@ -82,7 +82,6 @@ class _TripsPageState extends State<TripsPage> {
                         onTap: () {
                           Navigator.push(
                             context,
-                            // TODO: Route to a page displaying information on a trip
                             MaterialPageRoute(
                                 builder: (context) =>
                                     ViewTripPage(trip: trips[index])),

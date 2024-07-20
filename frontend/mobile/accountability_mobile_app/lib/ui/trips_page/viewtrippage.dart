@@ -1,3 +1,4 @@
+import 'package:accountability_mobile_app/api/trip_crud.dart';
 import 'package:accountability_mobile_app/ui/trips_page/tripspages.dart';
 import 'package:flutter/material.dart';
 import '../../models/Trip.dart';
@@ -15,13 +16,16 @@ class ViewTripPage extends StatefulWidget {
 }
 
 class _ViewTripsPage extends State<ViewTripPage> {
-  List<User> members = []; // Placeholder for member list
   List<Expense> expenses = []; // Placeholder for expenses list
 
   @override
   void initState() {
     super.initState();
     // TODO: Fetch members and expenses from the API
+  }
+
+  static Future<List<Trip>?> listExpenses(String tripId) async {
+    return await TripCRUD.listExpenses(tripId);
   }
 
   @override
@@ -70,9 +74,13 @@ class _ViewTripsPage extends State<ViewTripPage> {
           Expanded(
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: members.length,
+              itemCount: widget.trip.memberIds.length,
               itemBuilder: (context, index) {
-                User member = members[index];
+                // Grab the member
+                print("got before member");
+                // TODO: Gonna need an endpoint that gets the name associated with the user id
+                User member = userFromJson(widget.trip.memberIds[index]);
+                print("got after member");
                 return SizedBox(
                   width: 100,
                   height: 100,
@@ -124,6 +132,7 @@ class _ViewTripsPage extends State<ViewTripPage> {
             ),
           ),
           // Display a ListView of the expenses associated with the trip
+          // TODO: Fix this, cause it doesn't work
           Expanded(
             child: ListView.builder(
               scrollDirection: Axis.vertical,
