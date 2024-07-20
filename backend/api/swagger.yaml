@@ -516,26 +516,24 @@ paths:
           description: "Status internal server error"
           schema:
                 $ref: '#/definitions/ErrorInfo'
-  /trips/read:
+  /trips/getMembers:
     post:
-      summary: List all memberIds non-confidential info
+      summary: lists public info about all members of trip (including the leader and excluding the caller)
       tags:
         - trips
-      description: Returns memberIds name, email and bio
+      description: Returns the name, email, bio, and whether it's the leader for every member
       parameters:
       - in: body
-        name: Read
+        name: Get Members
         schema:
           type: object
           properties:
             jwt:
               type: string
               description: Authenticated JWT
-            memberIds:
-              type: array
-              items: 
-                type: string
-                description: ID of a member that is a part of the trip
+            tripId:
+              type: string
+              description: ID of the trip being queried
               
       responses:
         "200":
@@ -543,20 +541,23 @@ paths:
           schema:
             type: object
             properties:
-              memberIdsInfo:
+              members:
                 type: array
                 items:
                   type: object
                   properties:
                     name:
                       type: string
-                      description: Name associated with memberId
+                      description: Name of the current member
                     email:
                       type: string
-                      description: Email associated with memberId
+                      description: Email of the current member
                     bio:
                       type: string 
-                      description: Bio associated with memberId
+                      description: Bio of the current member
+                    isLeader:
+                      type: boolean
+                      description: Whether the current member is the leader
               jwt:
                 type: string
                 description: Refreshed JWT
