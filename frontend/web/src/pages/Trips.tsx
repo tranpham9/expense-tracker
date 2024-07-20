@@ -53,6 +53,8 @@ export default function Trips() {
             (response) => {
                 trips.value = response.trips;
                 currentPage.value = page;
+                pageCount.value = response.pageCount;
+                console.log(response);
                 console.log(response.trips, trips.value);
 
                 isBuffering.value = false;

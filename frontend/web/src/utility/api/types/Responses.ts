@@ -20,7 +20,11 @@ export type Trip = {
     leaderId: string;
     memberIds: string[];
 };
-type TripsSearchResponse = { trips: Trip[] };
+type TripsSearchResponse = {
+    trips: Trip[];
+    unpaginatedTripCount: number;
+    pageCount: number;
+};
 
 export type Responses = {
     refreshJWT: RefreshJWTResponse;
