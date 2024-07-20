@@ -1,13 +1,13 @@
 import express from "express";
-import { DB_NAME, formatEmail, getMongoClient, STATUS_BAD_REQUEST, STATUS_INTERNAL_SERVER_ERROR, STATUS_OK, STATUS_UNAUTHENTICATED, User, USER_COLLECTION_NAME } from "./common";
-import { MongoClient } from "mongodb";
+import { DB_NAME, formatEmail, getMongoClient, STATUS_BAD_REQUEST, STATUS_INTERNAL_SERVER_ERROR, STATUS_NOT_FOUND, STATUS_OK, STATUS_UNAUTHENTICATED, User, USER_COLLECTION_NAME } from "./common";
+import { MongoClient, ObjectId } from "mongodb";
 import { sendVerifyEmail, sendResetPasswordEmail, unverified } from "../email";
 import md5 from "md5";
 import { authenticationRouteHandler, createJWT, extract, extractUserId, isExpired } from "../JWT";
 
 export const router = express.Router();
 
-const AUTHENTICATED_ROUTES = ["/update"];
+const AUTHENTICATED_ROUTES = ["/update", "/get"];
 
 // JWT Verification
 router.use(AUTHENTICATED_ROUTES, authenticationRouteHandler);
@@ -89,6 +89,41 @@ router.post("/login", async (req, res) => {
         } else {
             res.status(STATUS_UNAUTHENTICATED).json({ error: "Invalid login credentials" });
         }
+    } catch (error) {
+        console.trace(error);
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
+    } finally {
+        await client?.close();
+    }
+});
+
+router.post("/get", async(req, res) => {
+    let client: MongoClient | undefined;
+    try {
+        // (This is the userId of the user to look up for, not the logged in user)
+        const { userId } = req.body;
+        if(!userId) {
+            res.status(STATUS_BAD_REQUEST).json({error: "userId required"});
+        }
+
+        client = await getMongoClient();
+        const db = client.db(DB_NAME);
+        const userCollection = db.collection<User>(USER_COLLECTION_NAME);
+        
+        const result = await userCollection.findOne({_id: ObjectId.createFromHexString(userId)});
+        if(!result) {
+            res.status(STATUS_NOT_FOUND).json({error: "userId not found"});
+            return;
+        }
+
+        // be cautious of not sending back the while object with the password hash
+        res.status(STATUS_OK).json({
+            _id: result._id,
+            name: result.name,
+            email: result.email,
+            bio: result.bio,
+            jwt: res.locals.refreshedJWT
+        });
     } catch (error) {
         console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });

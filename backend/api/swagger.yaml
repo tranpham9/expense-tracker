@@ -99,6 +99,47 @@ paths:
           description: "Authentication failure, either wrong username or password"
           schema:
                 $ref: '#/definitions/ErrorInfo'
+  /users/get:
+    post:
+      summary: READ user endpoint
+      tags: 
+        - users 
+      description: Read information about a user.
+      parameters:
+      - in: body
+        name: JSON
+        schema:
+          type: object
+          properties:
+            jwt:
+              type: string
+              description: Authenticated JWT
+            userId:
+              type: string
+              description: ID of the user to 
+      responses:
+        "200":
+          description: Found user
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              email:
+                type: string
+              bio:
+                type: string
+              jwt:
+                type: string
+                description: Refreshed JWT
+        "400":
+          description: Malformed request or JSON on front-end
+          schema:
+                $ref: '#/definitions/ErrorInfo'
+        "401":
+          description: "Authentication failure, either wrong username or password"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
   /users/update:
     post:
       summary: Update the personal information of the user
