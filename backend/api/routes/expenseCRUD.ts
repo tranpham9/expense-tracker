@@ -70,7 +70,7 @@ router.post("/create", async (req, res) => {
             cost,
             description,
         });
-        if (result.acknowledged) {
+        if (result.acknowledged && result.insertedId) {
             res.status(STATUS_OK).json({ expenseId: result.insertedId, jwt: res.locals.refreshedJWT });
         } else {
             res.status(STATUS_BAD_REQUEST).json({ error: "Failed to create expense" });
@@ -200,7 +200,7 @@ router.post("/update", async (req, res) => {
                 },
             }
         );
-        if (result.acknowledged) {
+        if (result.acknowledged && result.matchedCount) {
             res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
         } else {
             res.status(STATUS_BAD_REQUEST).json({ error: "Failed to update expense" });
@@ -259,7 +259,7 @@ router.post("/delete", async (req, res) => {
         }
 
         const result = await expenseCollection.deleteOne({ _id: expenseId });
-        if (result.acknowledged) {
+        if (result.acknowledged && result.deletedCount) {
             res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
         } else {
             res.status(STATUS_BAD_REQUEST).json({ error: "Failed to delete expense" });

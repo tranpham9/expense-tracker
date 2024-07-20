@@ -122,7 +122,7 @@ router.post("/update", async (req, res) => {
                 },
             }
         );
-        if (result.acknowledged) {
+        if (result.acknowledged && result.matchedCount) {
             res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
         } else {
             res.status(STATUS_BAD_REQUEST).json({ error: "Failed to update trip" });
@@ -164,17 +164,14 @@ router.post("/delete", async (req, res) => {
             _id: tripId,
             leaderId: userId,
         });
-        if (!result.acknowledged) {
+        if (!result.acknowledged || !result.deletedCount) {
             // user can't delete this trip ("invalid" since it might not be a trip that they should "know" of)
             res.status(STATUS_BAD_REQUEST).json({ error: "Invalid trip" });
             return;
         }
 
-        if (result.deletedCount >= 1) {
-            // cascade the deletion (at this point, the user was able to successfully delete the trip, so all the corresponding expenses should get expunged)
-            // no need to await since it's possible for there to be no corresponding expenses for the trip (in which case the deletion wouldn't get acknowledged, i.e. the deletion count would be 0)
-            await expenseCollection.deleteMany({ tripId });
-        }
+        // cascade the deletion (at this point, the user was able to successfully delete the trip, so all the corresponding expenses should get expunged)
+        await expenseCollection.deleteMany({ tripId });
 
         res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
     } catch (error) {
@@ -210,7 +207,7 @@ router.post("/join", async (req, res) => {
             // only add if not already in list
             { $addToSet: { memberIds: userId } }
         );
-        if (result.acknowledged && result.matchedCount >= 1) {
+        if (result.acknowledged && result.matchedCount) {
             res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
         } else {
             // either the invite code doesn't exist or the user is not someone who can join the invite code (i.e. they are the leader or already a part of the trip), so it's an invalid code for them
@@ -389,7 +386,7 @@ router.post("/read", async (req, res) => {
         } else {
             let index = 0;
             while (trip.memberIds[index] != null) {
-                let foundUser = await userCollection.findOne({ _id: trip.memberIds[index] });
+                const foundUser = await userCollection.findOne({ _id: trip.memberIds[index] });
                 if (foundUser) {
                     res.status(STATUS_OK).json({
                         name: foundUser.name,

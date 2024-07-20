@@ -237,7 +237,7 @@ router.post("/resetPassword", async (req, res) => {
         }
 
         const result = await userCollection.updateOne({ _id: userId }, { $set: { password: newPassword } });
-        if (result.acknowledged) {
+        if (result.acknowledged && result.matchedCount) {
             res.status(STATUS_OK).json({ message: "Successfully reset password" });
         } else {
             res.status(STATUS_BAD_REQUEST).json({ error: "Failed to update password" });
@@ -284,7 +284,7 @@ router.get("/verify/:token", async (req, res) => {
 
         // insert new user
         const result = await userCollection.insertOne(verified);
-        if (!result.acknowledged) {
+        if (!result.acknowledged || !result.insertedId) {
             res.status(STATUS_BAD_REQUEST).send(getHTMLTemplate("Failed to register user."));
             return;
         }
