@@ -516,6 +516,62 @@ paths:
           description: "Status internal server error"
           schema:
                 $ref: '#/definitions/ErrorInfo'
+  /trips/read:
+    post:
+      summary: List all memberIds non-confidential info
+      tags:
+        - trips
+      description: Returns memberIds name, email and bio
+      parameters:
+      - in: body
+        name: Read
+        schema:
+          type: object
+          properties:
+            jwt:
+              type: string
+              description: Authenticated JWT
+            memberIds:
+              type: array
+              items: 
+                type: string
+                description: ID of a member that is a part of the trip
+              
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              memberIdsInfo:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: Name associated with memberId
+                    email:
+                      type: string
+                      description: Email associated with memberId
+                    bio:
+                      type: string 
+                      description: Bio associated with memberId
+              jwt:
+                type: string
+                description: Refreshed JWT
+        "400":
+          description: Malformed request or JSON
+          schema:
+            $ref: '#/definitions/ErrorInfo'
+        "401":
+          description: "Authentication failure, invalid JWT"
+          schema:
+                $ref: '#/definitions/ErrorInfo'
+        "500":
+          description: "Status internal server error"
+          schema:
+                $ref: '#/definitions/ErrorInfo'              
   # ----------- Expenses ----------- # 
   /expenses/create:
     post:
