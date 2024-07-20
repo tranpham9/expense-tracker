@@ -170,7 +170,7 @@ router.post("/delete", async (req, res) => {
 
         // cascade the deletion (at this point, the user was able to successfully delete the trip, so all the corresponding expenses should get expunged)
         // no need to await since it's possible for there to be no corresponding expenses for the trip (in which case the deletion wouldn't get acknowledged, i.e. the deletion count would be 0)
-        expenseCollection.deleteMany({ tripId });
+        await expenseCollection.deleteMany({ tripId });
 
         res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
     } catch (error) {
