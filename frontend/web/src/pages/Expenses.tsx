@@ -10,12 +10,29 @@ import { Member } from "../utility/api/types/Responses";
 
 export const currentTripId = signal("");
 
-// TODO: get member names from backend
-const members: string[] = ["Joe Bro", "Bob", "Carol", "David", "Emily"];
-
 // TODO: probably remove avatar group and turn them into cards and have cards to include $ owe to friends
 export default function Expenses() {
     useSignals();
+
+    const members = useSignal<Member[]>([]);
+    //  = useComputed(() => {
+    useSignalEffect(() => {
+        if (!currentTripId.value) {
+            members.value = [];
+        }
+
+        request(
+            "trips/getMembers",
+            { tripId: currentTripId.value },
+            (response) => {
+                console.log(response);
+                members.value = response.members;
+            },
+            (errorMessage) => {
+                console.log(errorMessage);
+            }
+        );
+    });
 
     // https://stackoverflow.com/questions/74413650/what-is-difference-between-usenavigate-and-redirect-in-react-route-v6
     const navigate = useNavigate();
@@ -62,8 +79,8 @@ export default function Expenses() {
                         max={4}
                         spacing={4}
                     >
-                        {members.map((member, i) => (
-                            <Avatar key={i}>{getInitials(member)}</Avatar>
+                        {members.value.map((member, i) => (
+                            <Avatar key={i}>{getInitials(member.name)}</Avatar>
                         ))}
                     </AvatarGroup>
                 </Grid>
