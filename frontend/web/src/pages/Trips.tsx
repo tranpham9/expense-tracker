@@ -155,6 +155,8 @@ export default function Trips() {
         </Stack>
     );
 
+    const isBuffering = useSignal(false);
+
     return (
         <>
             <Box
@@ -166,8 +168,12 @@ export default function Trips() {
                 }}
             >
                 <SearchBar
+                    isBuffering={isBuffering.value}
                     onSearch={(query) => {
                         console.log("searching for", query);
+
+                        isBuffering.value = true;
+
                         request(
                             "trips/search",
                             { query, page: 1 },
@@ -175,9 +181,13 @@ export default function Trips() {
                                 trips.value = response.trips;
                                 setPage(1);
                                 console.log(response.trips, trips.value);
+
+                                isBuffering.value = false;
                             },
                             (errorMessage) => {
                                 console.log(errorMessage);
+
+                                isBuffering.value = false;
                             }
                         );
                     }}

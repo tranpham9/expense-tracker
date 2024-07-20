@@ -51,8 +51,10 @@ export default function TransitionModal({
                             transform: "translate(-50%, -50%)",
                             width: { xs: "60%", sm: "400px" },
                             bgcolor: "background.paper",
-                            border: "2px solid",
+                            border: "1px solid",
+                            // TODO: figure out which one fits more
                             borderColor: "secondary.main",
+                            // borderColor: "primary.main",
                             boxShadow: "0px 0px 10px 10px #0001",
                             p: 4,
                             ":focus": {
