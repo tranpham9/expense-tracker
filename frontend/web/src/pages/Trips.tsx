@@ -7,6 +7,9 @@ import { request } from "../utility/api/API";
 import { Trip } from "../utility/api/types/Responses";
 import { untracked } from "@preact/signals-react";
 import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import OpenTripIcon from "@mui/icons-material/Login";
 import CreateTripOverlay from "../components/CreateTripOverlay";
 
 // TODO: potentially make search term and current page persistent by pulling their signals out of the function
@@ -167,21 +170,64 @@ export default function Trips() {
                     >
                         <Grid
                             item
-                            xs={2}
+                            // xs={2}
+                            xs={5}
+                            sm={4}
+                            md={2}
                         >
                             <Typography>{trip.name}</Typography>
                         </Grid>
                         <Grid
                             item
-                            xs={8}
+                            // xs={5}
+                            // sm={6}
+                            // md={8}
+                            xs={2}
+                            sm={4}
+                            md={8}
                         >
                             <Box whiteSpace="pre-wrap">{trip.description}</Box>
                         </Grid>
                         <Grid
                             item
-                            xs={2}
+                            xs={5}
+                            sm={4}
+                            md={2}
+                            textAlign="right"
                         >
-                            <Skeleton width="100%" />
+                            <IconButton
+                                type="button"
+                                // disabled={*}
+                                sx={{ p: "5px" }}
+                                aria-label="edit"
+                                onClick={() => {
+                                    // *
+                                }}
+                            >
+                                <EditIcon />
+                            </IconButton>
+                            <IconButton
+                                type="button"
+                                // disabled={*}
+                                sx={{ p: "5px" }}
+                                aria-label="delete"
+                                onClick={() => {
+                                    // *
+                                }}
+                            >
+                                <DeleteIcon />
+                            </IconButton>
+                            <IconButton
+                                type="button"
+                                // disabled={*}
+                                sx={{ p: "5px" }}
+                                aria-label="open trip"
+                                onClick={() => {
+                                    // *
+                                }}
+                            >
+                                <OpenTripIcon />
+                            </IconButton>
                         </Grid>
                     </Grid>
                 </Paper>

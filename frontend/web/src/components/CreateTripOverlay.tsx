@@ -61,7 +61,6 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
                     onChange={(event) => {
                         description.value = event.target.value;
                     }}
-                    // onEnterKey={attemptCreateTrip}
                 />
                 <br />
                 {errorMessage.value && (
