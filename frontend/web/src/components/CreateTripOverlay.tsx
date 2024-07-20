@@ -56,11 +56,12 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
                 <StyledInput
                     label="Description"
                     required={false}
+                    useMultiline={true}
                     // error={error}
                     onChange={(event) => {
                         description.value = event.target.value;
                     }}
-                    onEnterKey={attemptCreateTrip}
+                    // onEnterKey={attemptCreateTrip}
                 />
                 <br />
                 {errorMessage.value && (

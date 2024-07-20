@@ -175,13 +175,12 @@ export default function Trips() {
                             item
                             xs={8}
                         >
-                            {trip.description}
+                            <Box whiteSpace="pre-wrap">{trip.description}</Box>
                         </Grid>
                         <Grid
                             item
                             xs={2}
                         >
-                            <Skeleton width="100%" />
                             <Skeleton width="100%" />
                         </Grid>
                     </Grid>
