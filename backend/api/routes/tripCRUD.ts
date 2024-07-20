@@ -297,7 +297,7 @@ router.post("/search", async (req, res) => {
                 },
             ],
         });
-        const pageCount = Math.floor(unpaginatedTripCount / 10);
+        const pageCount = Math.ceil(unpaginatedTripCount / 10);
 
         res.status(STATUS_OK).json({ trips, unpaginatedTripCount, pageCount, jwt: res.locals.refreshedJWT });
     } catch (error) {
