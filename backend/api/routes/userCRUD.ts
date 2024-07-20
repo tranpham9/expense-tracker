@@ -236,7 +236,7 @@ router.post("/resetPassword", async (req, res) => {
             return;
         }
 
-        const result = await userCollection.updateOne({ _id: userId }, { $set: { password: newPassword } });
+        const result = await userCollection.updateOne({ _id: userId }, { $set: { password: hashedPassword } });
         if (result.acknowledged && result.matchedCount) {
             res.status(STATUS_OK).json({ message: "Successfully reset password" });
         } else {
