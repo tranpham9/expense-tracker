@@ -11,6 +11,8 @@ import {
     Expense,
     EXPENSE_COLLECTION_NAME,
     STATUS_NOT_IMPLEMENTED,
+    User,
+    USER_COLLECTION_NAME,
 } from "./common";
 import { MongoClient, ObjectId } from "mongodb";
 import { authenticationRouteHandler, extractUserId } from "../JWT";
@@ -168,7 +170,7 @@ router.post("/delete", async (req, res) => {
             return;
         }
 
-        if(result.deletedCount >= 1) {
+        if (result.deletedCount >= 1) {
             // cascade the deletion (at this point, the user was able to successfully delete the trip, so all the corresponding expenses should get expunged)
             // no need to await since it's possible for there to be no corresponding expenses for the trip (in which case the deletion wouldn't get acknowledged, i.e. the deletion count would be 0)
             await expenseCollection.deleteMany({ tripId });
@@ -348,6 +350,56 @@ router.post("/listExpenses", async (req, res) => {
         const expenses = await expenseCollection.find({ tripId }).toArray();
 
         res.status(STATUS_OK).json({ expenses, jwt: res.locals.refreshedJWT });
+    } catch (error) {
+        console.trace(error);
+        res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
+    } finally {
+        await client?.close();
+    }
+});
+
+router.post("/read", async (req, res) => {
+    let client: MongoClient | undefined;
+    try {
+        let { tripId } = req.body;
+        if (!tripId) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
+            return;
+        }
+        tripId = ObjectId.createFromHexString(tripId);
+
+        const userId = extractUserId(res.locals.refreshedJWT);
+        if (!userId) {
+            res.status(STATUS_UNAUTHENTICATED).json({ error: "Malformed JWT" });
+            return;
+        }
+
+        client = await getMongoClient();
+        const db = client.db(DB_NAME);
+        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
+        const userCollection = db.collection<User>(USER_COLLECTION_NAME);
+
+        const trip = await tripCollection.findOne({
+            _id: tripId,
+            $or: [{ leaderId: userId }, { memberIds: userId }],
+        });
+        if (!trip) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Invalid trip" });
+            return;
+        } else {
+            let index = 0;
+            while (trip.memberIds[index] != null) {
+                let foundUser = await userCollection.findOne({ _id: trip.memberIds[index] });
+                if (foundUser) {
+                    res.status(STATUS_OK).json({
+                        name: foundUser.name,
+                        email: foundUser.email,
+                        bio: foundUser.bio,
+                    });
+                }
+                index++;
+            }
+        }
     } catch (error) {
         console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
