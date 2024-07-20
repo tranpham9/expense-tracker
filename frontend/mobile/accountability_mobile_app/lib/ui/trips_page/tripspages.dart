@@ -75,7 +75,11 @@ class _TripsPageState extends State<TripsPage> {
                       itemBuilder: (context, index) => ListTile(
                         title: Text(trips[index].name),
                         subtitle: Text(trips[index].description),
-                        onLongPress: () {
+                        trailing: Icon(
+                            trips[index].leaderId == Globals.user?.userId
+                                ? Icons.star
+                                : Icons.person),
+                        onTap: () {
                           Navigator.push(
                             context,
                             // TODO: Route to a page displaying information on a trip

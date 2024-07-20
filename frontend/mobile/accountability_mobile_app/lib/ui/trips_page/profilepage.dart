@@ -1,8 +1,7 @@
-// TODO: Call API here? To fill in the data about the user
+// TODO:Need to fix updating the global user in real time. Also fix the weird pop up to white
 import 'package:accountability_mobile_app/api/user_crud.dart';
 import 'package:accountability_mobile_app/globals.dart';
 import 'package:flutter/material.dart';
-import '../../globals.dart';
 import '../../utility/helpers.dart';
 
 // Profile Page Widget
