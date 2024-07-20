@@ -25,6 +25,7 @@ type TripsSearchResponse = {
     unpaginatedTripCount: number;
     pageCount: number;
 };
+type TripsCreateResponse = { tripId: string };
 
 export type Responses = {
     refreshJWT: RefreshJWTResponse;
@@ -36,4 +37,5 @@ export type Responses = {
     "users/resetPassword": UsersResetPasswordResponse;
 
     "trips/search": TripsSearchResponse;
+    "trips/create": TripsCreateResponse;
 };

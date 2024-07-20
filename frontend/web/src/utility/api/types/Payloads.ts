@@ -23,9 +23,13 @@ type TripsSearchPaylod = {
     page?: number;
 };
 
+type TripsCreatePayload = {
+    name?: string;
+    description?: string;
+};
 
 export type Payloads = {
-    "refreshJWT": RefreshJWTPayload;
+    refreshJWT: RefreshJWTPayload;
 
     "users/register": UsersRegisterPayload;
     "users/login": UsersLoginPayload;
@@ -34,4 +38,5 @@ export type Payloads = {
     "users/resetPassword": UsersResetPasswordPayload;
 
     "trips/search": TripsSearchPaylod;
+    "trips/create": TripsCreatePayload;
 };
