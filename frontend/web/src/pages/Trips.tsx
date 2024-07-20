@@ -9,6 +9,8 @@ import { untracked } from "@preact/signals-react";
 import AddIcon from "@mui/icons-material/Add";
 import CreateTripOverlay from "../components/CreateTripOverlay";
 
+// TODO: potentially make search term and current page persistent by pulling their signals out of the function
+
 export default function Trips() {
     useSignals();
 
@@ -99,7 +101,7 @@ export default function Trips() {
     );
 
     const LoadingSkeleton = () => (
-        <Stack sx={{ textAlign: "center" }}>
+        <Stack sx={{ textAlign: "center", mx: { md: 4 } }}>
             {[...Array(10).keys()].map((i) => (
                 <Paper
                     key={i}
@@ -145,7 +147,7 @@ export default function Trips() {
     );
 
     const RenderedTrips = () => (
-        <Stack sx={{ textAlign: "center" }}>
+        <Stack sx={{ textAlign: "center", mx: { md: 4 } }}>
             {trips.value?.map((trip, i) => (
                 <Paper
                     key={i}

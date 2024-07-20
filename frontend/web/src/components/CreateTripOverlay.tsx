@@ -33,7 +33,7 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
         );
     };
 
-    // TODO: maybe require name non-empty?
+    // FIXME: make name be required non-empty; the API doesn't allow it to be empty
     return (
         <Modal isOpen={isCreateTripOverlayVisible}>
             <Box
@@ -55,6 +55,7 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
                 <br />
                 <StyledInput
                     label="Description"
+                    required={false}
                     // error={error}
                     onChange={(event) => {
                         description.value = event.target.value;

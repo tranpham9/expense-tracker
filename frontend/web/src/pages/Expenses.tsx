@@ -85,7 +85,7 @@ export default function Expenses() {
             >
                 <Button startIcon={<AddIcon />}> Add an Expense </Button>
             </Box>
-            <Stack sx={{ textAlign: "center", mx: 4 }}>
+            <Stack sx={{ textAlign: "center", mx: { md: 4 } }}>
                 {[...Array(20).keys()].map((i) => (
                     <Paper
                         key={i}
