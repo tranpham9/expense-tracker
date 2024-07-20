@@ -33,13 +33,14 @@ export default function Trips() {
     */
     const trips = useSignal<Trip[] | null>(null);
 
+    // redirect if not logged in  (on mount/after first paint)
     useEffect(() => {
         if (!isLoggedIn.value) {
             console.log("<not logged in>");
             navigate("/home");
             return;
         }
-    });
+    }, []);
 
     useSignalEffect(() => {
         if (isLoggedIn.value) {
@@ -55,6 +56,9 @@ export default function Trips() {
                     console.trace("uhoh", errorMessage);
                 }
             );
+        } else {
+            console.log("<no longer logged in>");
+            navigate("/home");
         }
     });
 

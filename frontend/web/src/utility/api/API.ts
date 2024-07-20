@@ -16,10 +16,11 @@ export async function request<T extends keyof Payloads>(type: T, payload: Payloa
             // status OK
             case 200: {
                 const json = JSON.parse(await response.text());
+                success(json);
+                // this must be updated *after* success is run since success might update the account information (which jwt changing relies on)
                 if (json.jwt) {
                     userJWT.value = json.jwt;
                 }
-                success(json);
                 break;
             }
             // status UNAUTHENTICATED
