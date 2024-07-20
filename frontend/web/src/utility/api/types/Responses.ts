@@ -26,6 +26,13 @@ type TripsSearchResponse = {
     pageCount: number;
 };
 type TripsCreateResponse = { tripId: string };
+export type Member = {
+    name: string;
+    bio: string;
+    email: string;
+    isLeader: boolean;
+};
+type TripsGetMembersResponse = { members: Member[] };
 
 export type Responses = {
     refreshJWT: RefreshJWTResponse;
@@ -38,4 +45,5 @@ export type Responses = {
 
     "trips/search": TripsSearchResponse;
     "trips/create": TripsCreateResponse;
+    "trips/getMembers": TripsGetMembersResponse;
 };
