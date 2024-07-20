@@ -12,12 +12,12 @@ type UsersForgotPasswordResponse = { message: string };
 type UsersResetPasswordResponse = { message: string };
 
 export type Trip = {
+    _id: string;
     name: string;
     description: string;
     inviteCode: string;
-    // leaderId: ObjectId;
-    // memberIds: ObjectId[];
     leaderId: string;
+    // NOTE: probably not needed at this point
     memberIds: string[];
 };
 type TripsSearchResponse = {
