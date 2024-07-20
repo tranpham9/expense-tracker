@@ -10,13 +10,25 @@ import { ThemeProvider } from "@emotion/react";
 import { CssBaseline } from "@mui/material";
 import { theme } from "./Theme";
 import Test from "./components/Test";
+import { useEffect } from "react";
+import { request } from "./utility/api/API";
+import { userJWT } from "./Signals/Account";
+import { useSignals } from "@preact/signals-react/runtime";
 
 export default function App() {
-    /*
+    useSignals();
+
+    // run on startup to ensure use should still be logged in
     useEffect(() => {
-        // TODO: store/load relevant JWT
-    }, [isLoggedIn]);
-    */
+        if (userJWT.value) {
+            request(
+                "refreshJWT",
+                {},
+                () => console.log("User loaded in with a valid session; refreshed JWT."),
+                () => console.log("User loaded in with an expired session; logging out.")
+            );
+        }
+    }, []);
 
     return (
         <ThemeProvider theme={theme}>
