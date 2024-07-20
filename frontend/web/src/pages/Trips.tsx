@@ -193,6 +193,15 @@ export default function Trips() {
                         );
                     }}
                 />
+                <IconButton
+                    type="button"
+                    // disabled={*}
+                    sx={{ p: "10px", ml: 1 }}
+                    aria-label="add"
+                    onClick={() => {}}
+                >
+                    <AddIcon />
+                </IconButton>
             </Box>
             {!trips.value || trips.value.length ? <LinkedPagination isEnabled={!!trips.value} /> : <></>}
             {trips.value ? <RenderedTrips /> : <LoadingSkeleton />}
