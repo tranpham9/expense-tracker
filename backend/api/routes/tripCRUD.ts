@@ -355,16 +355,15 @@ router.post("/listExpenses", async (req, res) => {
     }
 });
 
-router.post("/read", async (req, res) => {
+router.post("/getMembers", async (req, res) => {
     let client: MongoClient | undefined;
     try {
-        let { memberIds } = req.body;
-        if (!(memberIds instanceof Array)) {
+        let { tripId } = req.body;
+        if (!tripId) {
             res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
             return;
         }
-        // tripId = ObjectId.createFromHexString(tripId);
-        memberIds = memberIds.map(ObjectId.createFromHexString);
+        tripId = ObjectId.createFromHexString(tripId);
 
         const userId = extractUserId(res.locals.refreshedJWT);
         if (!userId) {
@@ -375,18 +374,39 @@ router.post("/read", async (req, res) => {
         client = await getMongoClient();
         const db = client.db(DB_NAME);
         const userCollection = db.collection<User>(USER_COLLECTION_NAME);
+        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
 
-        // Define an array to store promises for fetching user info
-        const promises = memberIds.map(async (objectId: ObjectId) => {
-            // Find the user by _id (objectId)
-            return await userCollection.findOne({ _id: objectId }, { projection: { _id: 0, password: 0} });
+        const trip = await tripCollection.findOne({
+            _id: tripId,
+            $or: [
+                //[wrap]
+                { leaderId: userId },
+                { memberIds: userId },
+            ],
         });
+        if (!trip) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Invalid trip" });
+            return;
+        }
 
-        // Execute all promises concurrently
-        const memberIdsInfo = await Promise.all(promises);
+        const memberIds = trip.memberIds.concat([trip.leaderId]).filter((memberId) => !memberId.equals(userId));
 
-        res.status(200).json({memberIdsInfo})
-    
+        let members = await userCollection
+            .find({
+                _id: {
+                    $in: memberIds,
+                },
+            })
+            .project({
+                _id: 1,
+                name: 1,
+                email: 1, // for looking at a user's bio, there will need to be a user endpoint which uses email
+                bio: 1,
+            })
+            .toArray();
+        members = members.map((member) => ({ name: member.name, bio: member.bio, email: member.email, isLeader: member._id.equals(trip.leaderId) }));
+
+        res.status(STATUS_OK).json({ members, jwt: res.locals.refreshedJWT });
     } catch (error) {
         console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
