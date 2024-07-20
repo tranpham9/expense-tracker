@@ -206,7 +206,7 @@ router.post("/join", async (req, res) => {
             // only add if not already in list
             { $addToSet: { memberIds: userId } }
         );
-        if (result.acknowledged) {
+        if (result.matchedCount >= 1) {
             res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
         } else {
             // either the invite code doesn't exist or the user is not someone who can join the invite code (i.e. they are the leader or already a part of the trip), so it's an invalid code for them
