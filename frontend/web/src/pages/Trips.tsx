@@ -7,6 +7,7 @@ import { request } from "../utility/api/API";
 import { Trip } from "../utility/api/types/Responses";
 import { untracked } from "@preact/signals-react";
 import AddIcon from "@mui/icons-material/Add";
+import CreateTripOverlay from "../components/CreateTripOverlay";
 
 export default function Trips() {
     useSignals();
@@ -19,6 +20,7 @@ export default function Trips() {
     const isBuffering = useSignal(false);
     const currentPage = useSignal(1);
     const pageCount = useSignal(1);
+    const isCreateTripOverlayVisible = useSignal(false);
 
     // NOTE: this also runs when isLoggedIn is first computed
     useSignalEffect(() => {
@@ -208,7 +210,9 @@ export default function Trips() {
                     // disabled={*}
                     sx={{ p: "10px", ml: 1 }}
                     aria-label="add"
-                    onClick={() => {}}
+                    onClick={() => {
+                        isCreateTripOverlayVisible.value = true;
+                    }}
                 >
                     <AddIcon />
                 </IconButton>
@@ -218,6 +222,7 @@ export default function Trips() {
             {/* TODO: is this too flashy?  The search query finishes quite quickly, so this pops up on screen very briefly; it ends up rather jarring */}
             {/* {!isBuffering.value && trips.value ? <RenderedTrips /> : <LoadingSkeleton />} */}
             <LinkedPagination isEnabled={!!trips.value} />
+            <CreateTripOverlay isCreateTripOverlayVisible={isCreateTripOverlayVisible} />
         </>
     );
 }
