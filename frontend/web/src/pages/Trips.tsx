@@ -18,6 +18,7 @@ export default function Trips() {
     const searchInputText = useSignal("");
     const isBuffering = useSignal(false);
     const currentPage = useSignal(1);
+    const pageCount = useSignal(1);
 
     // NOTE: this also runs when isLoggedIn is first computed
     useSignalEffect(() => {
@@ -36,6 +37,12 @@ export default function Trips() {
     });
 
     const performSearch = (query = "", page = 1) => {
+        if (isBuffering.value) {
+            console.log("can't search while a search request is inflight");
+            console.warn("ideally, this should never be reached");
+            return;
+        }
+
         console.log("searching for", query);
 
         isBuffering.value = true;
@@ -69,11 +76,17 @@ export default function Trips() {
             }}
         >
             <Pagination
-                count={10}
+                count={pageCount.value}
                 color="primary"
                 page={currentPage.value}
                 disabled={!isEnabled}
                 onChange={(_event, page) => {
+                    // TODO: might want to instead make this a part of the disabled state, though it might be a bit clunky if all the buttons are constantly going between disabled and not
+                    if (isBuffering.value) {
+                        console.log("can't search while a search request is inflight");
+                        return;
+                    }
+
                     currentPage.value = page;
                     performSearch(searchInputText.value, page);
                 }}
