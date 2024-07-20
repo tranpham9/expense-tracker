@@ -168,9 +168,11 @@ router.post("/delete", async (req, res) => {
             return;
         }
 
-        // cascade the deletion (at this point, the user was able to successfully delete the trip, so all the corresponding expenses should get expunged)
-        // no need to await since it's possible for there to be no corresponding expenses for the trip (in which case the deletion wouldn't get acknowledged, i.e. the deletion count would be 0)
-        await expenseCollection.deleteMany({ tripId });
+        if(result.deletedCount >= 1) {
+            // cascade the deletion (at this point, the user was able to successfully delete the trip, so all the corresponding expenses should get expunged)
+            // no need to await since it's possible for there to be no corresponding expenses for the trip (in which case the deletion wouldn't get acknowledged, i.e. the deletion count would be 0)
+            await expenseCollection.deleteMany({ tripId });
+        }
 
         res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
     } catch (error) {
@@ -206,7 +208,7 @@ router.post("/join", async (req, res) => {
             // only add if not already in list
             { $addToSet: { memberIds: userId } }
         );
-        if (result.matchedCount >= 1) {
+        if (result.acknowledged && result.matchedCount >= 1) {
             res.status(STATUS_OK).json({ jwt: res.locals.refreshedJWT });
         } else {
             // either the invite code doesn't exist or the user is not someone who can join the invite code (i.e. they are the leader or already a part of the trip), so it's an invalid code for them
