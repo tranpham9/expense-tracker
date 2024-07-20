@@ -2,9 +2,9 @@
 // Compress some code that can be factored out
 import 'dart:core';
 import 'package:accountability_mobile_app/globals.dart';
+import 'package:accountability_mobile_app/models/UserManager.dart';
 import 'package:flutter/material.dart';
 import '../../api/login_user.dart';
-import '../../models/User.dart';
 import '../../utility/helpers.dart';
 import '../home_page/homepage.dart';
 import './register.dart';
@@ -25,7 +25,7 @@ class _LoginPage extends State<LoginPage> {
   String? passwordError;
 
   // Call the API endpoint to log the user in
-  Future<User?> loginUser(String email, String password) async {
+  Future<int?> loginUser(String email, String password) async {
     return await LoginUser.login(email, password);
   }
 
@@ -125,13 +125,7 @@ class _LoginPage extends State<LoginPage> {
                             emailError = null;
                             passwordError = null;
                           });
-                          // Set the current user of the app
-                          Globals.user = response;
-                          // TODO: Set up sort of local secure storage to place 'jwt'
-                          // Store the jwt for future use
-                          await Globals.storage
-                              .write(key: 'jwt', value: response.jwt);
-                          print(Globals.storage.read(key: 'jwt'));
+
                           // Route to the home page
                           Navigator.push(
                             context,

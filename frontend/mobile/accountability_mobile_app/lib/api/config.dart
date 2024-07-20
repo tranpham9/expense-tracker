@@ -6,14 +6,16 @@ class Config {
       'https://accountability-190955e8b06f.herokuapp.com/api';
   // Login/Register
   static const String loginAPI = '/users/login';
-  static const String registerAPI = 'users/register';
+  static const String registerAPI = '/users/register';
   // User
-  static const String joinTripAPI = '/users/joinTrip';
+  static const String forgotPasswordAPI = '/users/forgotPassword';
+  static const String updateUserAPI = '/users/update';
   // Trips
-  static const String getTripsAPI = '/trips/listMemberOf';
-  static const String getTripsOwnedAPI = '/trips/listOwnerOf';
+  static const String searchTripsAPI = '/trips/search';
   static const String createTripAPI = '/trips/create';
   static const String getTripAPI = '/trips/get';
   static const String updateTripAPI = '/trips/update';
+  static const String joinTripAPI = '/trips/join';
+  static const String listExpenseAPI = '/trips/listExpenses';
   // Expenses
 }

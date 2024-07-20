@@ -65,6 +65,10 @@ String hash(String text) {
   return md5.convert(utf8.encode(text)).toString();
 }
 
+String capitalize(String word) {
+  return "${word[0].toUpperCase()}${word.substring(1).toLowerCase()}";
+}
+
 // Create an overlay with the text of 'message'
 OverlayEntry createOverlayEntry(String message) {
   return OverlayEntry(

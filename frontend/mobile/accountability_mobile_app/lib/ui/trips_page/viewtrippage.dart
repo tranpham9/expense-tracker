@@ -35,7 +35,7 @@ class _ViewTripsPage extends State<ViewTripPage> {
         children: [
           // List the notes of the trip
           ListTile(
-            title: Text('${widget.trip.notes}'),
+            title: Text('${widget.trip.description}'),
             subtitle: Text('Notes'),
             trailing: ElevatedButton(
               onPressed: () {

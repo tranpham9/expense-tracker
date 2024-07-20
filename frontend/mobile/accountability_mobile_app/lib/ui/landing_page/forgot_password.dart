@@ -1,4 +1,5 @@
 import 'dart:core';
+import 'package:accountability_mobile_app/api/forgot_password.dart';
 import 'package:accountability_mobile_app/utility/helpers.dart';
 import 'package:flutter/material.dart';
 
@@ -41,6 +42,11 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
     });
   }
 
+  // Call the API endpoint to log the user in
+  Future<int?> forgotPassword(String email) async {
+    return await ForgotPassword.forgotPassword(email);
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -69,9 +75,20 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
           onPressed: disableButton([recoveryEmailError], [recoveryEmail.text])
               ? null
               : () {
-                  // TODO: Call the API to send recovery code to the email
-                  print("Sending Recovery Email");
-                  _showOverlay("Recovery Code Sent to ${recoveryEmail.text}");
+                  // Call the API
+                  forgotPassword(recoveryEmail.text).then((response) async {
+                    if (response != 200) {
+                      // Display an error
+                      setState(() {
+                        recoveryEmailError =
+                            "There Was an Error, Please Try Again";
+                      });
+                      return;
+                    }
+                    // Success! Show success overlay
+                    _showOverlay(
+                        "Success! Recovery Code Sent to ${recoveryEmail.text}");
+                  });
                 },
           child: const Text('Send Recovery Email'),
         ),

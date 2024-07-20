@@ -17,8 +17,8 @@ class _TripsPageState extends State<TripsPage> {
   final TextEditingController _searchQuery = TextEditingController();
 
   // Get a list of trips a user is apart of
-  Future<List<Trip>?> getTrips() async {
-    return await TripCRUD.getTrips();
+  Future<List<Trip>?> getTrips(int page, String query) async {
+    return await TripCRUD.getTrips(page, query);
   }
 
   @override
@@ -57,7 +57,7 @@ class _TripsPageState extends State<TripsPage> {
             ),
             Expanded(
               child: FutureBuilder<List<Trip>?>(
-                future: getTrips(),
+                future: getTrips(0, ""),
                 builder: (context, snapshot) {
                   // Display the loading skeleton for the trips
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -74,7 +74,7 @@ class _TripsPageState extends State<TripsPage> {
                     return ListView.builder(
                       itemBuilder: (context, index) => ListTile(
                         title: Text(trips[index].name),
-                        subtitle: Text(trips[index].notes),
+                        subtitle: Text(trips[index].description),
                         onLongPress: () {
                           Navigator.push(
                             context,

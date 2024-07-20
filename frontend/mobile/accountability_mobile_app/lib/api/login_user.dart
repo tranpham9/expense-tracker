@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:accountability_mobile_app/api/config.dart';
 import 'package:dio/dio.dart';
+import '../globals.dart';
 import '../models/User.dart';
+import '../models/UserManager.dart';
 
 class LoginUser {
-  static Future<User?> login(String email, String password) async {
+  static Future<int?> login(String email, String password) async {
     // Create a connection client
     final Dio dio = new Dio();
 
@@ -18,9 +20,13 @@ class LoginUser {
       if (response.statusCode != 200) {
         throw Exception("Failed to Log User in");
       }
+      // Store the user object
+      Globals.user = userFromJson(jsonEncode(response.data));
+      // Store the jwt
+      await UserManager.saveJwt(response.data['jwt']);
 
-      // Return the user information back
-      return userFromJson(jsonEncode(response.data));
+      // Successful login
+      return 200;
     } on DioException catch (e) {
       print('Error: $e');
       // return nothing

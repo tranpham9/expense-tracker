@@ -17,12 +17,13 @@ class _AddTripsPageState extends State<AddTripsPage> {
   final TextEditingController notes = TextEditingController();
   // The user can enter a trip code to join someone else's trip
   final TextEditingController code = TextEditingController();
+  String? codeError;
 
   // Show a pop up overlay after a successful registration
   OverlayEntry? _overlayEntry;
-
-  Future<int?> createTrip(String name, String notes) async {
-    return await TripCRUD.createTrip(name, notes);
+  // Create a trip with the user as the leader
+  Future<int?> createTrip(String name, String description) async {
+    return await TripCRUD.createTrip(name, description);
   }
 
   // Show a given pop up overlay
@@ -94,7 +95,7 @@ class _AddTripsPageState extends State<AddTripsPage> {
                       return;
                     }
                     // Display success to the user
-                    _showOverlay("Successfully create ${name.text}!");
+                    _showOverlay("Successfully created ${name.text}!");
                     return;
                   });
                 },
@@ -103,9 +104,8 @@ class _AddTripsPageState extends State<AddTripsPage> {
             SizedBox(
               height: 150,
             ),
-            // TODO: Call the join trip endpoint to add a user to a trip
             // Allow others to join a trip by inputting a trip code
-            JoinTrip(code: code),
+            JoinTrip(code: code, codeError: codeError),
           ],
         ),
       ),
@@ -113,11 +113,22 @@ class _AddTripsPageState extends State<AddTripsPage> {
   }
 }
 
-// Input the UUID code for a trip in order to join it
-class JoinTrip extends StatelessWidget {
+// Input the invite code to join a trip
+class JoinTrip extends StatefulWidget {
   final TextEditingController code;
+  String? codeError;
 
-  const JoinTrip({super.key, required this.code});
+  JoinTrip({super.key, required this.code, required this.codeError});
+
+  @override
+  State<JoinTrip> createState() => _JoinTripState();
+}
+
+class _JoinTripState extends State<JoinTrip> {
+  // Join someone else's trip
+  Future<int?> joinTrip(String inviteCode) async {
+    return await TripCRUD.joinTrip(inviteCode);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,11 +146,11 @@ class JoinTrip extends StatelessWidget {
               )),
             ),
             TextField(
-              controller: code,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Trip Code',
-              ),
+              controller: widget.code,
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Trip Code',
+                  errorText: widget.codeError),
             ),
             Container(
               height: 50,
@@ -155,6 +166,14 @@ class JoinTrip extends StatelessWidget {
                 ),
                 onPressed: () {
                   // TODO: Add the user to the trip if it exists
+                  joinTrip(widget.code.text).then((response) {
+                    if (response == null) {
+                      setState(() {
+                        widget.codeError = "That Trip Does Not Exists";
+                      });
+                      return;
+                    }
+                  });
                   // alert the user that they are added to the trip with an overlay notification
                 },
               ),
@@ -181,18 +200,18 @@ class EditNameNotesPage extends StatefulWidget {
 // Could possibly be an overlay??
 class _EditNameNotesPage extends State<EditNameNotesPage> {
   TextEditingController nameController = TextEditingController();
-  TextEditingController notesController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
 
   @override
   void initState() {
     // Set the text fields to the current values
     nameController.text = widget.trip.name;
-    notesController.text = widget.trip.notes;
+    descriptionController.text = widget.trip.description;
   }
 
-  static Future<int?> editNameNotes(
-      String tripId, String name, String notes) async {
-    return await TripCRUD.editNameNotes(tripId, name, notes);
+  static Future<int?> updateTrip(
+      String tripId, String name, String description) async {
+    return await TripCRUD.updateTrip(tripId, name, description);
   }
 
   Widget build(BuildContext context) {
@@ -213,7 +232,7 @@ class _EditNameNotesPage extends State<EditNameNotesPage> {
               ),
             ),
             TextFormField(
-              controller: notesController,
+              controller: descriptionController,
               decoration: InputDecoration(
                 labelText: 'Notes',
               ),
@@ -224,10 +243,10 @@ class _EditNameNotesPage extends State<EditNameNotesPage> {
               onPressed: () {
                 // Save the changes and go back to the screen
                 widget.trip.name = nameController.text;
-                widget.trip.notes = notesController.text;
+                widget.trip.description = descriptionController.text;
                 // TODO: Write the changes with the API and reflect those changes on the page
-                editNameNotes(widget.trip.id, nameController.text,
-                        notesController.text)
+                updateTrip(widget.trip.id, nameController.text,
+                        descriptionController.text)
                     .then((response) {
                   if (response == null) {
                     print("Error editing names/notes");
