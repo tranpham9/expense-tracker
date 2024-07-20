@@ -361,12 +361,13 @@ router.post("/listExpenses", async (req, res) => {
 router.post("/read", async (req, res) => {
     let client: MongoClient | undefined;
     try {
-        let { tripId } = req.body;
-        if (!tripId) {
+        let { memberIds } = req.body;
+        if (!(memberIds instanceof Array)) {
             res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
             return;
         }
-        tripId = ObjectId.createFromHexString(tripId);
+        // tripId = ObjectId.createFromHexString(tripId);
+        memberIds = memberIds.map(ObjectId.createFromHexString);
 
         const userId = extractUserId(res.locals.refreshedJWT);
         if (!userId) {
@@ -376,30 +377,20 @@ router.post("/read", async (req, res) => {
 
         client = await getMongoClient();
         const db = client.db(DB_NAME);
-        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
         const userCollection = db.collection<User>(USER_COLLECTION_NAME);
+        const tripCollection = db.collection<Trip>(TRIP_COLLECTION_NAME);
 
-        const trip = await tripCollection.findOne({
-            _id: tripId,
-            $or: [{ leaderId: userId }, { memberIds: userId }],
+        // Define an array to store promises for fetching user info
+        const promises = memberIds.map(async (objectId: ObjectId) => {
+            // Find the user by _id (objectId)
+            return await userCollection.findOne({ _id: objectId }, { projection: { name: 1, email: 1, bio: 1 } });
         });
-        if (!trip) {
-            res.status(STATUS_BAD_REQUEST).json({ error: "Invalid trip" });
-            return;
-        } else {
-            let index = 0;
-            while (trip.memberIds[index] != null) {
-                let foundUser = await userCollection.findOne({ _id: trip.memberIds[index] });
-                if (foundUser) {
-                    res.status(STATUS_OK).json({
-                        name: foundUser.name,
-                        email: foundUser.email,
-                        bio: foundUser.bio,
-                    });
-                }
-                index++;
-            }
-        }
+
+        // Execute all promises concurrently
+        const memberIdsInfo = await Promise.all(promises);
+
+        res.status(200).json({memberIdsInfo})
+    
     } catch (error) {
         console.trace(error);
         res.status(STATUS_INTERNAL_SERVER_ERROR).json({ error: "Something went wrong" });
