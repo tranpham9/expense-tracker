@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/inputs/SearchBar";
 import { Box, Grid, Pagination, Paper, Skeleton, Stack, Typography } from "@mui/material";
@@ -6,64 +6,43 @@ import { isLoggedIn } from "../Signals/Account";
 import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import { request } from "../utility/api/API";
 import { Trip } from "../utility/api/types/Responses";
+import { untracked } from "@preact/signals-react";
 
 export default function Trips() {
     useSignals();
 
+    // https://stackoverflow.com/questions/74413650/what-is-difference-between-usenavigate-and-redirect-in-react-route-v6
     const navigate = useNavigate();
 
-    // https://stackoverflow.com/questions/74413650/what-is-difference-between-usenavigate-and-redirect-in-react-route-v6
-    /*
-    useEffect(() => {
-        if (!isLoggedIn) {
-            console.log("<not logged in>");
-            navigate("/home");
-        }
-    }, [isLoggedIn, navigate]); // always trigger when navigating to here (navigate changes when path changes)
-    */
-    /*
-    useEffect(() => {
-        isLoggedIn.subscribe(() => {
-            if (!isLoggedIn.value) {
-                console.log("<not logged in>");
-                navigate("/home");
-            }
-        });
-    }, []);
-    */
     const trips = useSignal<Trip[] | null>(null);
 
-    // redirect if not logged in  (on mount/after first paint)
-    useEffect(() => {
-        if (!isLoggedIn.value) {
-            console.log("<not logged in>");
-            navigate("/home");
-            return;
-        }
-    }, []);
+    const defaultSearch = () => {
+        request(
+            "trips/search",
+            {},
+            (response) => {
+                trips.value = response.trips;
+            },
+            (errorMessage) => {
+                console.trace("uhoh", errorMessage);
+            }
+        );
+    };
 
+    // NOTE: this also runs when isLoggedIn is first computed
     useSignalEffect(() => {
         if (isLoggedIn.value) {
-            console.log("Just became logged in; running signal effect in Trips");
-
-            request(
-                "trips/search",
-                {},
-                (response) => {
-                    trips.value = response.trips;
-                },
-                (errorMessage) => {
-                    console.trace("uhoh", errorMessage);
-                }
-            );
+            console.log("<loaded trips page while logged in>");
+            untracked(defaultSearch);
         } else {
-            console.log("<no longer logged in>");
+            // console.log("<no longer logged in>");
+            console.log("<not logged in>");
             navigate("/home");
         }
     });
 
     useSignalEffect(() => {
-        console.log("Trips changed", trips);
+        console.log("Trips changed", trips.value);
     });
 
     // TODO: extract this to its own file once pagination isproperly set up in api
@@ -186,9 +165,25 @@ export default function Trips() {
                     m: 2,
                 }}
             >
-                <SearchBar />
+                <SearchBar
+                    onSearch={(query) => {
+                        console.log("searching for", query);
+                        request(
+                            "trips/search",
+                            { query, page: 1 },
+                            (response) => {
+                                trips.value = response.trips;
+                                setPage(1);
+                                console.log(response.trips, trips.value);
+                            },
+                            (errorMessage) => {
+                                console.log(errorMessage);
+                            }
+                        );
+                    }}
+                />
             </Box>
-            {(!trips.value || trips.value.length) && <LinkedPagination isEnabled={!!trips.value} />}
+            {!trips.value || trips.value.length ? <LinkedPagination isEnabled={!!trips.value} /> : <></>}
             {trips.value ? <RenderedTrips /> : <LoadingSkeleton />}
             <LinkedPagination isEnabled={!!trips.value} />
         </>

@@ -34,4 +34,4 @@ userInfo.subscribe((newUserInfo) => {
     }
 });
 
-export const isLoggedIn = computed(() => !!userJWT.value);
+export const isLoggedIn = computed(() => !!userInfo.value);
