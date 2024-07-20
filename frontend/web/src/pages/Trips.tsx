@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/inputs/SearchBar";
 import { Box, Grid, IconButton, Pagination, Paper, Skeleton, Stack, Typography } from "@mui/material";
@@ -16,44 +15,9 @@ export default function Trips() {
     const navigate = useNavigate();
 
     const trips = useSignal<Trip[] | null>(null);
-
-    /*
-    const defaultSearch = () => {
-        request(
-            "trips/search",
-            {},
-            (response) => {
-                trips.value = response.trips;
-            },
-            (errorMessage) => {
-                console.trace("uhoh", errorMessage);
-            }
-        );
-    };
-    */
-
-    const performSearch = (query = "", page = 1) => {
-        console.log("searching for", query);
-
-        isBuffering.value = true;
-
-        request(
-            "trips/search",
-            { query, page },
-            (response) => {
-                trips.value = response.trips;
-                setPage(page);
-                console.log(response.trips, trips.value);
-
-                isBuffering.value = false;
-            },
-            (errorMessage) => {
-                console.log(errorMessage);
-
-                isBuffering.value = false;
-            }
-        );
-    };
+    const searchInputText = useSignal("");
+    const isBuffering = useSignal(false);
+    const currentPage = useSignal(1);
 
     // NOTE: this also runs when isLoggedIn is first computed
     useSignalEffect(() => {
@@ -68,11 +32,33 @@ export default function Trips() {
     });
 
     useSignalEffect(() => {
-        console.log("Trips changed", trips.value);
+        console.log("Trips changed to", trips.value);
     });
 
-    // TODO: extract this to its own file once pagination isproperly set up in api
-    const [page, setPage] = useState(1);
+    const performSearch = (query = "", page = 1) => {
+        console.log("searching for", query);
+
+        isBuffering.value = true;
+
+        request(
+            "trips/search",
+            { query, page },
+            (response) => {
+                trips.value = response.trips;
+                currentPage.value = page;
+                console.log(response.trips, trips.value);
+
+                isBuffering.value = false;
+            },
+            (errorMessage) => {
+                console.log(errorMessage);
+
+                isBuffering.value = false;
+            }
+        );
+    };
+
+    // TODO: potentially extract this to its own file?  (This would be low pirority though, since linked pagination isn't needed anywhere else)
     const LinkedPagination = ({ isEnabled = true }) => (
         <Box
             sx={{
@@ -85,10 +71,10 @@ export default function Trips() {
             <Pagination
                 count={10}
                 color="primary"
-                page={page}
+                page={currentPage.value}
                 disabled={!isEnabled}
                 onChange={(_event, page) => {
-                    setPage(page);
+                    currentPage.value = page;
                     performSearch(searchInputText.value, page);
                 }}
             />
@@ -184,9 +170,6 @@ export default function Trips() {
             ))}
         </Stack>
     );
-
-    const isBuffering = useSignal(false);
-    const searchInputText = useSignal("");
 
     return (
         <>
