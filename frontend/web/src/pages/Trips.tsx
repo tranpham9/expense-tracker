@@ -83,6 +83,7 @@ export default function Trips() {
                         container
                         p={2}
                         spacing={2}
+                        alignItems={"center"}
                     >
                         <Grid
                             item
@@ -195,6 +196,8 @@ export default function Trips() {
             </Box>
             {!trips.value || trips.value.length ? <LinkedPagination isEnabled={!!trips.value} /> : <></>}
             {trips.value ? <RenderedTrips /> : <LoadingSkeleton />}
+            {/* TODO: is this too flashy?  The search query finishes quite quickly, so this pops up on screen very briefly; it ends up rather jarring */}
+            {/* {!isBuffering.value && trips.value ? <RenderedTrips /> : <LoadingSkeleton />} */}
             <LinkedPagination isEnabled={!!trips.value} />
         </>
     );

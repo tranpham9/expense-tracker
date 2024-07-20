@@ -22,6 +22,7 @@ export default function SearchBar({
 
     return (
         // https://mui.com/material-ui/react-paper/#elevation
+        // <Typography>Search</Typography>
         <Paper
             component="form"
             elevation={10}

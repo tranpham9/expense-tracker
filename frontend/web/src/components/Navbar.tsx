@@ -96,6 +96,10 @@ export default function Navbar() {
             name: "Trips",
             requiresLoggedIn: true,
         },
+        {
+            name: "Expenses",
+            requiresLoggedIn: true,
+        },
     ];
 
     const options: Option[] = [
