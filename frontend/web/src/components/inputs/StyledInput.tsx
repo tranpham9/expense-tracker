@@ -7,6 +7,7 @@ export default function StyledInput({
     label = "",
     error = "",
     required = true,
+    useMultiline = false,
     onChange,
     onEnterKey,
 }: {
@@ -14,6 +15,7 @@ export default function StyledInput({
     label?: string;
     error?: string;
     required?: boolean;
+    useMultiline?: boolean;
     onChange?: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
     onEnterKey?: () => void;
 }) {
@@ -22,6 +24,8 @@ export default function StyledInput({
             type={type}
             label={label}
             variant="outlined"
+            multiline={useMultiline}
+            rows={3}
             margin="dense"
             required={required}
             error={error !== ""}
