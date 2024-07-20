@@ -7,11 +7,11 @@ import PasswordInput from "./inputs/PasswordInput";
 import { useNavigate } from "react-router-dom";
 import { request } from "../utility/api/API";
 import md5 from "md5";
-import { userInfo, userJWT } from "../Signals/Account";
+import { userInfo, } from "../Signals/Account";
 import { useSignal, useSignals } from "@preact/signals-react/runtime";
 
 // TODO: make pressing enter in a field click submit button
-export default function Login({ onSuccessFulLogin = () => {} }) {
+export default function Login({ onSuccessfulLogin = () => {} }) {
     useSignals();
 
     const errorMessage = useSignal("");
@@ -39,9 +39,8 @@ export default function Login({ onSuccessFulLogin = () => {} }) {
             (response) => {
                 console.log(response);
                 userInfo.value = response;
-                userJWT.value = response.jwt;
 
-                onSuccessFulLogin();
+                onSuccessfulLogin();
 
                 if (response.jwt) {
                     navigate("/trips");

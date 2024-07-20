@@ -12,7 +12,7 @@ export default function AccountOverlay({ isAccountOverlayVisible, setIsAccountOv
     const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
         setActiveTab(newValue);
     };
-    
+
     return (
         <Modal
             isOpen={isAccountOverlayVisible}
@@ -29,7 +29,12 @@ export default function AccountOverlay({ isAccountOverlayVisible, setIsAccountOv
                         <Tab label="Signup" />
                     </Tabs>
                 </Box>
-                {activeTab ? <Signup onSuccessfulSignup={() => setActiveTab(0)} /> : <Login onSuccessFulLogin={() => setIsAccountOverlayVisible(false)} />}
+                {activeTab ? (
+                    //[wrap]
+                    <Signup onSuccessfulSignup={() => setActiveTab(0)} />
+                ) : (
+                    <Login onSuccessfulLogin={() => setIsAccountOverlayVisible(false)} />
+                )}
             </>
         </Modal>
     );
