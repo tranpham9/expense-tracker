@@ -1,4 +1,4 @@
-import { userJWT } from "../../Signals/Account";
+import { userInfo, userJWT } from "../../Signals/Account";
 import { Payloads } from "./types/Payloads";
 import { Responses } from "./types/Responses";
 
@@ -18,14 +18,18 @@ export async function request<T extends keyof Payloads>(type: T, payload: Payloa
                 const json = JSON.parse(await response.text());
                 success(json);
                 // this must be updated *after* success is run since success might update the account information (which jwt changing relies on)
-                if (json.jwt) {
-                    userJWT.value = json.jwt;
+                if (json.jwt && userInfo.value) {
+                    // userJWT.value = json.jwt;
+                    // userInfo.value.jwt = json.jwt;
+                    // TODO: I don't think that objects are "deeply reactive," so I believe that reassignment to the object itself is required (as opposed to just doing signal.obj.prop = ...)
+                    userInfo.value = { ...userInfo.value, jwt: json.jwt };
                 }
                 break;
             }
             // status UNAUTHENTICATED
             case 401: {
-                userJWT.value = null;
+                // userJWT.value = null;
+                userInfo.value = null;
 
                 const json = JSON.parse(await response.text());
                 fail(json.error);
