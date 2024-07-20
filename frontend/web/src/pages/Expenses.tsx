@@ -1,9 +1,14 @@
 import { Avatar, AvatarGroup, Box, Button, Grid, Paper, Skeleton, Stack, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { getInitials } from "../utility/Manipulation";
-import { useSignalEffect, useSignals } from "@preact/signals-react/runtime";
+import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import { useNavigate } from "react-router-dom";
 import { isLoggedIn } from "../Signals/Account";
+import { signal } from "@preact/signals-react";
+import { request } from "../utility/api/API";
+import { Member } from "../utility/api/types/Responses";
+
+export const currentTripId = signal("");
 
 // TODO: get member names from backend
 const members: string[] = ["Joe Bro", "Bob", "Carol", "David", "Emily"];
@@ -24,6 +29,11 @@ export default function Expenses() {
         if (isLoggedIn.value) {
             console.log("<loaded exenses page while logged in>");
             // untracked(defaultSearch);
+
+            if (!currentTripId.value) {
+                console.log("<no trip selected>");
+                navigate("/trips");
+            }
         } else {
             // console.log("<no longer logged in>");
             console.log("<not logged in>");

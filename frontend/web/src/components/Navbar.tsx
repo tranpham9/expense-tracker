@@ -18,11 +18,12 @@ import AccountOverlay from "./AccountOverlay";
 import { getInitials } from "../utility/Manipulation";
 import { isLoggedIn, userInfo } from "../Signals/Account";
 import { useSignal, useSignals } from "@preact/signals-react/runtime";
+import { currentTripId } from "../pages/Expenses";
 
 type Page = {
     name: string;
     customPath?: string;
-    requiresLoggedIn?: boolean;
+    getEnabled: () => boolean;
 };
 
 type Option = {
@@ -88,14 +89,15 @@ export default function Navbar() {
     const pages: Page[] = [
         {
             name: "Home",
+            getEnabled: () => true,
         },
         {
             name: "Trips",
-            requiresLoggedIn: true,
+            getEnabled: () => isLoggedIn.value,
         },
         {
             name: "Expenses",
-            requiresLoggedIn: true,
+            getEnabled: () => isLoggedIn.value && currentTripId.value !== "",
         },
     ];
 
@@ -193,8 +195,7 @@ export default function Navbar() {
                                         key={page.name}
                                         selected={isCurrentPage(page)}
                                         onClick={() => navigateToPage(page)}
-                                        // disabled={page.requiresLoggedIn && !userJWT.value}
-                                        disabled={page.requiresLoggedIn && !isLoggedIn}
+                                        disabled={!page.getEnabled()}
                                     >
                                         <Typography textAlign="center">{page.name}</Typography>
                                     </MenuItem>
@@ -237,7 +238,7 @@ export default function Navbar() {
                                     key={page.name}
                                     variant="contained"
                                     onClick={() => navigateToPage(page)}
-                                    disabled={page.requiresLoggedIn && !isLoggedIn.value}
+                                    disabled={!page.getEnabled()}
                                     sx={{
                                         mx: 0.5,
                                         my: 2,
