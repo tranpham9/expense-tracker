@@ -13,25 +13,6 @@ export default function Expenses() {
     useSignals();
 
     const members = useSignal<Member[]>([]);
-    //  = useComputed(() => {
-    useSignalEffect(() => {
-        if (!currentTripId.value) {
-            members.value = [];
-        }
-
-        request(
-            "trips/getMembers",
-            { tripId: currentTripId.value },
-            (response) => {
-                console.log(response);
-                members.value = response.members;
-            },
-            (errorMessage) => {
-                console.log(errorMessage);
-            }
-        );
-    });
-
     // https://stackoverflow.com/questions/74413650/what-is-difference-between-usenavigate-and-redirect-in-react-route-v6
     const navigate = useNavigate();
 
@@ -45,7 +26,19 @@ export default function Expenses() {
             console.log("<loaded exenses page while logged in>");
             // untracked(defaultSearch);
 
-            if (!currentTripId.value) {
+            if (currentTripId.value) {
+                request(
+                    "trips/getMembers",
+                    { tripId: currentTripId.value },
+                    (response) => {
+                        console.log(response);
+                        members.value = response.members;
+                    },
+                    (errorMessage) => {
+                        console.log(errorMessage);
+                    }
+                );
+            } else {
                 console.log("<no trip selected>");
                 navigate("/trips");
             }
