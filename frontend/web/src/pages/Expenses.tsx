@@ -1,12 +1,16 @@
-import { Avatar, AvatarGroup, Box, Button, Grid, Paper, Skeleton, Stack, Typography } from "@mui/material";
+import { Avatar, AvatarGroup, Box, Button, Grid, IconButton, Paper, Stack, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { getInitials } from "../utility/Manipulation";
 import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import { useNavigate } from "react-router-dom";
 import { isLoggedIn } from "../Signals/Account";
 import { request } from "../utility/api/API";
-import { Member } from "../utility/api/types/Responses";
+import { Expense, Member } from "../utility/api/types/Responses";
 import { currentTripId } from "../Signals/Trip";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import LoadingSkeleton from "../components/LoadingSkeleton";
+import SearchBar from "../components/inputs/SearchBar";
 // TODO: use this for generating the expense report
 // import GenerateReportIcon from "@mui/icons-material/CurrencyExchange";
 
@@ -15,6 +19,9 @@ export default function Expenses() {
     useSignals();
 
     const members = useSignal<Member[]>([]);
+    const expenses = useSignal<Expense[] | null>(null);
+    const query = useSignal("");
+
     // https://stackoverflow.com/questions/74413650/what-is-difference-between-usenavigate-and-redirect-in-react-route-v6
     const navigate = useNavigate();
 
@@ -40,6 +47,17 @@ export default function Expenses() {
                         console.log(errorMessage);
                     }
                 );
+                request(
+                    "trips/listExpenses",
+                    { tripId: currentTripId.value },
+                    (response) => {
+                        console.log(response);
+                        expenses.value = response.expenses;
+                    },
+                    (errorMessage) => {
+                        console.log(errorMessage);
+                    }
+                );
             } else {
                 console.log("<no trip selected>");
                 navigate("/trips");
@@ -55,8 +73,113 @@ export default function Expenses() {
     //     console.log("Trips changed", trips.value);
     // });
 
+    const RenderedExpenses = () => (
+        <Stack sx={{ textAlign: "center", mx: { md: 4 } }}>
+            {expenses.value
+                ?.filter((expense) => {
+                    const searchTerm = query.value.toLocaleLowerCase();
+                    return expense.name.toLocaleLowerCase().includes(searchTerm) || expense.description.toLocaleLowerCase().includes(searchTerm) || `$${expense.cost.toFixed(2)}`.includes(searchTerm); // || members.value.some((member) => expense.memberIds.includes(member.))
+                })
+                .map((expense, i) => (
+                    <Paper
+                        key={i}
+                        elevation={10}
+                        sx={{
+                            m: 1,
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Grid
+                            container
+                            p={2}
+                            spacing={2}
+                            alignItems="center"
+                        >
+                            <Grid
+                                item
+                                xs={5}
+                                sm={4}
+                                md={2}
+                            >
+                                <Typography>{expense.name}</Typography>
+                            </Grid>
+                            <Grid
+                                item
+                                xs={2}
+                                sm={4}
+                                md={8}
+                            >
+                                <Box whiteSpace="pre-wrap">{expense.description}</Box>
+                            </Grid>
+                            <Grid
+                                item
+                                xs={5}
+                                sm={4}
+                                md={2}
+                                textAlign="right"
+                            >
+                                <IconButton
+                                    type="button"
+                                    sx={{ p: "5px" }}
+                                    aria-label="edit"
+                                    onClick={() => {
+                                        // TODO: impl
+                                    }}
+                                >
+                                    <EditIcon />
+                                </IconButton>
+                                <IconButton
+                                    type="button"
+                                    sx={{ p: "5px" }}
+                                    aria-label="delete"
+                                    onClick={() => {
+                                        // TODO: impl
+                                    }}
+                                >
+                                    <DeleteIcon />
+                                </IconButton>
+                            </Grid>
+                        </Grid>
+                    </Paper>
+                ))}
+        </Stack>
+    );
+
     return (
         <>
+            {/* <Typography variant="h4">[Trip Title]</Typography> */}
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    m: 2,
+                }}
+            >
+                <SearchBar
+                    placeholder="Search Expenses"
+                    onChange={(event) => {
+                        query.value = event.target.value;
+                    }}
+                    // onSearch={(currentQuery) => {
+                    //     query.value = currentQuery;
+                    // }}
+                />
+                <IconButton
+                    type="button"
+                    // disabled={*}
+                    sx={{ p: "10px", ml: 1 }}
+                    aria-label="add"
+                    onClick={() => {
+                        // isCreateTripOverlayVisible.value = true;
+                    }}
+                >
+                    <AddIcon />
+                </IconButton>
+            </Box>
+
             <Grid
                 container
                 direction={"row"}
@@ -64,9 +187,6 @@ export default function Expenses() {
                 px={4}
                 py={2}
             >
-                <Grid item>
-                    <Typography variant="h4">{"Trip Expense"}</Typography>
-                </Grid>
                 <Grid item>
                     <AvatarGroup
                         max={4}
@@ -87,41 +207,7 @@ export default function Expenses() {
             >
                 <Button startIcon={<AddIcon />}> Add an Expense </Button>
             </Box>
-            <Stack sx={{ textAlign: "center", mx: { md: 4 } }}>
-                {[...Array(20).keys()].map((i) => (
-                    <Paper
-                        key={i}
-                        elevation={10}
-                        sx={{
-                            m: 1,
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                        }}
-                    >
-                        <Grid
-                            container
-                            p={2}
-                            spacing={2}
-                        >
-                            <Grid
-                                item
-                                xs={10}
-                            >
-                                <Skeleton width="100%" />
-                                <Skeleton width="100%" />
-                            </Grid>
-                            <Grid
-                                item
-                                xs={2}
-                            >
-                                <Skeleton width="100%" />
-                                <Skeleton width="100%" />
-                            </Grid>
-                        </Grid>
-                    </Paper>
-                ))}
-            </Stack>
+            {expenses.value ? <RenderedExpenses /> : <LoadingSkeleton />}
         </>
     );
 }

@@ -7,6 +7,7 @@ import { CircularProgress } from "@mui/material";
 
 /* TODO: should this clear on submit or not? */
 export default function SearchBar({
+    placeholder,
     isBuffering = false,
     onChange = (event) => {
         event; // no-op for ESLint
@@ -15,6 +16,7 @@ export default function SearchBar({
         query; // no-op for ESLint
     },
 }: {
+    placeholder: string;
     isBuffering?: boolean;
     onChange?: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>;
     onSearch?: (query: string) => void;
@@ -43,8 +45,8 @@ export default function SearchBar({
         >
             <InputBase
                 sx={{ ml: 1, flex: 1 }}
-                placeholder="Search Trips"
-                inputProps={{ "aria-label": "search trips" }}
+                placeholder={placeholder}
+                inputProps={{ "aria-label": placeholder.toLocaleLowerCase() }}
                 inputRef={inputRef}
                 onChange={onChange}
                 onKeyDown={(event) => {
