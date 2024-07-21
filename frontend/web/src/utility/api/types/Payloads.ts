@@ -22,15 +22,12 @@ type TripsSearchPaylod = {
     query?: string;
     page?: number;
 };
-
 type TripsCreatePayload = {
     name?: string;
     description?: string;
 };
-
-type TripsGetMembersPayload = {
-    tripId: string;
-};
+type TripsGetMembersPayload = { tripId: string };
+type TripsListExpensesPayload = { tripId: string };
 
 export type Payloads = {
     refreshJWT: RefreshJWTPayload;
@@ -44,4 +41,5 @@ export type Payloads = {
     "trips/search": TripsSearchPaylod;
     "trips/create": TripsCreatePayload;
     "trips/getMembers": TripsGetMembersPayload;
+    "trips/listExpenses": TripsListExpensesPayload;
 };

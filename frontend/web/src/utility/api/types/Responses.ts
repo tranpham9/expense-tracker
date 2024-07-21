@@ -33,6 +33,16 @@ export type Member = {
     isLeader: boolean;
 };
 type TripsGetMembersResponse = { members: Member[] };
+export type Expense = {
+    _id: string;
+    name: string;
+    description: string;
+    cost: number;
+    tripId: string;
+    payerId: string;
+    memberIds: string[];
+};
+type TripsListExpensesResponse = { expenses: Expense[] };
 
 export type Responses = {
     refreshJWT: RefreshJWTResponse;
@@ -46,4 +56,5 @@ export type Responses = {
     "trips/search": TripsSearchResponse;
     "trips/create": TripsCreateResponse;
     "trips/getMembers": TripsGetMembersResponse;
+    "trips/listExpenses": TripsListExpensesResponse;
 };
