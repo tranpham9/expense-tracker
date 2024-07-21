@@ -18,7 +18,7 @@ import AccountOverlay from "./AccountOverlay";
 import { getInitials } from "../utility/Manipulation";
 import { isLoggedIn, userInfo } from "../Signals/Account";
 import { useSignal, useSignals } from "@preact/signals-react/runtime";
-import { currentTripId } from "../Signals/Trip";
+import { currentTrip } from "../Signals/Trip";
 
 type Page = {
     name: string;
@@ -97,7 +97,7 @@ export default function Navbar() {
         },
         {
             name: "Expenses",
-            getEnabled: () => isLoggedIn.value && currentTripId.value !== "",
+            getEnabled: () => isLoggedIn.value && !!currentTrip.value,
         },
     ];
 

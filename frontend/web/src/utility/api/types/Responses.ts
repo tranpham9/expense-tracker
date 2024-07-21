@@ -5,7 +5,8 @@ export type UsersLoginResponse = {
     userId: string;
     name: string;
     email: string;
-    jwt: string; // rest of the responses don't need to specify this explicitly
+    // rest of the responses don't need to specify this explicitly
+    jwt: string;
 };
 type UsersUpdateResponse = object; // empty response (when ignoring jwt)
 type UsersForgotPasswordResponse = { message: string };
@@ -25,7 +26,11 @@ type TripsSearchResponse = {
     unpaginatedTripCount: number;
     pageCount: number;
 };
-type TripsCreateResponse = { tripId: string };
+type TripsCreateResponse = {
+    // kept in for compatibility
+    tripId: string;
+    trip: Trip;
+};
 export type Member = {
     name: string;
     bio: string;

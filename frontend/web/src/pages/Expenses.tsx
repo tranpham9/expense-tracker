@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { isLoggedIn } from "../Signals/Account";
 import { request } from "../utility/api/API";
 import { Expense, Member } from "../utility/api/types/Responses";
-import { currentTripId, currentTripInfo } from "../Signals/Trip";
+import { currentTrip } from "../Signals/Trip";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LoadingSkeleton from "../components/LoadingSkeleton";
@@ -35,10 +35,10 @@ export default function Expenses() {
             console.log("<loaded exenses page while logged in>");
             // untracked(defaultSearch);
 
-            if (currentTripId.value) {
+            if (currentTrip.value) {
                 request(
                     "trips/getMembers",
-                    { tripId: currentTripId.value },
+                    { tripId: currentTrip.value._id },
                     (response) => {
                         console.log(response);
                         members.value = response.members;
@@ -49,7 +49,7 @@ export default function Expenses() {
                 );
                 request(
                     "trips/listExpenses",
-                    { tripId: currentTripId.value },
+                    { tripId: currentTrip.value._id },
                     (response) => {
                         console.log(response);
                         expenses.value = response.expenses;
@@ -161,7 +161,7 @@ export default function Expenses() {
                     variant="h5"
                     flexShrink={0}
                 >
-                    {currentTripInfo.value.name}
+                    {currentTrip.value?.name}
                 </Typography>
                 {/* <Typography>{currentTripInfo.value.description}</Typography> */}
                 {/* <Stack direction="row" spacing={1} overflow="auto"> */}
