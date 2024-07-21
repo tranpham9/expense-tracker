@@ -1,4 +1,4 @@
-import { Avatar, AvatarGroup, Box, Button, Grid, IconButton, Paper, Stack, Typography } from "@mui/material";
+import { Avatar, AvatarGroup, Box, Chip, Divider, Grid, IconButton, Paper, Stack, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { getInitials } from "../utility/Manipulation";
 import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { isLoggedIn } from "../Signals/Account";
 import { request } from "../utility/api/API";
 import { Expense, Member } from "../utility/api/types/Responses";
-import { currentTripId } from "../Signals/Trip";
+import { currentTripId, currentTripInfo } from "../Signals/Trip";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LoadingSkeleton from "../components/LoadingSkeleton";
@@ -149,7 +149,132 @@ export default function Expenses() {
 
     return (
         <>
-            {/* <Typography variant="h4">[Trip Title]</Typography> */}
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    m: 2,
+                }}
+            >
+                <Typography
+                    variant="h5"
+                    flexShrink={0}
+                >
+                    {currentTripInfo.value.name}
+                </Typography>
+                {/* <Typography>{currentTripInfo.value.description}</Typography> */}
+                {/* <Stack direction="row" spacing={1} overflow="auto"> */}
+                <Box
+                    sx={{
+                        display: "flex",
+                        flexWrap: { xs: "nowrap", md: "wrap" },
+                        overflow: "auto",
+                        gap: 1,
+                    }}
+                >
+                    <Chip
+                        avatar={<Avatar>JZ</Avatar>}
+                        label="$2.48"
+                    />
+                    <Chip
+                        avatar={<Avatar>JZ</Avatar>}
+                        label="$2.48"
+                    />
+                    <Chip
+                        avatar={<Avatar>XY</Avatar>}
+                        label="$479.24"
+                    />
+                    <Chip
+                        avatar={<Avatar>JZ</Avatar>}
+                        label="$2.48"
+                    />
+                    <Chip
+                        avatar={<Avatar>JZ</Avatar>}
+                        label="$2.48"
+                    />
+                    <Chip
+                        avatar={<Avatar>XY</Avatar>}
+                        label="$479.24"
+                    />
+                    <Chip
+                        avatar={<Avatar>JZ</Avatar>}
+                        label="$2.48"
+                    />
+                    <Chip
+                        avatar={<Avatar>XY</Avatar>}
+                        label="$479.24"
+                    />
+                    <Chip
+                        avatar={<Avatar>JZ</Avatar>}
+                        label="$2.48"
+                    />
+                    <Chip
+                        avatar={<Avatar>JZ</Avatar>}
+                        label="$2.48"
+                    />
+                    <Chip
+                        avatar={<Avatar>JZ</Avatar>}
+                        label="$2.48"
+                    />
+                    <Chip
+                        avatar={<Avatar>JZ</Avatar>}
+                        label="$2.48"
+                    />
+                    <Chip
+                        avatar={<Avatar>JZ</Avatar>}
+                        label="$2.48"
+                    />
+                    <Chip
+                        avatar={<Avatar>XY</Avatar>}
+                        label="$479.24"
+                    />
+                    <Chip
+                        avatar={<Avatar>JZ</Avatar>}
+                        label="$2.48"
+                    />
+                    <Chip
+                        avatar={<Avatar>JZ</Avatar>}
+                        label="$2.48"
+                    />
+                    <Chip
+                        avatar={<Avatar>JZ</Avatar>}
+                        label="$2.48"
+                    />
+                    <Chip
+                        avatar={<Avatar>XY</Avatar>}
+                        label="$479.24"
+                    />
+                    <Chip
+                        avatar={<Avatar>JZ</Avatar>}
+                        label="$2.48"
+                    />
+                    <Chip
+                        avatar={<Avatar>JZ</Avatar>}
+                        label="$2.48"
+                    />
+                </Box>
+                {/* </Stack> */}
+                {/* <Grid
+                    container
+                    direction={"row"}
+                    justifyContent={"space-between"}
+                    px={4}
+                    py={2}
+                >
+                    <Grid item>
+                        <AvatarGroup
+                            max={4}
+                            spacing={4}
+                        >
+                            {members.value.map((member, i) => (
+                                <Avatar key={i}>{getInitials(member.name)}</Avatar>
+                            ))}
+                        </AvatarGroup>
+                    </Grid>
+                </Grid> */}
+            </Box>
+            <Divider />
             <Box
                 sx={{
                     display: "flex",
@@ -178,34 +303,6 @@ export default function Expenses() {
                 >
                     <AddIcon />
                 </IconButton>
-            </Box>
-
-            <Grid
-                container
-                direction={"row"}
-                justifyContent={"space-between"}
-                px={4}
-                py={2}
-            >
-                <Grid item>
-                    <AvatarGroup
-                        max={4}
-                        spacing={4}
-                    >
-                        {members.value.map((member, i) => (
-                            <Avatar key={i}>{getInitials(member.name)}</Avatar>
-                        ))}
-                    </AvatarGroup>
-                </Grid>
-            </Grid>
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    px: 4,
-                }}
-            >
-                <Button startIcon={<AddIcon />}> Add an Expense </Button>
             </Box>
             {expenses.value ? <RenderedExpenses /> : <LoadingSkeleton />}
         </>
