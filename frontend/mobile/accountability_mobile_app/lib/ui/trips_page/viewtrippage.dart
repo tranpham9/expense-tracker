@@ -1,6 +1,6 @@
 import 'package:accountability_mobile_app/api/trip_crud.dart';
-import 'package:accountability_mobile_app/ui/trips_page/tripspages.dart';
 import 'package:flutter/material.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../../globals.dart';
 import '../../models/Trip.dart';
 import '../../utility/helpers.dart';
@@ -19,16 +19,11 @@ class ViewTripPage extends StatefulWidget {
 
 class _ViewTripsPage extends State<ViewTripPage> {
   List<Expense> expenses = []; // Placeholder for expenses list
+  List<User> members = []; // Placeholder for members list
 
-  @override
-  void initState() {
-    super.initState();
-    // TODO: Fetch members and expenses from the API
-  }
-
-  static Future<List<Trip>?> listExpenses(String tripId) async {
-    return await TripCRUD.listExpenses(tripId);
-  }
+  // static Future<List<Trip>?> listExpenses(String tripId) async {
+  //   return await TripCRUD.listExpenses(tripId);
+  // }
 
   static Future<int?> deleteTrip(String tripId) async {
     return await TripCRUD.deleteTrip(tripId);
@@ -71,33 +66,64 @@ class _ViewTripsPage extends State<ViewTripPage> {
           ),
           // Display the members of the trip
           Expanded(
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: widget.trip.memberIds.length,
-              itemBuilder: (context, index) {
-                // Grab the member
-                print("got before member");
-                // TODO: Gonna need an endpoint that gets the name associated with the user id
-                User member = userFromJson(widget.trip.memberIds[index]);
-                print("got after member");
-                return SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ViewMemberPage(member),
+            child: FutureBuilder<List<User>?>(
+              future: TripCRUD.getMembers(widget.trip.id),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Skeletonizer(
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 5,
+                      itemBuilder: (context, index) {
+                        return MemberSkeleton();
+                      },
+                    ),
+                  );
+                } else if (snapshot.data!.isEmpty) {
+                  return Center(
+                    child: Text("No Members Found"),
+                  );
+                } else if (snapshot.hasData) {
+                  List<User> members = snapshot.data!;
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: members.length,
+                    itemBuilder: (context, index) {
+                      // Grab the member
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: SizedBox(
+                          width: 100,
+                          height: 100,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ViewMemberPage(members[index]),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              fixedSize: const Size(100, 100),
+                              shape: const CircleBorder(),
+                            ),
+                            child: Text(
+                              members[index].name.substring(0, 2).toUpperCase(),
+                              style: TextStyle(
+                                  fontSize: 24,
+                                  decoration: TextDecoration.underline,
+                                  decorationThickness: 2.0),
+                            ),
+                          ),
                         ),
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      shape: CircleBorder(),
-                      padding: EdgeInsets.all(10),
-                    ),
-                    child: Text('${member.name}'),
-                  ),
+                  );
+                }
+                return Center(
+                  child: Text("Error Loading Members"),
                 );
               },
             ),
@@ -131,29 +157,68 @@ class _ViewTripsPage extends State<ViewTripPage> {
             ),
           ),
           // Display a ListView of the expenses associated with the trip
-          // TODO: Fix this, cause it doesn't work
+          // TODO: Fix the distance between the add button and expense
           Expanded(
-            child: ListView.builder(
-              scrollDirection: Axis.vertical,
-              itemCount: expenses.length,
-              itemBuilder: (context, index) {
-                Expense expense = expenses[index];
-                return ListTile(
-                  title: Text(expense.name),
-                  subtitle: Text(expense.description),
-                  trailing: Text('\$${expense.cost}'),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ViewExpensePage(expense),
-                      ),
-                    );
-                  },
+            child: FutureBuilder<List<Expense>?>(
+              future: TripCRUD.listExpenses(widget.trip.id),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Skeletonizer(
+                    child: ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      itemCount: 5,
+                      itemBuilder: (context, index) {
+                        return ExpenseSkeleton();
+                      },
+                    ),
+                  );
+                } else if (snapshot.data!.isEmpty) {
+                  return Center(
+                    child: Text("No Expenses Found"),
+                  );
+                } else if (snapshot.hasData) {
+                  List<Expense> expenses = snapshot.data!;
+                  return ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    itemCount: expenses.length,
+                    itemBuilder: (context, index) {
+                      // Grab the member
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ViewExpensePage(expenses[index]),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
+                            padding: EdgeInsets.all(10),
+                          ),
+                          child: Container(
+                            width: double.infinity,
+                            height: 35,
+                            padding: EdgeInsets.all(10),
+                            child: Text(expenses[index].name),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }
+                return Center(
+                  child: Text("Error Loading Expenses"),
                 );
               },
             ),
           ),
+          // Delete Trip
           ElevatedButton(
             onPressed: Globals.user?.userId != widget.trip.leaderId
                 ? null
@@ -170,6 +235,40 @@ class _ViewTripsPage extends State<ViewTripPage> {
             child: Icon(Icons.delete),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class MemberSkeleton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Container(
+        width: 100,
+        height: 100,
+        decoration: BoxDecoration(
+          color: Colors.grey,
+          shape: BoxShape.circle,
+        ),
+      ),
+    );
+  }
+}
+
+class ExpenseSkeleton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Container(
+        width: double.infinity,
+        height: 50,
+        decoration: BoxDecoration(
+            color: Colors.grey,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(18.0)),
       ),
     );
   }

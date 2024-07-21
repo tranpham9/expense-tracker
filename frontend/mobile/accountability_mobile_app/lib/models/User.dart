@@ -1,7 +1,9 @@
 import 'dart:convert';
 
-List<User> userListFromJson(String str) => List<User>.from(
-    json.decode(str)['trips'].map((x) => User.fromJson(x)).toList());
+// List<User> userListFromJson(String str) => List<User>.from(
+//     json.decode(str)['trips'].map((x) => User.fromJson(x)).toList());
+List<User> userListFromJson(String str) =>
+    List<User>.from(json.decode(str).map((x) => User.fromJson(x)).toList());
 
 User userFromJson(String str) => User.fromJson(json.decode(str));
 
@@ -9,7 +11,7 @@ String userToJson(User data) => json.encode(data.toJson());
 
 // Store basic user information
 class User {
-  String userId;
+  String? userId;
   String name;
   String email;
   String? bio;

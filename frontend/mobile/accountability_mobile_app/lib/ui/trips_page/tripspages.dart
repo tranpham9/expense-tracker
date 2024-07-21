@@ -128,25 +128,3 @@ class TripsSkeleton extends StatelessWidget {
     );
   }
 }
-
-// Generate a receipt for the current trip, which includes all members and expenses up to this point
-// TODO: Need to determine how to lay this out and complete the calculations
-class ReceiptPage extends StatefulWidget {
-  final Trip trip;
-  // Pass a trip to the widget
-  const ReceiptPage({super.key, required this.trip});
-
-  @override
-  State<ReceiptPage> createState() => _ReceiptPage();
-}
-
-class _ReceiptPage extends State<ReceiptPage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Generating A Receipt"),
-      ),
-    );
-  }
-}

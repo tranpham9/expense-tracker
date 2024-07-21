@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:accountability_mobile_app/api/config.dart';
 import 'package:accountability_mobile_app/models/UserManager.dart';
 import 'package:dio/dio.dart';
+import '../models/Expense.dart';
 import '../models/Trip.dart';
 import '../models/User.dart';
 
@@ -151,7 +152,7 @@ class TripCRUD {
   }
 
   // Get a list of expenses related to a trip
-  static Future<List<Trip>?> listExpenses(String tripId) async {
+  static Future<List<Expense>?> listExpenses(String tripId) async {
     final Dio dio = new Dio();
 
     try {
@@ -170,7 +171,7 @@ class TripCRUD {
       // Store the jwt
       await UserManager.saveJwt(response.data['jwt']);
       // Successfully retrieved expenses
-      return tripListFromJson(jsonEncode(response.data['expenses']));
+      return expenseListFromJson(jsonEncode(response.data['expenses']));
     } catch (e) {
       print('Error: $e');
     }
@@ -197,7 +198,7 @@ class TripCRUD {
       // Store the jwt
       await UserManager.saveJwt(response.data['jwt']);
       // Successfully retrieved the list of members (except the caller)
-      return userListFromJson(jsonEncode(response.data['expenses']));
+      return userListFromJson(jsonEncode(response.data['members']));
     } catch (e) {
       print('Error: $e');
     }

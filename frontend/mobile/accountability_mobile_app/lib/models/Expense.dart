@@ -4,6 +4,9 @@
 
 import 'dart:convert';
 
+List<Expense> expenseListFromJson(String str) => List<Expense>.from(
+    json.decode(str).map((x) => Expense.fromJson(x)).toList());
+
 Expense expenseFromJson(String str) => Expense.fromJson(json.decode(str));
 
 String expenseToJson(Expense data) => json.encode(data.toJson());
@@ -11,9 +14,9 @@ String expenseToJson(Expense data) => json.encode(data.toJson());
 class Expense {
   String id;
   String name;
-  String tripId;
-  double cost;
   String description;
+  String? tripId;
+  double? cost;
 
   Expense({
     required this.id,
