@@ -224,7 +224,9 @@ class _EditNameNotesPage extends State<EditNameNotesPage> {
   void initState() {
     // Set the text fields to the current values
     nameController.text = widget.trip.name;
-    descriptionController.text = widget.trip.description;
+    descriptionController.text = widget.trip.description.isEmpty
+        ? '"Empty Description"'
+        : widget.trip.description;
   }
 
   static Future<int?> updateTrip(
@@ -234,59 +236,60 @@ class _EditNameNotesPage extends State<EditNameNotesPage> {
 
   Widget build(BuildContext context) {
     // Build the page
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit Name and Notes'),
+    return AlertDialog(
+      title: Text("Edit Name And Description"),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          TextFormField(
+            controller: nameController,
+            decoration: InputDecoration(
+              labelText: 'Trip Name',
+            ),
+          ),
+          SizedBox(
+            height: 25,
+          ),
+          TextFormField(
+            controller: descriptionController,
+            decoration: InputDecoration(
+              labelText: 'Description',
+            ),
+            maxLines: null,
+          ),
+          SizedBox(height: 20.0),
+        ],
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            TextFormField(
-              controller: nameController,
-              decoration: InputDecoration(
-                labelText: 'Trip Name',
-              ),
-            ),
-            SizedBox(
-              height: 25,
-            ),
-            TextFormField(
-              controller: descriptionController,
-              decoration: InputDecoration(
-                labelText: 'Notes',
-              ),
-              maxLines: null,
-            ),
-            SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () {
-                // Save the changes and go back to the screen
-                widget.trip.name = nameController.text;
-                widget.trip.description = descriptionController.text;
-                // TODO: Write the changes with the API and reflect those changes on the page
-                updateTrip(widget.trip.id, nameController.text,
-                        descriptionController.text)
-                    .then((response) {
-                  if (response == null) {
-                    print("Error editing names/notes");
-                    return;
-                  }
-                });
-                // Go back to the last screen
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor),
-              child: Text(
-                'Save',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Cancel'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
         ),
-      ),
+        ElevatedButton(
+          onPressed: () {
+            // Save the changes and go back to the screen
+            widget.trip.name = nameController.text;
+            widget.trip.description = descriptionController.text;
+            // TODO: Write the changes with the API and reflect those changes on the page
+            updateTrip(widget.trip.id, nameController.text,
+                    descriptionController.text)
+                .then((response) {
+              if (response == null) {
+                print("Error editing names/notes");
+                return;
+              }
+            });
+            // Go back to the last screen
+            Navigator.pop(context);
+          },
+          child: Text(
+            'Save',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -306,21 +309,28 @@ class ViewMemberPage extends StatefulWidget {
 class _ViewMemberPage extends State<ViewMemberPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('${widget.member.name}'),
-        centerTitle: true,
+    return AlertDialog(
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('${widget.member.name}'),
+          Icon(widget.member.isLeader == true ? Icons.star : Icons.group),
+        ],
       ),
-      // TODO: Probably become a column and place all their information along with how much you owe them
-      body: Container(
-        child: Center(
-          child: Text(
-            '${widget.member.email}',
-            style: TextStyle(
-              fontSize: 20,
-            ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            title: Text("${widget.member?.bio ?? "'Empty Bio'"}"),
+            subtitle: Text("Bio"),
           ),
-        ),
+          // Email
+          ListTile(
+            title: Text("${widget.member?.email}"),
+            subtitle: Text("Email"),
+          ),
+          // TODO: Add how much you owe them Here
+        ],
       ),
     );
   }

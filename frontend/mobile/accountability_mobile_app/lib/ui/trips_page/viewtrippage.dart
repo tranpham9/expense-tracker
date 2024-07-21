@@ -18,13 +18,6 @@ class ViewTripPage extends StatefulWidget {
 }
 
 class _ViewTripsPage extends State<ViewTripPage> {
-  List<Expense> expenses = []; // Placeholder for expenses list
-  List<User> members = []; // Placeholder for members list
-
-  // static Future<List<Trip>?> listExpenses(String tripId) async {
-  //   return await TripCRUD.listExpenses(tripId);
-  // }
-
   static Future<int?> deleteTrip(String tripId) async {
     return await TripCRUD.deleteTrip(tripId);
   }
@@ -92,30 +85,26 @@ class _ViewTripsPage extends State<ViewTripPage> {
                       // Grab the member
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: SizedBox(
-                          width: 100,
-                          height: 100,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      ViewMemberPage(members[index]),
-                                ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              fixedSize: const Size(100, 100),
-                              shape: const CircleBorder(),
-                            ),
-                            child: Text(
-                              members[index].name.substring(0, 2).toUpperCase(),
-                              style: TextStyle(
-                                  fontSize: 24,
-                                  decoration: TextDecoration.underline,
-                                  decorationThickness: 2.0),
-                            ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ViewMemberPage(members[index]),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            fixedSize: const Size(100, 100),
+                            shape: const CircleBorder(),
+                          ),
+                          child: Text(
+                            members[index].name.substring(0, 2).toUpperCase(),
+                            style: TextStyle(
+                                fontSize: 24,
+                                decoration: TextDecoration.underline,
+                                decorationThickness: 2.0),
                           ),
                         ),
                       );
@@ -147,17 +136,16 @@ class _ViewTripsPage extends State<ViewTripPage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30.0),
               ),
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
             ),
             child: Container(
               width: double.infinity,
-              height: 35,
-              padding: EdgeInsets.all(10),
+              height: 50,
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Icon(Icons.add),
             ),
           ),
           // Display a ListView of the expenses associated with the trip
-          // TODO: Fix the distance between the add button and expense
           Expanded(
             child: FutureBuilder<List<Expense>?>(
               future: TripCRUD.listExpenses(widget.trip.id),
@@ -199,13 +187,16 @@ class _ViewTripsPage extends State<ViewTripPage> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30.0),
                             ),
-                            padding: EdgeInsets.all(10),
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
                           ),
                           child: Container(
                             width: double.infinity,
-                            height: 35,
+                            height: 50,
                             padding: EdgeInsets.all(10),
-                            child: Text(expenses[index].name),
+                            child: Text(
+                              expenses[index].name,
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ),
                       );
@@ -293,7 +284,9 @@ class EditNameNotes extends StatelessWidget {
                   subtitle: Text('Name'),
                 ),
                 ListTile(
-                  title: Text('${trip.description}'),
+                  title: Text(trip.description.isEmpty
+                      ? '"Empty Description"'
+                      : trip.description),
                   subtitle: Text('Description'),
                 )
               ],
