@@ -282,6 +282,31 @@ paths:
             properties:
               tripId:
                 description: The ID of the created trip
+              trip:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    description: ID of the trip, suitable for other /trips/ endpoint calls
+                  name:
+                    type: string
+                    description: Title of the trip
+                  description:
+                    type: string
+                    description: Miscellaneous description for the trip
+                  inviteCode:
+                    type: string
+                    description: Code to join the trip
+                  leaderId:
+                    type: string
+                    description: ID of the creator of the trip
+                  memberIds:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                          _id:
+                            type: string
               jwt:
                 type: string
                 description: Refreshed JWT
