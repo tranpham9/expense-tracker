@@ -1,6 +1,6 @@
-import { Avatar, AvatarGroup, Box, Chip, Divider, Grid, IconButton, Paper, Stack, Typography } from "@mui/material";
+import { Avatar, Box, Chip, Divider, Grid, IconButton, Paper, Stack, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { getInitials } from "../utility/Manipulation";
+// import { getInitials } from "../utility/Manipulation";
 import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import { useNavigate } from "react-router-dom";
 import { isLoggedIn } from "../Signals/Account";
