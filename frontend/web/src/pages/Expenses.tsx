@@ -1,4 +1,4 @@
-import { Avatar, Box, Chip, Divider, Grid, IconButton, Paper, Stack, Typography } from "@mui/material";
+import { Avatar, AvatarGroup, Box, Chip, Divider, Grid, IconButton, Paper, Stack, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 // import { getInitials } from "../utility/Manipulation";
 import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
@@ -11,7 +11,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LoadingSkeleton from "../components/LoadingSkeleton";
 import SearchBar from "../components/inputs/SearchBar";
-import { getFormattedCurrency } from "../utility/Manipulation";
+import { getFormattedCurrency, getInitials } from "../utility/Manipulation";
 // TODO: use this for generating the expense report
 // import GenerateReportIcon from "@mui/icons-material/CurrencyExchange";
 
@@ -102,25 +102,51 @@ export default function Expenses() {
                         >
                             <Grid
                                 item
-                                xs={5}
-                                sm={4}
-                                md={2}
+                                xs={3}
+                                sm={2}
                             >
                                 <Typography>{expense.name}</Typography>
                             </Grid>
                             <Grid
                                 item
-                                xs={2}
+                                xs={3}
                                 sm={4}
-                                md={8}
                             >
                                 <Box whiteSpace="pre-wrap">{expense.description}</Box>
                             </Grid>
                             <Grid
                                 item
-                                xs={5}
-                                sm={4}
-                                md={2}
+                                xs={1}
+                                sm={1}
+                            >
+                                {getFormattedCurrency(expense.cost)}
+                            </Grid>
+                            {/* TODO: maybe make this look nicer at smaller screen sizes */}
+                            <Grid
+                                item
+                                xs={2}
+                                sm={3}
+                                display="flex"
+                                gap={1}
+                            >
+                                <Avatar
+                                    sx={{
+                                        border: "2px solid",
+                                        borderColor: "secondary.main",
+                                    }}
+                                >
+                                    {getInitials(members.value.find((member) => member._id === expense.payerId)?.name || "")}
+                                </Avatar>
+                                <AvatarGroup>
+                                    {expense.memberIds.map((memberId) => (
+                                        <Avatar key={memberId}>{getInitials(members.value.find((member) => member._id === memberId)?.name || "")}</Avatar>
+                                    ))}
+                                </AvatarGroup>
+                            </Grid>
+                            <Grid
+                                item
+                                xs={3}
+                                sm={2}
                                 textAlign="right"
                             >
                                 <IconButton
