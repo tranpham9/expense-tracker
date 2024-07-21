@@ -476,6 +476,19 @@ paths:
                     description:
                       type: string
                       description: Miscellaneous description for the trip
+                    inviteCode:
+                      type: string
+                      description: Code to join the trip
+                    leaderId:
+                      type: string
+                      description: ID of the creator of the trip
+                    memberIds:
+                      type: array
+                      items:
+                          type: object
+                          properties:
+                            _id:
+                              type: string
               jwt:
                 type: string
                 description: Refreshed JWT
@@ -522,10 +535,10 @@ paths:
                       description: ID of the expense, suitable for other /expense/ endpoint calls
                     name:
                       type: string
-                      description: Title of the trip
+                      description: Title of the expense
                     description:
                       type: string
-                      description: Miscellaneous description for the trip
+                      description: Miscellaneous description for the expense
               jwt:
                 type: string
                 description: Refreshed JWT
