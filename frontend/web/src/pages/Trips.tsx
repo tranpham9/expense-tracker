@@ -12,7 +12,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 // import OpenTripIcon from "@mui/icons-material/Login";
 import OpenExpensesIcon from "@mui/icons-material/AttachMoney";
 import CreateTripOverlay from "../components/CreateTripOverlay";
-import { currentTripId } from "../Signals/Trip";
+import { currentTripId, currentTripInfo } from "../Signals/Trip";
 import LoadingSkeleton from "../components/LoadingSkeleton";
 
 // TODO: potentially make search term and current page persistent by pulling their signals out of the function
@@ -177,6 +177,7 @@ export default function Trips() {
                                 aria-label="open trip"
                                 onClick={() => {
                                     currentTripId.value = trip._id;
+                                    currentTripInfo.value = { name: trip.name, description: trip.description };
                                     navigate("/expenses");
                                 }}
                             >

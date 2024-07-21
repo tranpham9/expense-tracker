@@ -5,7 +5,7 @@ import StyledInput from "./inputs/StyledInput";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { request } from "../utility/api/API";
 import { useNavigate } from "react-router-dom";
-import { currentTripId } from "../Signals/Trip";
+import { currentTripId, currentTripInfo } from "../Signals/Trip";
 
 export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCreateTripOverlayVisible: Signal<boolean> }) {
     useSignals();
@@ -18,12 +18,14 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
     const navigate = useNavigate();
 
     const attemptCreateTrip = () => {
+        const tripInfo = { name: name.value, description: description.value };
         request(
             "trips/create",
-            { name: name.value, description: description.value },
+            tripInfo,
             (response) => {
                 console.log(response);
                 currentTripId.value = response.tripId;
+                currentTripInfo.value = tripInfo;
                 navigate("/expenses");
             },
             (currentErrorMessage) => {
