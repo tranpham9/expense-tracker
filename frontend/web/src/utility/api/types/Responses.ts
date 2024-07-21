@@ -32,6 +32,7 @@ type TripsCreateResponse = {
     trip: Trip;
 };
 export type Member = {
+    _id: string;
     name: string;
     bio: string;
     email: string;
