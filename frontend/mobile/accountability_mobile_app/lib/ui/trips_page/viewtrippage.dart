@@ -1,7 +1,9 @@
 import 'package:accountability_mobile_app/api/trip_crud.dart';
 import 'package:accountability_mobile_app/ui/trips_page/tripspages.dart';
 import 'package:flutter/material.dart';
+import '../../globals.dart';
 import '../../models/Trip.dart';
+import '../../utility/helpers.dart';
 import 'tripcrud.dart';
 import '../../models/Expense.dart';
 import '../../models/User.dart';
@@ -28,6 +30,19 @@ class _ViewTripsPage extends State<ViewTripPage> {
     return await TripCRUD.listExpenses(tripId);
   }
 
+  static Future<int?> deleteTrip(String tripId) async {
+    return await TripCRUD.deleteTrip(tripId);
+  }
+
+  // Show a given pop up overlay
+  void _showOverlay(String message) {
+    var _overlayEntry = createOverlayEntry(message);
+    Overlay.of(context)!.insert(_overlayEntry!);
+    Future.delayed(const Duration(seconds: 5), () {
+      _overlayEntry?.remove();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,29 +52,13 @@ class _ViewTripsPage extends State<ViewTripPage> {
       ),
       body: Column(
         children: [
-          // List the notes of the trip
           ListTile(
-            title: Text('${widget.trip.description}'),
-            subtitle: Text('Notes'),
-            trailing: ElevatedButton(
-              onPressed: () {
-                // Navigate to the name and notes edit page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EditNameNotesPage(widget.trip),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
-              ),
-              child: Text(
-                "Edit",
-                style: TextStyle(color: Colors.white),
-              ),
+            title: Text(
+              "Trip Details",
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
+          EditNameNotes(trip: widget.trip),
           ListTile(
             title: Text("${widget.trip.inviteCode}"),
             subtitle: Text('Trip Code'),
@@ -156,25 +155,66 @@ class _ViewTripsPage extends State<ViewTripPage> {
             ),
           ),
           ElevatedButton(
-            onPressed: () {
-              // Generate a receipt for the current trip
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ReceiptPage(trip: widget.trip),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).primaryColor,
-            ),
-            child: Text(
-              "Generate Receipt",
-              style: TextStyle(color: Colors.white),
-            ),
+            onPressed: Globals.user?.userId != widget.trip.leaderId
+                ? null
+                : () {
+                    deleteTrip(widget.trip.id).then((response) {
+                      if (response == null) {
+                        _showOverlay("There Was an Error Deleting Your Trip.");
+                        return;
+                      }
+                      // Go back to the last screen
+                      Navigator.pop(context);
+                    });
+                  },
+            child: Icon(Icons.delete),
           ),
         ],
       ),
+    );
+  }
+}
+
+// Display the name and description and allow editing
+class EditNameNotes extends StatelessWidget {
+  final Trip trip;
+  // Pass a trip to the widget
+  EditNameNotes({super.key, required this.trip});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            child: Column(
+              children: [
+                ListTile(
+                  title: Text('${trip.name}'),
+                  subtitle: Text('Name'),
+                ),
+                ListTile(
+                  title: Text('${trip.description}'),
+                  subtitle: Text('Description'),
+                )
+              ],
+            ),
+          ),
+        ),
+        ElevatedButton(
+            onPressed: Globals.user?.userId != trip.leaderId
+                ? null
+                : () {
+                    // Navigate to the name and notes edit page
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditNameNotesPage(trip),
+                      ),
+                    );
+                  },
+            child: Icon(Icons.edit))
+      ],
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:accountability_mobile_app/api/user_crud.dart';
 import 'package:accountability_mobile_app/globals.dart';
 import 'package:flutter/material.dart';
 import '../../utility/helpers.dart';
+import 'package:flutter/cupertino.dart';
 
 // Profile Page Widget
 class ProfilePage extends StatelessWidget {
@@ -40,13 +41,7 @@ class ProfilePage extends StatelessWidget {
                                           intiCred: Globals.user?.name,
                                         )));
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColor,
-                          ),
-                          child: Text(
-                            "Edit",
-                            style: TextStyle(color: Colors.white),
-                          )),
+                          child: Icon(Icons.edit)),
                     ],
                   ),
                 ),
@@ -68,13 +63,7 @@ class ProfilePage extends StatelessWidget {
                                         credType: "bio",
                                         intiCred: Globals.user!.bio ?? "")));
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColor,
-                          ),
-                          child: Text(
-                            "Edit",
-                            style: TextStyle(color: Colors.white),
-                          )),
+                          child: Icon(Icons.edit)),
                     ],
                   ),
                 ),
@@ -97,13 +86,7 @@ class ProfilePage extends StatelessWidget {
                                           intiCred: Globals.user?.email,
                                         )));
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColor,
-                          ),
-                          child: Text(
-                            "Edit",
-                            style: TextStyle(color: Colors.white),
-                          )),
+                          child: Icon(Icons.edit)),
                     ],
                   ),
                 ),
@@ -115,9 +98,6 @@ class ProfilePage extends StatelessWidget {
             width: 400,
             padding: const EdgeInsets.all(10),
             child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
-              ),
               child: const Text(
                 'Logout',
                 style: TextStyle(color: Colors.white),

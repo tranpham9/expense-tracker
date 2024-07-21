@@ -15,7 +15,9 @@ class Config {
   static const String createTripAPI = '/trips/create';
   static const String getTripAPI = '/trips/get';
   static const String updateTripAPI = '/trips/update';
+  static const String deleteTripAPI = '/trips/delete';
   static const String joinTripAPI = '/trips/join';
   static const String listExpenseAPI = '/trips/listExpenses';
+  static const String getMembersAPI = '/trips/getMembers';
   // Expenses
 }

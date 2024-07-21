@@ -6,6 +6,7 @@ import '../../models/Trip.dart';
 import '../../models/User.dart';
 import '../../utility/helpers.dart';
 
+// Create your own trip
 class AddTripsPage extends StatefulWidget {
   @override
   State<AddTripsPage> createState() => _AddTripsPageState();
@@ -40,73 +41,79 @@ class _AddTripsPageState extends State<AddTripsPage> {
     return Scaffold(
       // Display the title at the top of the screen
       appBar: AppBar(
-        title: const Text("Add a Trip"),
+        title: Text("Trip Creation"),
         centerTitle: true,
         // We don't need a back button to go to some main page
         automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(10),
-        child: Column(
-          // Have our list of containers that will take in text input
-          children: <Widget>[
-            // Enter Name
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: TextField(
-                controller: name,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Name',
+        child: SingleChildScrollView(
+          child: Column(
+            // Have our list of containers that will take in text input
+            children: <Widget>[
+              ListTile(
+                title: Center(
+                    child: Text(
+                  "Create a Trip",
+                  style: TextStyle(fontSize: 20),
+                )),
+              ),
+              // Enter Name
+              Container(
+                padding: const EdgeInsets.all(10),
+                child: TextField(
+                  controller: name,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Name',
+                  ),
                 ),
               ),
-            ),
-            // Enter Notes
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: TextField(
-                controller: notes,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Notes',
+              // Enter Notes
+              Container(
+                padding: const EdgeInsets.all(10),
+                child: TextField(
+                  controller: notes,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Notes',
+                  ),
                 ),
               ),
-            ),
-            // Confirm Add Trip
-            Container(
-              height: 50,
-              padding: const EdgeInsets.all(10),
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                ),
-                child: const Text(
-                  'Add Trip',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () {
-                  // Create a trip with the current user as the leader
-                  createTrip(name.text, notes.text).then((response) {
-                    // Display an error message to the user
-                    if (response == null) {
-                      _showOverlay(
-                          "There was an error creating your trip. Please try again.");
+              // Confirm Add Trip
+              Container(
+                height: 50,
+                padding: const EdgeInsets.all(10),
+                width: double.infinity,
+                child: ElevatedButton(
+                  child: const Text(
+                    'Add Trip',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () {
+                    // Create a trip with the current user as the leader
+                    createTrip(name.text, notes.text).then((response) {
+                      // Display an error message to the user
+                      if (response == null) {
+                        _showOverlay(
+                            "There was an error creating your trip. Please try again.");
+                        return;
+                      }
+                      // Display success to the user
+                      _showOverlay("Successfully created ${name.text}!");
                       return;
-                    }
-                    // Display success to the user
-                    _showOverlay("Successfully created ${name.text}!");
-                    return;
-                  });
-                },
+                    });
+                  },
+                ),
               ),
-            ),
-            SizedBox(
-              height: 150,
-            ),
-            // Allow others to join a trip by inputting a trip code
-            JoinTrip(code: code, codeError: codeError),
-          ],
+              SizedBox(
+                height: 150,
+              ),
+              // Allow others to join a trip by inputting a trip code
+              JoinTrip(code: code, codeError: codeError),
+            ],
+          ),
         ),
       ),
     );
@@ -128,6 +135,15 @@ class _JoinTripState extends State<JoinTrip> {
   // Join someone else's trip
   Future<int?> joinTrip(String inviteCode) async {
     return await TripCRUD.joinTrip(inviteCode);
+  }
+
+  // Show a given pop up overlay
+  void _showOverlay(String message) {
+    var _overlayEntry = createOverlayEntry(message);
+    Overlay.of(context)!.insert(_overlayEntry!);
+    Future.delayed(const Duration(seconds: 5), () {
+      _overlayEntry?.remove();
+    });
   }
 
   @override
@@ -157,22 +173,24 @@ class _JoinTripState extends State<JoinTrip> {
               width: double.infinity,
               padding: const EdgeInsets.all(10),
               child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                ),
                 child: const Text(
                   'Join Trip',
                   style: TextStyle(color: Colors.white),
                 ),
                 onPressed: () {
-                  // TODO: Add the user to the trip if it exists
+                  // Join another users trip
                   joinTrip(widget.code.text).then((response) {
                     if (response == null) {
                       setState(() {
-                        widget.codeError = "That Trip Does Not Exists";
+                        widget.codeError = "That Trip Does Not Exist";
                       });
                       return;
                     }
+                    setState(() {
+                      widget.codeError = null;
+                    });
+                    // Show join successful overlay
+                    _showOverlay("Successfully Joined!");
                   });
                   // alert the user that they are added to the trip with an overlay notification
                 },
@@ -185,7 +203,8 @@ class _JoinTripState extends State<JoinTrip> {
   }
 }
 
-// Name & Notes Widgets
+// TODO: Implement some realtime updating
+// Name & Description Widgets (Only for the owner of the trip)
 class EditNameNotesPage extends StatefulWidget {
   // Each trip has both a name and notes associated with it
   final Trip trip;
@@ -197,7 +216,6 @@ class EditNameNotesPage extends StatefulWidget {
 }
 
 // TODO: This is kind of messed up... Should be an overlay
-// Could possibly be an overlay??
 class _EditNameNotesPage extends State<EditNameNotesPage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -230,6 +248,9 @@ class _EditNameNotesPage extends State<EditNameNotesPage> {
               decoration: InputDecoration(
                 labelText: 'Trip Name',
               ),
+            ),
+            SizedBox(
+              height: 25,
             ),
             TextFormField(
               controller: descriptionController,
@@ -268,15 +289,11 @@ class _EditNameNotesPage extends State<EditNameNotesPage> {
       ),
     );
   }
-
-  void saveEdits() {
-    // Call API
-  }
 }
 
 // Member Related Widgets
 class ViewMemberPage extends StatefulWidget {
-  // Each trip has both a name and notes associated with it
+  // Pass the member we want to look at
   final User member;
   // Make sure to pass the name and notes of the trip to the function
   const ViewMemberPage(this.member);
@@ -294,6 +311,7 @@ class _ViewMemberPage extends State<ViewMemberPage> {
         title: Text('${widget.member.name}'),
         centerTitle: true,
       ),
+      // TODO: Probably become a column and place all their information along with how much you owe them
       body: Container(
         child: Center(
           child: Text(
@@ -380,7 +398,7 @@ class _ViewExpensePage extends State<ViewExpensePage> {
               padding: const EdgeInsets.all(10),
               child: ListTile(
                 leading: Text(
-                  "Who Was Apart of This Expense?",
+                  "Members",
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                 ),
               ),
