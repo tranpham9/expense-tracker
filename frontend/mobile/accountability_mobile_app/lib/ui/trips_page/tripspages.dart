@@ -78,7 +78,7 @@ class _TripsPageState extends State<TripsPage> {
                         trailing: Icon(
                             trips[index].leaderId == Globals.user?.userId
                                 ? Icons.star
-                                : Icons.person),
+                                : Icons.group),
                         onTap: () {
                           Navigator.push(
                             context,

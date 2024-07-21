@@ -3,6 +3,7 @@ import 'package:accountability_mobile_app/api/config.dart';
 import 'package:accountability_mobile_app/models/UserManager.dart';
 import 'package:dio/dio.dart';
 import '../models/Trip.dart';
+import '../models/User.dart';
 
 class TripCRUD {
   // Create a trip with the current user as the leader
@@ -74,7 +75,6 @@ class TripCRUD {
     final Dio dio = new Dio();
 
     try {
-      // TODO: Need to put the correct url's here
       Response response =
           await dio.post('${Config.remoteApiURL}${Config.updateTripAPI}',
               data: jsonEncode(<String, String?>{
@@ -97,7 +97,32 @@ class TripCRUD {
     }
     return null;
   }
+
   // delete trip (Only for the owner)
+  static Future<int?> deleteTrip(String tripId) async {
+    final Dio dio = new Dio();
+
+    try {
+      Response response =
+          await dio.post('${Config.remoteApiURL}${Config.deleteTripAPI}',
+              data: jsonEncode(<String, String?>{
+                'jwt': await UserManager.getJwt(),
+                'tripId': tripId,
+              }));
+
+      if (response.statusCode != 200) {
+        throw Exception("Error in Joining Trip");
+      }
+
+      // Store the jwt
+      await UserManager.saveJwt(response.data['jwt']);
+      // Successful edit
+      return 200;
+    } catch (e) {
+      print('Error: $e');
+    }
+    return null;
+  }
 
   // join a trip TODO: implement checking if the trip even exists
   static Future<int?> joinTrip(String inviteCode) async {
@@ -112,7 +137,7 @@ class TripCRUD {
               }));
 
       if (response.statusCode != 200) {
-        throw Exception("Error in Creating a Trip");
+        throw Exception("Error in Joining Trip");
       }
 
       // Store the jwt
@@ -139,13 +164,40 @@ class TripCRUD {
               }));
 
       if (response.statusCode != 200) {
-        throw Exception("Error in Creating a Trip");
+        throw Exception("Error in Getting Expenses");
       }
 
       // Store the jwt
       await UserManager.saveJwt(response.data['jwt']);
       // Successfully retrieved expenses
       return tripListFromJson(jsonEncode(response.data['expenses']));
+    } catch (e) {
+      print('Error: $e');
+    }
+    return null;
+  }
+
+  // Get the members of a trip as User objects
+  static Future<List<User>?> getMembers(String tripId) async {
+    final Dio dio = new Dio();
+
+    try {
+      // Call the API
+      Response response =
+          await dio.post('${Config.remoteApiURL}${Config.getMembersAPI}',
+              data: jsonEncode(<String, String?>{
+                'jwt': await UserManager.getJwt(),
+                'tripId': tripId,
+              }));
+
+      if (response.statusCode != 200) {
+        throw Exception("Error in Getting Memebers");
+      }
+
+      // Store the jwt
+      await UserManager.saveJwt(response.data['jwt']);
+      // Successfully retrieved the list of members (except the caller)
+      return userListFromJson(jsonEncode(response.data['expenses']));
     } catch (e) {
       print('Error: $e');
     }

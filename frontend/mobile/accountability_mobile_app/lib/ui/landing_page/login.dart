@@ -1,8 +1,6 @@
 // TODO: Find a way to make the imports take less space
 // Compress some code that can be factored out
 import 'dart:core';
-import 'package:accountability_mobile_app/globals.dart';
-import 'package:accountability_mobile_app/models/UserManager.dart';
 import 'package:flutter/material.dart';
 import '../../api/login_user.dart';
 import '../../utility/helpers.dart';
@@ -94,47 +92,48 @@ class _LoginPage extends State<LoginPage> {
             Container(
               height: 50,
               padding: const EdgeInsets.all(10),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  fixedSize: Size(400, 50),
-                ),
-                // You can press the button if the input requirements are meet
-                onPressed: (disableButton([emailError, passwordError],
-                        [email.text, password.text]))
-                    ? null
-                    : () {
-                        // Call the login endpoint
-                        loginUser(email.text, hash(password.text))
-                            .then((response) async {
-                          // Let the user know the email/password was wrong
-                          if (response == null) {
+              child: SizedBox(
+                height: 50,
+                width: 400,
+                child: ElevatedButton(
+                  // You can press the button if the input requirements are meet
+                  onPressed: (disableButton([emailError, passwordError],
+                          [email.text, password.text]))
+                      ? null
+                      : () {
+                          // Call the login endpoint
+                          loginUser(email.text, hash(password.text))
+                              .then((response) async {
+                            // Let the user know the email/password was wrong
+                            if (response == null) {
+                              setState(() {
+                                emailError =
+                                    "Email/Password Combination Incorrect";
+                                passwordError =
+                                    "Email/Password Combination Incorrect";
+                              });
+                              return;
+                            }
+                            // Login was successful, route the user to their home page
+                            email.text = '';
+                            password.text = '';
+                            // Reset Decorations back to normal
                             setState(() {
-                              emailError =
-                                  "Email/Password Combination Incorrect";
-                              passwordError =
-                                  "Email/Password Combination Incorrect";
+                              emailError = null;
+                              passwordError = null;
                             });
-                            return;
-                          }
-                          // Login was successful, route the user to their home page
-                          email.text = '';
-                          password.text = '';
-                          // Reset Decorations back to normal
-                          setState(() {
-                            emailError = null;
-                            passwordError = null;
-                          });
 
-                          // Route to the home page
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => HomePage()),
-                          );
-                        });
-                      },
-                child:
-                    const Text('Login', style: TextStyle(color: Colors.white)),
+                            // Route to the home page
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomePage()),
+                            );
+                          });
+                        },
+                  child: const Text('Login',
+                      style: TextStyle(color: Colors.white)),
+                ),
               ),
             ),
             // Forgot Password
