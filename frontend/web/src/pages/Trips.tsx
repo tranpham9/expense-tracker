@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/inputs/SearchBar";
-import { Box, Grid, IconButton, Pagination, Paper, Skeleton, Stack, Typography } from "@mui/material";
+import { Box, Grid, IconButton, Pagination, Paper, Stack, Typography } from "@mui/material";
 import { isLoggedIn, userInfo } from "../Signals/Account";
 import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import { request } from "../utility/api/API";
@@ -13,6 +13,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import OpenExpensesIcon from "@mui/icons-material/AttachMoney";
 import CreateTripOverlay from "../components/CreateTripOverlay";
 import { currentTripId } from "../Signals/Trip";
+import LoadingSkeleton from "../components/LoadingSkeleton";
 
 // TODO: potentially make search term and current page persistent by pulling their signals out of the function
 
@@ -103,52 +104,6 @@ export default function Trips() {
                 }}
             />
         </Box>
-    );
-
-    const LoadingSkeleton = () => (
-        <Stack sx={{ textAlign: "center", mx: { md: 4 } }}>
-            {[...Array(10).keys()].map((i) => (
-                <Paper
-                    key={i}
-                    elevation={10}
-                    sx={{
-                        m: 1,
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                    }}
-                >
-                    <Grid
-                        container
-                        p={2}
-                        spacing={2}
-                        alignItems={"center"}
-                    >
-                        <Grid
-                            item
-                            xs={2}
-                        >
-                            <Skeleton width="100%" />
-                            <Skeleton width="100%" />
-                        </Grid>
-                        <Grid
-                            item
-                            xs={8}
-                        >
-                            <Skeleton width="100%" />
-                            <Skeleton width="100%" />
-                        </Grid>
-                        <Grid
-                            item
-                            xs={2}
-                        >
-                            <Skeleton width="100%" />
-                            <Skeleton width="100%" />
-                        </Grid>
-                    </Grid>
-                </Paper>
-            ))}
-        </Stack>
     );
 
     const RenderedTrips = () => (
@@ -245,6 +200,7 @@ export default function Trips() {
                 }}
             >
                 <SearchBar
+                    placeholder="Search Trips"
                     isBuffering={isBuffering.value}
                     onChange={(event) => {
                         searchInputText.value = event.target.value;
