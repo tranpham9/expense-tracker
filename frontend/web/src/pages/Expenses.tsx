@@ -7,6 +7,8 @@ import { isLoggedIn } from "../Signals/Account";
 import { request } from "../utility/api/API";
 import { Member } from "../utility/api/types/Responses";
 import { currentTripId } from "../Signals/Trip";
+// TODO: use this for generating the expense report
+// import GenerateReportIcon from "@mui/icons-material/CurrencyExchange";
 
 // TODO: probably remove avatar group and turn them into cards and have cards to include $ owe to friends
 export default function Expenses() {

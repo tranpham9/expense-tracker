@@ -9,7 +9,8 @@ import { untracked } from "@preact/signals-react";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import OpenTripIcon from "@mui/icons-material/Login";
+// import OpenTripIcon from "@mui/icons-material/Login";
+import OpenExpensesIcon from "@mui/icons-material/AttachMoney";
 import CreateTripOverlay from "../components/CreateTripOverlay";
 import { currentTripId } from "../Signals/Trip";
 
@@ -224,7 +225,7 @@ export default function Trips() {
                                     navigate("/expenses");
                                 }}
                             >
-                                <OpenTripIcon />
+                                <OpenExpensesIcon />
                             </IconButton>
                         </Grid>
                     </Grid>
