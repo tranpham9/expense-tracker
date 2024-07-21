@@ -74,9 +74,21 @@ router.post("/create", async (req, res) => {
             leaderId: userId,
             inviteCode: inviteCode,
         });
+        if (!result.acknowledged || !result.insertedId) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Failed to create trip" });
+            return;
+        }
+        const tripId = result.insertedId;
+
+        const trip = await tripCollection.findOne({ _id: tripId });
+        if (!trip) {
+            res.status(STATUS_BAD_REQUEST).json({ error: "Failed to create trip" });
+            return;
+        }
 
         res.status(STATUS_OK).json({
-            tripId: result.insertedId,
+            tripId,
+            trip,
             jwt: res.locals.refreshedJWT,
         });
     } catch (error) {
