@@ -14,7 +14,7 @@ import {
     User,
     USER_COLLECTION_NAME,
 } from "./common";
-import { MongoClient, ObjectId } from "mongodb";
+import { MongoClient, ObjectId, WithId } from "mongodb";
 import { authenticationRouteHandler, extractUserId } from "../JWT";
 
 export const router = express.Router();
@@ -403,20 +403,17 @@ router.post("/getMembers", async (req, res) => {
 
         const memberIds = trip.memberIds.concat([trip.leaderId]).filter((memberId) => !memberId.equals(userId));
 
-        let members = await userCollection
+        const membersIncomplete = await userCollection
             .find({
                 _id: {
                     $in: memberIds,
                 },
             })
-            .project({
-                _id: 1,
-                name: 1,
-                email: 1, // for looking at a user's bio, there will need to be a user endpoint which uses email
-                bio: 1,
+            .project<WithId<Omit<User, "password">>>({
+                password: 0,
             })
             .toArray();
-        members = members.map((member) => ({ name: member.name, bio: member.bio, email: member.email, isLeader: member._id.equals(trip.leaderId) }));
+        const members = membersIncomplete.map((member) => ({ ...member, isLeader: member._id.equals(trip.leaderId) }));
 
         res.status(STATUS_OK).json({ members, jwt: res.locals.refreshedJWT });
     } catch (error) {
