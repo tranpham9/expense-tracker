@@ -5,3 +5,7 @@ export function getInitials(name: string) {
         .reduce((res, word) => res + word.substring(0, 1), "")
         .toLocaleUpperCase();
 }
+
+export function getFormattedCurrency(amount: number) {
+    return amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
+}

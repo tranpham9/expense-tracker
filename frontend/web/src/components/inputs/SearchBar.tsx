@@ -46,7 +46,7 @@ export default function SearchBar({
             <InputBase
                 sx={{ ml: 1, flex: 1 }}
                 placeholder={placeholder}
-                inputProps={{ "aria-label": placeholder.toLocaleLowerCase() }}
+                inputProps={{ "aria-label": placeholder.toLowerCase() }}
                 inputRef={inputRef}
                 onChange={onChange}
                 onKeyDown={(event) => {

@@ -11,6 +11,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LoadingSkeleton from "../components/LoadingSkeleton";
 import SearchBar from "../components/inputs/SearchBar";
+import { getFormattedCurrency } from "../utility/Manipulation";
 // TODO: use this for generating the expense report
 // import GenerateReportIcon from "@mui/icons-material/CurrencyExchange";
 
@@ -78,7 +79,9 @@ export default function Expenses() {
             {expenses.value
                 ?.filter((expense) => {
                     const searchTerm = query.value.toLocaleLowerCase();
-                    return expense.name.toLocaleLowerCase().includes(searchTerm) || expense.description.toLocaleLowerCase().includes(searchTerm) || `$${expense.cost.toFixed(2)}`.includes(searchTerm); // || members.value.some((member) => expense.memberIds.includes(member.))
+                    return (
+                        expense.name.toLocaleLowerCase().includes(searchTerm) || expense.description.toLocaleLowerCase().includes(searchTerm) || getFormattedCurrency(expense.cost).includes(searchTerm)
+                    ); // || members.value.some((member) => expense.memberIds.includes(member.))
                 })
                 .map((expense, i) => (
                     <Paper
