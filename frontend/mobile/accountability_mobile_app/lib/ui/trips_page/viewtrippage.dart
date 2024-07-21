@@ -18,6 +18,7 @@ class ViewTripPage extends StatefulWidget {
 }
 
 class _ViewTripsPage extends State<ViewTripPage> {
+  late List<User> members;
   static Future<int?> deleteTrip(String tripId) async {
     return await TripCRUD.deleteTrip(tripId);
   }
@@ -77,7 +78,8 @@ class _ViewTripsPage extends State<ViewTripPage> {
                     child: Text("No Members Found"),
                   );
                 } else if (snapshot.hasData) {
-                  List<User> members = snapshot.data!;
+                  // List<User> members = snapshot.data!;
+                  members = snapshot.data!;
                   return ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: members.length,
@@ -129,7 +131,9 @@ class _ViewTripsPage extends State<ViewTripPage> {
               // Navigate to add expense page
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AddExpensePage()),
+                MaterialPageRoute(
+                    builder: (context) =>
+                        AddExpensePage(widget.trip.id, members)),
               );
             },
             style: ElevatedButton.styleFrom(

@@ -457,14 +457,25 @@ class _ViewExpensePage extends State<ViewExpensePage> {
   }
 }
 
-// TODO: Might change since we might not be storing this amount of information
-class AddExpensePage extends StatelessWidget {
+// TODO: Implement a check box sort of system to determine who was apart of the expense
+// It is assumed that the person creating the expense is the payer
+class AddExpensePage extends StatefulWidget {
+  // Pass the member we want to look at
+  final String tripId;
+  // Our list of members (User objects)
+  final List<User> members;
+  // Make sure to pass the name and notes of the trip to the function
+  const AddExpensePage(this.tripId, this.members);
+
+  @override
+  State<AddExpensePage> createState() => _AddExpensePageState();
+}
+
+class _AddExpensePageState extends State<AddExpensePage> {
   // Grab text that will be entered by the user
   final TextEditingController name = TextEditingController();
   final TextEditingController notes = TextEditingController();
   final TextEditingController cost = TextEditingController();
-  final TextEditingController payer = TextEditingController();
-  final TextEditingController members = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -513,29 +524,36 @@ class AddExpensePage extends StatelessWidget {
                 ),
               ),
             ),
-            // Container(
-            //   padding: const EdgeInsets.all(10),
-            //   child: TextField(
-            //     obscureText: true,
-            //     controller: payer,
-            //     decoration: const InputDecoration(
-            //       border: OutlineInputBorder(),
-            //       labelText: 'Payer',
-            //     ),
-            //   ),
-            // ),
-            // Container(
-            //   padding: const EdgeInsets.all(10),
-            //   child: TextField(
-            //     obscureText: true,
-            //     controller: members,
-            //     decoration: const InputDecoration(
-            //       border: OutlineInputBorder(),
-            //       labelText: 'Members',
-            //     ),
-            //   ),
-            // ),
-            // Confirm Add Trip
+            // Add Members to the Expense
+            // TODO: Fix this, when checked the new state isn't saved
+            SizedBox(
+              height: 200,
+              child: ListView.builder(
+                  itemCount: widget.members.length,
+                  itemBuilder: (context, index) {
+                    // Set up a list of isChecked bool's to keep track of who is added to the list
+                    List<bool> isChecked =
+                        List.generate(widget.members.length, (index) => false);
+                    return CheckboxListTile(
+                      // The member that you want to add
+                      title: Text(widget.members[index].name),
+                      value: isChecked[index],
+                      tristate: false,
+                      // Switch the value when you click
+                      onChanged: (bool? pressed) {
+                        setState(() {
+                          print("State BEFORE: ${isChecked[index]}");
+                          isChecked[index] = pressed!;
+                          print("State AFTER: ${isChecked[index]}");
+                          return;
+                        });
+                      },
+                      activeColor: Theme.of(context).primaryColor,
+                      checkColor: Colors.white,
+                    );
+                  }),
+            ),
+            // Confirm Add Expense
             Container(
               height: 50,
               padding: const EdgeInsets.all(10),
