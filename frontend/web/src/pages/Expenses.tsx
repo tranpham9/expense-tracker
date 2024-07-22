@@ -219,7 +219,7 @@ export default function Expenses() {
                             key={i}
                             avatar={<Avatar>{getInitials(member.name)}</Avatar>}
                             label="$0.00"
-                            {...(!member.isLeader && {
+                            {...(member.isLeader && {
                                 sx: {
                                     border: "2px solid",
                                     borderColor: "secondary.contrastText",
