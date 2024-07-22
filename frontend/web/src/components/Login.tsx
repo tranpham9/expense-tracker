@@ -7,7 +7,7 @@ import PasswordInput from "./inputs/PasswordInput";
 import { useNavigate } from "react-router-dom";
 import { request } from "../utility/api/API";
 import md5 from "md5";
-import { userInfo, } from "../Signals/Account";
+import { userInfo } from "../Signals/Account";
 import { useSignal, useSignals } from "@preact/signals-react/runtime";
 
 // TODO: make pressing enter in a field click submit button
@@ -52,7 +52,7 @@ export default function Login({ onSuccessfulLogin = () => {} }) {
             }
         );
     };
-    
+
     const handleForgotPassword = () => {
         // TODO: impl
     };
@@ -78,6 +78,7 @@ export default function Login({ onSuccessfulLogin = () => {} }) {
                 variant="text"
                 sx={{ m: 1 }}
                 onClick={handleForgotPassword}
+                color="info"
             >
                 Forgot Password
             </Button>
