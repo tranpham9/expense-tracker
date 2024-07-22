@@ -1,4 +1,4 @@
-import { Avatar, AvatarGroup, Box, Chip, Divider, Grid, IconButton, Paper, Stack, Typography } from "@mui/material";
+import { Avatar, AvatarGroup, Box, Button, Chip, Divider, Grid, IconButton, Paper, Stack, Tooltip, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 // import { getInitials } from "../utility/Manipulation";
 import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
@@ -133,7 +133,7 @@ export default function Expenses() {
                                 <Avatar
                                     sx={{
                                         border: "2px solid",
-                                        borderColor: "secondary.main",
+                                        borderColor: "secondary.contrastText",
                                     }}
                                 >
                                     {getInitials(members.value.find((member) => member._id === expense.payerId)?.name || "")}
@@ -211,86 +211,19 @@ export default function Expenses() {
                         gap: 1,
                     }}
                 >
-                    <Chip
-                        avatar={<Avatar>JZ</Avatar>}
-                        label="$2.48"
-                    />
-                    <Chip
-                        avatar={<Avatar>JZ</Avatar>}
-                        label="$2.48"
-                    />
-                    <Chip
-                        avatar={<Avatar>XY</Avatar>}
-                        label="$479.24"
-                    />
-                    <Chip
-                        avatar={<Avatar>JZ</Avatar>}
-                        label="$2.48"
-                    />
-                    <Chip
-                        avatar={<Avatar>JZ</Avatar>}
-                        label="$2.48"
-                    />
-                    <Chip
-                        avatar={<Avatar>XY</Avatar>}
-                        label="$479.24"
-                    />
-                    <Chip
-                        avatar={<Avatar>JZ</Avatar>}
-                        label="$2.48"
-                    />
-                    <Chip
-                        avatar={<Avatar>XY</Avatar>}
-                        label="$479.24"
-                    />
-                    <Chip
-                        avatar={<Avatar>JZ</Avatar>}
-                        label="$2.48"
-                    />
-                    <Chip
-                        avatar={<Avatar>JZ</Avatar>}
-                        label="$2.48"
-                    />
-                    {/* <Chip
-                        avatar={<Avatar>JZ</Avatar>}
-                        label="$2.48"
-                    />
-                    <Chip
-                        avatar={<Avatar>JZ</Avatar>}
-                        label="$2.48"
-                    />
-                    <Chip
-                        avatar={<Avatar>JZ</Avatar>}
-                        label="$2.48"
-                    /> */}
-                    {/* <Chip
-                        avatar={<Avatar>XY</Avatar>}
-                        label="$479.24"
-                    />
-                    <Chip
-                        avatar={<Avatar>JZ</Avatar>}
-                        label="$2.48"
-                    />
-                    <Chip
-                        avatar={<Avatar>JZ</Avatar>}
-                        label="$2.48"
-                    />
-                    <Chip
-                        avatar={<Avatar>JZ</Avatar>}
-                        label="$2.48"
-                    />
-                    <Chip
-                        avatar={<Avatar>XY</Avatar>}
-                        label="$479.24"
-                    />
-                    <Chip
-                        avatar={<Avatar>JZ</Avatar>}
-                        label="$2.48"
-                    />
-                    <Chip
-                        avatar={<Avatar>JZ</Avatar>}
-                        label="$2.48"
-                    /> */}
+                    {members.value.map((member, i) => (
+                        <Chip
+                            key={i}
+                            avatar={<Avatar>{getInitials(member.name)}</Avatar>}
+                            label="$0.00"
+                            {...(!member.isLeader && {
+                                sx: {
+                                    border: "2px solid",
+                                    borderColor: "secondary.contrastText",
+                                },
+                            })}
+                        />
+                    ))}
                 </Box>
                 {/* </Stack> */}
                 {/* <Grid

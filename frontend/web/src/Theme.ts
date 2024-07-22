@@ -10,6 +10,7 @@ const baseTheme = createTheme({
         secondary: {
             // main: orange[500],
             main: alpha(orange[500], 0.6),
+            contrastText: orange[500],
         },
         background: {
             default: grey[900],
