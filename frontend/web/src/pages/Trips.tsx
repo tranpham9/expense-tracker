@@ -139,7 +139,13 @@ export default function Trips() {
                             sm={4}
                             md={8}
                         >
-                            <Box whiteSpace="pre-wrap">{trip.description}</Box>
+                            <Box
+                                display="inline-block"
+                                textAlign="left"
+                                whiteSpace="pre-wrap"
+                            >
+                                {trip.description}
+                            </Box>
                         </Grid>
                         <Grid
                             item
