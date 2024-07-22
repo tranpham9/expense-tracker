@@ -215,17 +215,30 @@ export default function Expenses() {
                     }}
                 >
                     {members.value.map((member, i) => (
-                        <Chip
                             key={i}
-                            avatar={<Avatar>{getInitials(member.name)}</Avatar>}
-                            label="$0.00"
-                            {...(member.isLeader && {
-                                sx: {
-                                    border: "2px solid",
-                                    borderColor: "secondary.contrastText",
-                                },
-                            })}
-                        />
+                            title={
+                                <Box textAlign="center">
+                                    {member.name}
+                                    {member.isLeader ? " (Leader)" : ""}
+                                    <br />
+                                    {/* TODO: impl */}
+                                    You owe them {getFormattedCurrency(0)}
+                                </Box>
+                            }
+                            arrow
+                        >
+                            <Chip
+                                avatar={<Avatar>{getInitials(member.name)}</Avatar>}
+                                // TODO: impl
+                                label="$0.00"
+                                {...(member.isLeader && {
+                                    sx: {
+                                        border: "2px solid",
+                                        borderColor: "secondary.contrastText",
+                                    },
+                                })}
+                            />
+                        </Tooltip>
                     ))}
                 </Box>
                 {/* </Stack> */}
