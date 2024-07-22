@@ -128,7 +128,7 @@ export default function Expenses() {
                                     xs={1}
                                     sm={1}
                                 >
-                                    {getFormattedCurrency(expense.cost)}
+                                    <Typography>{getFormattedCurrency(expense.cost)}</Typography>
                                 </Grid>
                                 {/* TODO: maybe make this look nicer at smaller screen sizes */}
                                 <Grid

@@ -133,13 +133,14 @@ export default function Trips() {
                         >
                             <Typography>{trip.name}</Typography>
                         </Grid>
-                        <Divider
+                        {/* Unfortunately, these don't work well with grid spacing (it ends up making the sections look offset) */}
+                        {/* <Divider
                             orientation="vertical"
                             flexItem
                             // right margin of -1px is required to not break grid ( https://stackoverflow.com/questions/63712269/material-ui-using-divider-breaks-the-grid )
                             // top margin of 2 is done to account for outer grid padding of 2 which is only accounted for in the bottom maring of this element for some reason
                             sx={{ mr: "-1px", mt: 2 }}
-                        />
+                        /> */}
                         <Grid
                             item
                             xs={2}
@@ -154,13 +155,13 @@ export default function Trips() {
                                 {trip.description}
                             </Box>
                         </Grid>
-                        <Divider
+                        {/* <Divider
                             orientation="vertical"
                             flexItem
                             // right margin of -1px is required to not break grid ( https://stackoverflow.com/questions/63712269/material-ui-using-divider-breaks-the-grid )
                             // top margin of 2 is done to account for outer grid padding of 2 which is only accounted for in the bottom maring of this element for some reason
                             sx={{ mr: "-1px", mt: 2 }}
-                        />
+                        /> */}
                         <Grid
                             item
                             xs={5}
