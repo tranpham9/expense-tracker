@@ -427,6 +427,7 @@ export default function Expenses() {
             {expenses.value ? <RenderedExpenses /> : <LoadingSkeleton />}
             <CreateExpenseOverlay
                 isCreateExpenseOverlayVisible={isCreateExpenseOverlayVisible}
+                tripMembers={members}
                 onSuccessfulCreate={() => {
                     // TODO: IMPL
                 }}

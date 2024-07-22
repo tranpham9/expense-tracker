@@ -1,13 +1,22 @@
 import { Signal } from "@preact/signals-react";
 import Modal from "./Modal";
-import { useSignal, useSignals } from "@preact/signals-react/runtime";
+import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import StyledInput from "./inputs/StyledInput";
-import { Box, Button, CircularProgress, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Chip, CircularProgress, FormControl, InputLabel, MenuItem, OutlinedInput, Select, Typography } from "@mui/material";
 import { request } from "../utility/api/API";
 import { currentTrip } from "../Signals/Trip";
 import { ExpensesCreatePayload } from "../utility/api/types/Payloads";
+import { Member } from "../utility/api/types/Responses";
 
-export default function CreateExpenseOverlay({ isCreateExpenseOverlayVisible, onSuccessfulCreate = () => {} }: { isCreateExpenseOverlayVisible: Signal<boolean>; onSuccessfulCreate?: () => void }) {
+export default function CreateExpenseOverlay({
+    isCreateExpenseOverlayVisible,
+    tripMembers,
+    onSuccessfulCreate = () => {},
+}: {
+    isCreateExpenseOverlayVisible: Signal<boolean>;
+    tripMembers: Signal<Member[]>;
+    onSuccessfulCreate?: () => void;
+}) {
     useSignals();
 
     // FIXME: need to do input validation to ensure that name and cost are filled!
@@ -46,6 +55,64 @@ export default function CreateExpenseOverlay({ isCreateExpenseOverlayVisible, on
         );
     };
 
+    useSignalEffect(() => {
+        console.log("list of selected members for expense changed to", memberIds.value);
+    });
+
+    const MembersSelector = () => {
+        // NOTE: this needs to be called here due to how it is using the signals directly (instead of just having the changed value passed in; it updates the values itself + relies on it as well)!
+        useSignals();
+
+        return (
+            <FormControl sx={{ m: 1, width: "90%" }}>
+                <InputLabel>Participants</InputLabel>
+                <Select
+                    multiple
+                    input={<OutlinedInput label="Participants" />}
+                    value={memberIds.value}
+                    onChange={(event) => {
+                        const value = event.target.value;
+                        console.log(value);
+                        // this is to handle autofill returning a stringified result as per the MUI docs
+                        memberIds.value = typeof value === "string" ? value.split(",") : value;
+                    }}
+                    renderValue={(selected) => {
+                        console.log("selected", selected);
+                        return (
+                            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                                {selected.map((value) => {
+                                    const member = tripMembers.value.find((tripMember) => tripMember._id === value);
+                                    return (
+                                        <Chip
+                                            key={value}
+                                            // label={`${member?.name || ""} (${member?.email || ""})`}
+                                            label={member?.name || ""}
+                                        />
+                                    );
+                                })}
+                            </Box>
+                        );
+                    }}
+                >
+                    {tripMembers.value.map((tripMember) => (
+                        <MenuItem
+                            key={tripMember._id}
+                            value={tripMember._id}
+                            // style={{ fontWeight: memberIds.value.includes(tripMember._id) ? "bold" : "regular" }}
+                            // style={{ color: memberIds.value.includes(tripMember._id) ? "red" : "blue" }}
+                        >
+                            {/* {tripMember.name} ({tripMember.email}) */}
+                            <Checkbox checked={memberIds.value.includes(tripMember._id)} />
+                            {tripMember.name}
+                            {/* I don't think this is needed? */}
+                            {/* <ListItemText primary={tripMember.name} /> */}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
+        );
+    };
+
     // FIXME: make name be required non-empty; the API doesn't allow it to be empty
     return (
         <Modal isOpen={isCreateExpenseOverlayVisible}>
@@ -76,7 +143,6 @@ export default function CreateExpenseOverlay({ isCreateExpenseOverlayVisible, on
                     }}
                 />
                 <br />
-                {/* TODO: add cost input (customize it to only allow certain characters at certain spots) */}
                 <StyledInput
                     label="Cost"
                     // error={error}
@@ -105,7 +171,8 @@ export default function CreateExpenseOverlay({ isCreateExpenseOverlayVisible, on
                     }}
                 />
                 <br />
-                {/* TODO: add members input (use select with checkmarks and chips: https://mui.com/material-ui/react-select/ ) */}
+                <MembersSelector />
+                <br />
                 {errorMessage.value && (
                     <Typography
                         variant="body1"
