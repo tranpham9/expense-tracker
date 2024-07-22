@@ -108,20 +108,20 @@ class _TripsPageState extends State<TripsPage> {
 class TripsSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 8.0),
-      child: ListTile(
-        title: Container(
-          height: 16,
-          width: 100,
-          color: Colors.black.withOpacity(.04),
-        ),
-        subtitle: Container(
-          height: 14,
-          width: 200,
-          color: Colors.black.withOpacity(.04),
-        ),
+    return ListTile(
+      title: Container(
+          height: 16, width: 100, color: Colors.black.withOpacity(.04)),
+      subtitle: Container(
+        height: 14,
+        width: 200,
+        color: Colors.black.withOpacity(.04),
       ),
+      trailing: Container(
+        height: 25,
+        width: 25,
+        color: Colors.black.withOpacity(.04),
+      ),
+      onTap: () {},
     );
   }
 }
