@@ -25,9 +25,21 @@ class _RegisterPage extends State<RegisterPage> {
   void initState() {
     super.initState();
 
-    name.addListener(validateName);
-    email.addListener(validateEmail);
-    password.addListener(validatePassword);
+    name.addListener(() {
+      setState(() {
+        nameError = validateText("name", name.text);
+      });
+    });
+    email.addListener(() {
+      setState(() {
+        emailError = validateText("email", email.text);
+      });
+    });
+    password.addListener(() {
+      setState(() {
+        passwordError = validateText("password", password.text);
+      });
+    });
   }
 
   @override
@@ -38,40 +50,19 @@ class _RegisterPage extends State<RegisterPage> {
     super.dispose();
   }
 
-  // Call the API endpoint
-  Future<int?> registerUser(String name, String email, String password) async {
-    return await RegisterUser.register(name, email, password);
-  }
+  // // Call the API endpoint
+  // Future<int?> registerUser(String name, String email, String password) async {
+  //   return await RegisterUser.register(name, email, password);
+  // }
 
-  // Listen and ensure that the email field follows an email regex
-  void validateEmail() {
-    setState(() {
-      emailError = validateText("email", email.text);
-    });
-  }
-
-  // Listen and ensure that the password follows the proper requirements
-  void validatePassword() {
-    setState(() {
-      passwordError = validateText("password", password.text);
-    });
-  }
-
-  // List and ensure a proper name is entered
-  void validateName() {
-    setState(() {
-      nameError = validateText("name", name.text);
-    });
-  }
-
-  // Show a given pop up overlay
-  void _showOverlay(String message) {
-    _overlayEntry = createOverlayEntry(message);
-    Overlay.of(context)!.insert(_overlayEntry!);
-    Future.delayed(const Duration(seconds: 5), () {
-      _overlayEntry?.remove();
-    });
-  }
+  // // Show a given pop up overlay
+  // void _showOverlay(String message) {
+  //   _overlayEntry = createOverlayEntry(message);
+  //   Overlay.of(context)!.insert(_overlayEntry!);
+  //   Future.delayed(const Duration(seconds: 5), () {
+  //     _overlayEntry?.remove();
+  //   });
+  // }
 
   // Set the main layout of the login page
   @override
@@ -109,9 +100,9 @@ class _RegisterPage extends State<RegisterPage> {
                             [nameError, emailError, passwordError],
                             [name.text, email.text, password.text])
                         ? null
-                        : () {
+                        : () async {
                             //Call the register API
-                            registerUser(
+                            await RegisterUser.register(
                                     name.text, email.text, hash(password.text))
                                 .then((res) {
                               // Failed to register
@@ -132,8 +123,9 @@ class _RegisterPage extends State<RegisterPage> {
                                 return;
                               } else {
                                 // Let the user know that the verification email was sent
-                                _showOverlay(
-                                    "Registration Was Successful! Check Your Email to Verify Your Account.");
+                                showOverlay(
+                                    "Registration Was Successful! Check Your Email to Verify Your Account.",
+                                    context);
                               }
                             });
                           },

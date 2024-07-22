@@ -24,13 +24,13 @@ class _ViewTripsPage extends State<ViewTripPage> {
   }
 
   // Show a given pop up overlay
-  void _showOverlay(String message) {
-    var _overlayEntry = createOverlayEntry(message);
-    Overlay.of(context)!.insert(_overlayEntry!);
-    Future.delayed(const Duration(seconds: 5), () {
-      _overlayEntry?.remove();
-    });
-  }
+  // void _showOverlay(String message) {
+  //   var _overlayEntry = createOverlayEntry(message);
+  //   Overlay.of(context)!.insert(_overlayEntry!);
+  //   Future.delayed(const Duration(seconds: 5), () {
+  //     _overlayEntry?.remove();
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -220,7 +220,8 @@ class _ViewTripsPage extends State<ViewTripPage> {
                 : () {
                     deleteTrip(widget.trip.id).then((response) {
                       if (response == null) {
-                        _showOverlay("There Was an Error Deleting Your Trip.");
+                        showOverlay(
+                            "There Was an Error Deleting Your Trip.", context);
                         return;
                       }
                       // Go back to the last screen

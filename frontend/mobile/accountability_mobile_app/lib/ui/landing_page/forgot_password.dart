@@ -11,40 +11,22 @@ class ForgotPasswordDialog extends StatefulWidget {
 class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
   final TextEditingController recoveryEmail = TextEditingController();
   String? recoveryEmailError;
-  OverlayEntry? _overlayEntry;
 
   @override
   void initState() {
     super.initState();
 
-    recoveryEmail.addListener(validateRecoveryEmail);
+    recoveryEmail.addListener(() {
+      setState(() {
+        recoveryEmailError = validateText("email", recoveryEmail.text);
+      });
+    });
   }
 
   @override
   void dispose() {
     recoveryEmail.dispose();
     super.dispose();
-  }
-
-  // Validate the recovery email entered
-  void validateRecoveryEmail() {
-    setState(() {
-      recoveryEmailError = validateText("email", recoveryEmail.text);
-    });
-  }
-
-  // Show a given pop up overlay
-  void _showOverlay(String message) {
-    _overlayEntry = createOverlayEntry(message);
-    Overlay.of(context)!.insert(_overlayEntry!);
-    Future.delayed(const Duration(seconds: 2), () {
-      _overlayEntry?.remove();
-    });
-  }
-
-  // Call the API endpoint to log the user in
-  Future<int?> forgotPassword(String email) async {
-    return await ForgotPassword.forgotPassword(email);
   }
 
   @override
@@ -74,9 +56,10 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
         ElevatedButton(
           onPressed: disableButton([recoveryEmailError], [recoveryEmail.text])
               ? null
-              : () {
+              : () async {
                   // Call the API
-                  forgotPassword(recoveryEmail.text).then((response) async {
+                  await ForgotPassword.forgotPassword(recoveryEmail.text)
+                      .then((response) async {
                     if (response != 200) {
                       // Display an error
                       setState(() {
@@ -86,8 +69,9 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
                       return;
                     }
                     // Success! Show success overlay
-                    _showOverlay(
-                        "Success! Recovery Code Sent to ${recoveryEmail.text}");
+                    showOverlay(
+                        "Success! Recovery Code Sent to ${recoveryEmail.text}",
+                        context);
                   });
                 },
           child: const Text('Send Recovery Email'),

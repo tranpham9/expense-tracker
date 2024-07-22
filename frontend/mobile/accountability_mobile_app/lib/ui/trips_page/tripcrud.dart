@@ -22,19 +22,10 @@ class _AddTripsPageState extends State<AddTripsPage> {
   String? codeError;
 
   // Show a pop up overlay after a successful registration
-  OverlayEntry? _overlayEntry;
+  // OverlayEntry? _overlayEntry;
   // Create a trip with the user as the leader
   Future<int?> createTrip(String nameController, String description) async {
     return await TripCRUD.createTrip(nameController, description);
-  }
-
-  // Show a given pop up overlay
-  void _showOverlay(String message) {
-    _overlayEntry = createOverlayEntry(message);
-    Overlay.of(context)!.insert(_overlayEntry!);
-    Future.delayed(const Duration(seconds: 5), () {
-      _overlayEntry?.remove();
-    });
   }
 
   @override
@@ -98,13 +89,15 @@ class _AddTripsPageState extends State<AddTripsPage> {
                         .then((response) {
                       // Display an error message to the user
                       if (response == null) {
-                        _showOverlay(
-                            "There was an error creating your trip. Please try again.");
+                        showOverlay(
+                            "There was an error creating your trip. Please try again.",
+                            context);
                         return;
                       }
                       // Display success to the user
-                      _showOverlay(
-                          "Successfully created ${nameController.text}!");
+                      showOverlay(
+                          "Successfully created ${nameController.text}!",
+                          context);
                       return;
                     });
                   },
@@ -141,13 +134,13 @@ class _JoinTripState extends State<JoinTrip> {
   }
 
   // Show a given pop up overlay
-  void _showOverlay(String message) {
-    var _overlayEntry = createOverlayEntry(message);
-    Overlay.of(context)!.insert(_overlayEntry!);
-    Future.delayed(const Duration(seconds: 5), () {
-      _overlayEntry?.remove();
-    });
-  }
+  // void _howOverlay(String message) {
+  //   var _overlayEntry = createOverlayEntry(message);
+  //   Overlay.of(context)!.insert(_overlayEntry!);
+  //   Future.delayed(const Duration(seconds: 5), () {
+  //     _overlayEntry?.remove();
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -193,7 +186,7 @@ class _JoinTripState extends State<JoinTrip> {
                       widget.codeError = null;
                     });
                     // Show join successful overlay
-                    _showOverlay("Successfully Joined!");
+                    showOverlay("Successfully Joined!", context);
                   });
                   // alert the user that they are added to the trip with an overlay notification
                 },
@@ -507,7 +500,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                 controller: nameController,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'nameController',
+                  labelText: 'Name',
                 ),
               ),
             ),
@@ -518,7 +511,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                 controller: descriptionController,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'descriptionController',
+                  labelText: 'Description',
                 ),
               ),
             ),
@@ -526,16 +519,16 @@ class _AddExpensePageState extends State<AddExpensePage> {
             Container(
               padding: const EdgeInsets.all(10),
               child: TextField(
-                obscureText: true,
                 controller: costController,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'costController',
+                  labelText: 'Cost',
                 ),
               ),
             ),
             // Add Members to the Expense
             // TODO: Get this to be in some sort of grid view??
+            // Perhaps add singlechildscrollview
             SizedBox(
               height: 200,
               // Ensure we don't display if there aren't any members
@@ -586,6 +579,10 @@ class _AddExpensePageState extends State<AddExpensePage> {
                           double.parse(costController.text),
                           addMembers)
                       .then((response) {
+                    if (response == null) {
+                      print("There was an error");
+                      return;
+                    }
                     // Go back to the last screen
                     Navigator.pop(context);
                   });

@@ -1,6 +1,5 @@
 // Contains all helper functions that would be need to complete common tasks throughout the application
 import 'dart:convert';
-
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 
@@ -45,6 +44,7 @@ String? validateText(String validateType, String validateText) {
     default:
       return null;
   }
+  return null;
 }
 
 // Determine if a submit button should be disabled or not
@@ -69,8 +69,17 @@ String capitalize(String word) {
   return "${word[0].toUpperCase()}${word.substring(1).toLowerCase()}";
 }
 
+// Show a given pop up overlay with a given message
+void showOverlay(String message, BuildContext context) {
+  OverlayEntry overlayEntry = createOverlayEntry(message, context);
+  Overlay.of(context).insert(overlayEntry);
+  Future.delayed(const Duration(seconds: 2), () {
+    overlayEntry.remove();
+  });
+}
+
 // Create an overlay with the text of 'message'
-OverlayEntry createOverlayEntry(String message) {
+OverlayEntry createOverlayEntry(String message, BuildContext context) {
   return OverlayEntry(
     builder: (context) => Positioned(
       top: MediaQuery.of(context).size.height * 0.4,

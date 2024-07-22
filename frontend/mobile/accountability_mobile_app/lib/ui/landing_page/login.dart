@@ -22,17 +22,20 @@ class _LoginPage extends State<LoginPage> {
   String? emailError;
   String? passwordError;
 
-  // Call the API endpoint to log the user in
-  Future<int?> loginUser(String email, String password) async {
-    return await LoginUser.login(email, password);
-  }
-
   @override
   void initState() {
     super.initState();
-
-    email.addListener(validateEmail);
-    password.addListener(validatePassword);
+    // Add listeners to properly validate the proper regex
+    email.addListener(() {
+      setState(() {
+        emailError = validateText("email", email.text);
+      });
+    });
+    password.addListener(() {
+      setState(() {
+        passwordError = validateText("password", password.text);
+      });
+    });
   }
 
   @override
@@ -40,30 +43,6 @@ class _LoginPage extends State<LoginPage> {
     email.dispose();
     password.dispose();
     super.dispose();
-  }
-
-  // Listen and ensure that the email field follows an email regex
-  void validateEmail() {
-    setState(() {
-      emailError = validateText("email", email.text);
-    });
-  }
-
-  // Listen and ensure that the password follows the proper requirements
-  void validatePassword() {
-    setState(() {
-      passwordError = validateText("password", password.text);
-    });
-  }
-
-  // Show forgot password dialog
-  void _showForgotPasswordDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return ForgotPasswordDialog();
-      },
-    );
   }
 
   // Set the main layout of the login page
@@ -100,9 +79,9 @@ class _LoginPage extends State<LoginPage> {
                   onPressed: (disableButton([emailError, passwordError],
                           [email.text, password.text]))
                       ? null
-                      : () {
+                      : () async {
                           // Call the login endpoint
-                          loginUser(email.text, hash(password.text))
+                          await LoginUser.login(email.text, hash(password.text))
                               .then((response) async {
                             // Let the user know the email/password was wrong
                             if (response == null) {
@@ -146,7 +125,12 @@ class _LoginPage extends State<LoginPage> {
                   decorationThickness: 1.5,
                 ),
               ),
-              onPressed: () => _showForgotPasswordDialog(context),
+              onPressed: () => showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return ForgotPasswordDialog();
+                },
+              ),
             ),
             // Give a new user ability to register
             Row(

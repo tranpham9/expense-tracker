@@ -22,7 +22,7 @@ class User {
       required this.isLeader});
 
   factory User.fromJson(Map<String, dynamic> json) => User(
-      userId: json["userId"],
+      userId: json["userId"] ?? json["_id"],
       name: json["name"],
       email: json["email"],
       isLeader: json["isLeader"]);

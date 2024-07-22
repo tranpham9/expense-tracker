@@ -192,7 +192,7 @@ class TripCRUD {
               }));
 
       if (response.statusCode != 200) {
-        throw Exception("Error in Getting Memebers");
+        throw Exception("Error in Getting Members");
       }
 
       // Store the jwt
