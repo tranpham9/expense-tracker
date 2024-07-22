@@ -432,7 +432,6 @@ export default function Expenses() {
                 isCreateExpenseOverlayVisible={isCreateExpenseOverlayVisible}
                 tripMembers={members}
                 onSuccessfulCreate={() => {
-                    isCreateExpenseOverlayVisible.value = false;
                     loadAllData(currentTrip.value!._id);
                 }}
             />

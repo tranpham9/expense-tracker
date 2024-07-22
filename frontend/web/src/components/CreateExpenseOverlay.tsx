@@ -43,6 +43,7 @@ export default function CreateExpenseOverlay({
 
                 isProcessing.value = false;
                 isCreateExpenseOverlayVisible.value = false;
+
                 onSuccessfulCreate();
             },
             (currentErrorMessage) => {
@@ -56,6 +57,19 @@ export default function CreateExpenseOverlay({
 
     useSignalEffect(() => {
         console.log("list of selected members for expense changed to", memberIds.value);
+    });
+
+    useSignalEffect(() => {
+        if (!isCreateExpenseOverlayVisible.value) {
+            console.log("expense overlay was closed; resetting all values");
+
+            // reset all values (it seems that only the non-primitive one needs to get reset for some reason [memberIds], but I'm doing all of them just in case)
+            name.value = "";
+            description.value = "";
+            cost.value = "";
+            errorMessage.value = "";
+            memberIds.value = [];
+        }
     });
 
     const MembersSelector = () => {
