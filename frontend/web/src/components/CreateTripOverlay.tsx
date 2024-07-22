@@ -6,10 +6,12 @@ import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { request } from "../utility/api/API";
 import { useNavigate } from "react-router-dom";
 import { currentTrip } from "../Signals/Trip";
+import { TripsCreatePayload } from "../utility/api/types/Payloads";
 
 export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCreateTripOverlayVisible: Signal<boolean> }) {
     useSignals();
 
+    // FIXME: make name be required non-empty; the API doesn't allow it to be empty
     const isProcessing = useSignal(false);
     const name = useSignal("");
     const description = useSignal("");
@@ -18,23 +20,29 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
     const navigate = useNavigate();
 
     const attemptCreateTrip = () => {
-        const tripInfo = { name: name.value, description: description.value };
+        isProcessing.value = true;
+
+        const tripInfo: TripsCreatePayload = { name: name.value, description: description.value };
         request(
             "trips/create",
             tripInfo,
             (response) => {
                 console.log(response);
+
+                isProcessing.value = false;
                 currentTrip.value = response.trip;
+
                 navigate("/expenses");
             },
             (currentErrorMessage) => {
                 console.log(currentErrorMessage);
+
+                isProcessing.value = false;
                 errorMessage.value = currentErrorMessage;
             }
         );
     };
 
-    // FIXME: make name be required non-empty; the API doesn't allow it to be empty
     return (
         <Modal isOpen={isCreateTripOverlayVisible}>
             <Box
