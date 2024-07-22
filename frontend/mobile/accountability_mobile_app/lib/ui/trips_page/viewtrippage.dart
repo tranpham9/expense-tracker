@@ -4,6 +4,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import '../../globals.dart';
 import '../../models/Trip.dart';
 import '../../utility/helpers.dart';
+import 'expensecrud.dart';
 import 'tripcrud.dart';
 import '../../models/Expense.dart';
 import '../../models/User.dart';
@@ -18,25 +19,14 @@ class ViewTripPage extends StatefulWidget {
 }
 
 class _ViewTripsPage extends State<ViewTripPage> {
+  // Keep track of the members (beside the current user) of the trip
   late List<User> members = [];
-  static Future<int?> deleteTrip(String tripId) async {
-    return await TripCRUD.deleteTrip(tripId);
-  }
-
-  // Show a given pop up overlay
-  // void _showOverlay(String message) {
-  //   var _overlayEntry = createOverlayEntry(message);
-  //   Overlay.of(context)!.insert(_overlayEntry!);
-  //   Future.delayed(const Duration(seconds: 5), () {
-  //     _overlayEntry?.remove();
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.trip.name}'),
+        title: Text(widget.trip.name),
         centerTitle: true,
       ),
       body: Column(
@@ -47,9 +37,11 @@ class _ViewTripsPage extends State<ViewTripPage> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
+          // Edit the name and description of the trip
           EditNameNotes(trip: widget.trip),
+          // Trip Code
           ListTile(
-            title: Text("${widget.trip.inviteCode}"),
+            title: Text(widget.trip.inviteCode),
             subtitle: Text('Trip Code'),
           ),
           ListTile(
@@ -217,8 +209,8 @@ class _ViewTripsPage extends State<ViewTripPage> {
           ElevatedButton(
             onPressed: Globals.user?.userId != widget.trip.leaderId
                 ? null
-                : () {
-                    deleteTrip(widget.trip.id).then((response) {
+                : () async {
+                    await TripCRUD.deleteTrip(widget.trip.id).then((response) {
                       if (response == null) {
                         showOverlay(
                             "There Was an Error Deleting Your Trip.", context);
@@ -281,21 +273,19 @@ class EditNameNotes extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Container(
-            child: Column(
-              children: [
-                ListTile(
-                  title: Text('${trip.name}'),
-                  subtitle: Text('Name'),
-                ),
-                ListTile(
-                  title: Text(trip.description.isEmpty
-                      ? '"Empty Description"'
-                      : trip.description),
-                  subtitle: Text('Description'),
-                )
-              ],
-            ),
+          child: Column(
+            children: [
+              ListTile(
+                title: Text(trip.name),
+                subtitle: Text('Name'),
+              ),
+              ListTile(
+                title: Text(trip.description.isEmpty
+                    ? '"Empty Description"'
+                    : trip.description),
+                subtitle: Text('Description'),
+              )
+            ],
           ),
         ),
         ElevatedButton(

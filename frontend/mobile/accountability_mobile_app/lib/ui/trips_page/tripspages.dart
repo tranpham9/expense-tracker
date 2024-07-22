@@ -16,11 +16,6 @@ class _TripsPageState extends State<TripsPage> {
   // Grab the search field when we want to search
   final TextEditingController _searchQuery = TextEditingController();
 
-  // Get a list of trips a user is apart of
-  Future<List<Trip>?> getTrips(int page, String query) async {
-    return await TripCRUD.getTrips(page, query);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,7 +52,7 @@ class _TripsPageState extends State<TripsPage> {
             ),
             Expanded(
               child: FutureBuilder<List<Trip>?>(
-                future: getTrips(0, ""),
+                future: TripCRUD.getTrips(0, ""),
                 builder: (context, snapshot) {
                   // Display the loading skeleton for the trips
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -70,6 +65,7 @@ class _TripsPageState extends State<TripsPage> {
                       ),
                     );
                   } else if (snapshot.hasData) {
+                    // TODO: Might be able to factor 'trips' so we can perform search operation
                     List<Trip> trips = snapshot.data!;
                     return ListView.builder(
                       itemBuilder: (context, index) => ListTile(
@@ -108,6 +104,7 @@ class _TripsPageState extends State<TripsPage> {
   }
 }
 
+// Skeleton for the shape a trip bar
 class TripsSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
