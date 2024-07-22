@@ -1,4 +1,4 @@
-import { ChangeEventHandler, HTMLInputTypeAttribute } from "react";
+import { ChangeEventHandler, HTMLInputTypeAttribute, KeyboardEventHandler } from "react";
 
 import { TextField } from "@mui/material";
 
@@ -8,9 +8,10 @@ export default function StyledInput({
     error = "",
     required = true,
     useMultiline = false,
-    onChange,
-    onEnterKey,
-}: {
+    onChange = () => {},
+    onEnterKey = () => {},
+}: // onKeyDown = () => {},
+{
     type?: HTMLInputTypeAttribute;
     label?: string;
     error?: string;
@@ -18,6 +19,7 @@ export default function StyledInput({
     useMultiline?: boolean;
     onChange?: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
     onEnterKey?: () => void;
+    // onKeyDown?: KeyboardEventHandler<HTMLDivElement>; // excludes enter key
 }) {
     return (
         <TextField
@@ -38,7 +40,9 @@ export default function StyledInput({
                 if (onEnterKey && event.key === "Enter") {
                     event.preventDefault();
                     onEnterKey();
-                }
+                } /*else {
+                    onKeyDown(event);
+                }*/
             }}
             // onKeyUp={onKeyUp}
             // It seems that MUI uses onChange to mean something akin to onKeyDown instead of only triggering when focus is lost/enter is hit

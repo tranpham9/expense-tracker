@@ -12,6 +12,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import LoadingSkeleton from "../components/LoadingSkeleton";
 import SearchBar from "../components/inputs/SearchBar";
 import { getFormattedCurrency, getInitials } from "../utility/Manipulation";
+import CreateExpenseOverlay from "../components/CreateExpenseOverlay";
 // TODO: use this for generating the expense report
 // import GenerateReportIcon from "@mui/icons-material/CurrencyExchange";
 
@@ -25,6 +26,8 @@ export default function Expenses() {
 
     const isSnackbarOpen = useSignal(false);
     const snackbarContents = useSignal<{ message: string; severity: "success" | "error" }>({ message: "", severity: "success" });
+
+    const isCreateExpenseOverlayVisible = useSignal(false);
 
     // https://stackoverflow.com/questions/74413650/what-is-difference-between-usenavigate-and-redirect-in-react-route-v6
     const navigate = useNavigate();
@@ -413,6 +416,7 @@ export default function Expenses() {
                         // disabled={*}
                         sx={{ p: "10px", ml: 1 }}
                         onClick={() => {
+                            isCreateExpenseOverlayVisible.value = true;
                             // isCreateTripOverlayVisible.value = true;
                         }}
                     >
@@ -421,6 +425,12 @@ export default function Expenses() {
                 </Tooltip>
             </Box>
             {expenses.value ? <RenderedExpenses /> : <LoadingSkeleton />}
+            <CreateExpenseOverlay
+                isCreateExpenseOverlayVisible={isCreateExpenseOverlayVisible}
+                onSuccessfulCreate={() => {
+                    // TODO: IMPL
+                }}
+            />
         </>
     );
 }

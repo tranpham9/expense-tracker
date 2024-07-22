@@ -7,14 +7,15 @@ import { request } from "../utility/api/API";
 import { currentTrip } from "../Signals/Trip";
 import { ExpensesCreatePayload } from "../utility/api/types/Payloads";
 
-export default function CreateExpense({ isCreateExpenseOverlayVisible, onSuccessfulCreate = () => {} }: { isCreateExpenseOverlayVisible: Signal<boolean>; onSuccessfulCreate?: () => void }) {
+export default function CreateExpenseOverlay({ isCreateExpenseOverlayVisible, onSuccessfulCreate = () => {} }: { isCreateExpenseOverlayVisible: Signal<boolean>; onSuccessfulCreate?: () => void }) {
     useSignals();
 
     // FIXME: need to do input validation to ensure that name and cost are filled!
     const isProcessing = useSignal(false);
     const name = useSignal("");
     const description = useSignal("");
-    const cost = useSignal("$0.00");
+    // const cost = useSignal("$0.00");
+    const cost = useSignal("");
     const errorMessage = useSignal("");
     const memberIds = useSignal<string[]>([]);
 
@@ -76,6 +77,34 @@ export default function CreateExpense({ isCreateExpenseOverlayVisible, onSuccess
                 />
                 <br />
                 {/* TODO: add cost input (customize it to only allow certain characters at certain spots) */}
+                <StyledInput
+                    label="Cost"
+                    // error={error}
+                    // onKeyDown={(event) => {
+                    //     event.key
+                    // }}
+                    onChange={(event) => {
+                        if (!event.target.value) {
+                            return;
+                        }
+                        // cost.value = event.target.value;
+                        // if (!cost.value && event.target.value !== "$") {
+                        if (!event.target.value.startsWith("$")) {
+                            event.target.value = `$${event.target.value}`;
+                        }
+
+                        // if(event.target.value.match(/[^0-9.$]/)) {
+                        //     event.target.value = cost.value;
+                        // }
+
+                        if (event.target.value.match(/^\$[0-9]*(\.[0-9]{0,2})?$/)) {
+                            cost.value = event.target.value;
+                        } else {
+                            event.target.value = cost.value;
+                        }
+                    }}
+                />
+                <br />
                 {/* TODO: add members input (use select with checkmarks and chips: https://mui.com/material-ui/react-select/ ) */}
                 {errorMessage.value && (
                     <Typography
