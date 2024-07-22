@@ -242,19 +242,17 @@ class _ViewTripsPage extends State<ViewTripPage> {
           ),
           Center(
             child: ElevatedButton(
+              // Navigate to confirm delete delete
               onPressed: Globals.user?.userId != widget.trip.leaderId
                   ? null
                   : () async {
-                      await TripCRUD.deleteTrip(widget.trip.id)
-                          .then((response) {
-                        if (response == null) {
-                          showOverlay("There Was an Error Deleting Your Trip.",
-                              context);
-                          return;
-                        }
-                        // Go back to the last screen
-                        Navigator.pop(context);
-                      });
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DeleteTripWidget(
+                              tripId: widget.trip.id, name: widget.trip.name),
+                        ),
+                      );
                     },
               child: Icon(Icons.delete),
             ),
@@ -358,6 +356,52 @@ class EditNameNotes extends StatelessWidget {
                     );
                   },
             child: Icon(Icons.edit))
+      ],
+    );
+  }
+}
+
+class DeleteTripWidget extends StatefulWidget {
+  final String tripId;
+  final String name;
+  // Pass a trip to the widget
+  const DeleteTripWidget({super.key, required this.tripId, required this.name});
+
+  @override
+  State<DeleteTripWidget> createState() => _DeleteTripWidget();
+}
+
+class _DeleteTripWidget extends State<DeleteTripWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text("Confirm Trip Deletion"),
+      content: Text(
+          'Are you sure you want to delete "${widget.name}"?\nThis will also delete all associated expenses.'),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('NO'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            // Call the API
+            await TripCRUD.deleteTrip(widget.tripId).then((response) {
+              if (response == null) {
+                showOverlay("There Was an Error Deleting Your Trip.", context);
+                return;
+              }
+              // Go back to the last screen
+              Navigator.pop(context);
+            });
+            // Success! Show success overlay
+            showOverlay('Successfully Deleted "${widget.name}"', context);
+            Navigator.pop(context);
+          },
+          child: const Text('YES'),
+        ),
       ],
     );
   }
