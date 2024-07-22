@@ -45,7 +45,6 @@ export default function Navbar() {
         return (pageName === "home" && !currentPage.length) || pageName === currentPage;
     };
 
-    // TODO: check if useSignals() allows converting this to a signal (I don't think so)
     const isAccountOverlayVisible = useSignal(false);
 
     /*
@@ -297,7 +296,7 @@ export default function Navbar() {
                                 }}
                                 sx={{ mx: 0.5, my: 2, display: "block" }}
                             >
-                                Login/Signup
+                                Login / Signup
                             </Button>
                         )}
                     </Toolbar>
