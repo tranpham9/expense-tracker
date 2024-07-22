@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/inputs/SearchBar";
-import { Box, Grid, IconButton, Pagination, Paper, Stack, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, IconButton, Pagination, Paper, Stack, Tooltip, Typography } from "@mui/material";
 import { isLoggedIn, userInfo } from "../Signals/Account";
 import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import { request } from "../utility/api/API";
@@ -29,6 +29,7 @@ export default function Trips() {
     const currentPage = useSignal(1);
     const pageCount = useSignal(1);
     const isCreateTripOverlayVisible = useSignal(false);
+    const activeDeleteConfirmationDialog = useSignal(""); // houses the id of the current trip which has a confirmation dialog open for it
 
     // NOTE: this also runs when isLoggedIn is first computed
     useSignalEffect(() => {
@@ -70,10 +71,23 @@ export default function Trips() {
                 isBuffering.value = false;
             },
             (errorMessage) => {
-                console.log(errorMessage);
+                console.error(errorMessage);
 
                 isBuffering.value = false;
             }
+        );
+    };
+
+    const performDelete = (tripId: string) => {
+        request(
+            "trips/delete",
+            { tripId },
+            (response) => {
+                console.log(response);
+
+                performSearch(searchInputText.value, currentPage.value);
+            },
+            console.error
         );
     };
 
@@ -193,12 +207,48 @@ export default function Trips() {
                                     disabled={trip.leaderId !== userInfo.value?.userId}
                                     sx={{ p: "5px" }}
                                     onClick={() => {
-                                        // TODO: impl
+                                        activeDeleteConfirmationDialog.value = trip._id;
                                     }}
                                 >
                                     <DeleteIcon />
                                 </IconButton>
                             </Tooltip>
+                            <Dialog
+                                open={activeDeleteConfirmationDialog.value === trip._id}
+                                onClose={() => {
+                                    activeDeleteConfirmationDialog.value = "";
+                                }}
+                            >
+                                <Paper elevation={2}>
+                                    <DialogTitle>{"Confirm Trip Deletion"}</DialogTitle>
+                                    <DialogContent>
+                                        <DialogContentText whiteSpace="pre-wrap">
+                                            Are you sure you want to delete "{trip.name}"?{"\n"}This will also delete all associated expenses.
+                                        </DialogContentText>
+                                    </DialogContent>
+                                    <DialogActions sx={{ pb: 2, pr: 2 }}>
+                                        <Button
+                                            variant="contained"
+                                            onClick={() => {
+                                                activeDeleteConfirmationDialog.value = "";
+                                            }}
+                                            sx={{ mr: 1 }}
+                                        >
+                                            No
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            onClick={() => {
+                                                activeDeleteConfirmationDialog.value = "";
+
+                                                performDelete(trip._id);
+                                            }}
+                                        >
+                                            Yes
+                                        </Button>
+                                    </DialogActions>
+                                </Paper>
+                            </Dialog>
                             {/* TODO: find out if these tooltips have any issues at the bottom of the page (probably not since there is enough of a gap from the pagination at the bottom anyway) */}
                             <Tooltip
                                 title={<Typography variant="body2">Open Expenses</Typography>}
