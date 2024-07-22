@@ -242,6 +242,8 @@ export default function Navbar() {
                                     sx={{
                                         mx: 0.5,
                                         my: 2,
+                                        px:0,
+                                        width: "100px",
                                         display: "block",
                                         ...(isCurrentPage(page) && { outlineColor: "secondary.main", outlineWidth: 2, outlineStyle: "solid" }),
                                     }}
