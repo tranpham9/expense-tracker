@@ -1,5 +1,6 @@
 import 'package:accountability_mobile_app/api/trip_crud.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../globals.dart';
 import '../../models/Trip.dart';
@@ -29,215 +30,236 @@ class _ViewTripsPage extends State<ViewTripPage> {
         title: Text(widget.trip.name),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ListTile(
-              title: Text(
-                "Trip Details",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            // Edit the name and description of the trip
-            EditNameNotes(trip: widget.trip),
-            // Trip Code
-            ListTile(
-              title: Text(widget.trip.inviteCode),
-              subtitle: Text('Trip Code'),
-            ),
-            ListTile(
-              title: Text(
-                "Members",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            // Display the members of the trip
-            FutureBuilder<List<User>?>(
-              future: TripCRUD.getMembers(widget.trip.id),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Skeletonizer(
-                    child: SizedBox(
-                      height: 120.0,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 5,
-                        itemBuilder: (context, index) {
-                          return MemberSkeleton();
-                        },
-                      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ListTile(
+                    title: Text(
+                      "Trip Details",
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                  );
-                } else if (snapshot.data!.isEmpty) {
-                  return Center(
-                    child: Text("No Members Found"),
-                  );
-                } else if (snapshot.hasData) {
-                  List<User> members = snapshot.data!;
-                  return SizedBox(
-                    height: 90,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: members.length,
-                      itemBuilder: (context, index) {
-                        // Grab the member
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      ViewMemberPage(members[index]),
-                                ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              fixedSize: const Size(90, 90),
-                              shape: const CircleBorder(),
-                            ),
-                            child: Text(
-                              members[index].name.substring(0, 2).toUpperCase(),
-                              style: TextStyle(
-                                  fontSize: 24,
-                                  decoration: TextDecoration.underline,
-                                  decorationThickness: 2.0),
+                  ),
+                  // Edit the name and description of the trip
+                  EditNameNotes(trip: widget.trip),
+                  // Trip Code
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ListTile(
+                          title: Text(widget.trip.inviteCode),
+                          subtitle: Text('Trip Code'),
+                        ),
+                      ),
+                      ElevatedButton(
+                          onPressed: () {
+                            Clipboard.setData(
+                                ClipboardData(text: widget.trip.inviteCode));
+                          },
+                          child: Icon(Icons.copy))
+                    ],
+                  ),
+                  ListTile(
+                    title: Text(
+                      "Members",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  // Display the members of the trip
+                  FutureBuilder<List<User>?>(
+                    future: TripCRUD.getMembers(widget.trip.id),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Skeletonizer(
+                          child: SizedBox(
+                            height: 120.0,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: 5,
+                              itemBuilder: (context, index) {
+                                return MemberSkeleton();
+                              },
                             ),
                           ),
                         );
-                      },
-                    ),
-                  );
-                }
-                return Center(
-                  child: Text("Error Loading Members"),
-                );
-              },
-            ),
-            ListTile(
-              title: Text(
-                "Expenses",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            // Add a new expense
-            ElevatedButton(
-              onPressed: () {
-                // Navigate to add expense page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          AddExpensePage(widget.trip.id, members)),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-              ),
-              child: Container(
-                width: double.infinity,
-                height: 50,
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Icon(Icons.add),
-              ),
-            ),
-            // Display a ListView of the expenses associated with the trip
-            FutureBuilder<List<Expense>?>(
-              future: TripCRUD.listExpenses(widget.trip.id),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Skeletonizer(
-                    child: SizedBox(
-                      height: 300.0, // Adjust height as necessary
-                      child: ListView.builder(
-                        scrollDirection: Axis.vertical,
-                        itemCount: 5,
-                        itemBuilder: (context, index) {
-                          return ExpenseSkeleton();
-                        },
-                      ),
-                    ),
-                  );
-                } else if (snapshot.data!.isEmpty) {
-                  return Center(
-                    child: Text("No Expenses Found"),
-                  );
-                } else if (snapshot.hasData) {
-                  List<Expense> expenses = snapshot.data!;
-                  return SizedBox(
-                    height: 300.0, // Adjust height as necessary
-                    child: ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      itemCount: expenses.length,
-                      itemBuilder: (context, index) {
-                        // Grab the member
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      ViewExpensePage(expenses[index]),
+                      } else if (snapshot.data!.isEmpty) {
+                        return Center(
+                          child: Text("No Members Found"),
+                        );
+                      } else if (snapshot.hasData) {
+                        members = snapshot.data!;
+                        return SizedBox(
+                          height: 90,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: members.length,
+                            itemBuilder: (context, index) {
+                              // Grab the member
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ViewMemberPage(members[index]),
+                                      ),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    fixedSize: const Size(90, 90),
+                                    shape: const CircleBorder(),
+                                  ),
+                                  child: Text(
+                                    members[index]
+                                        .name
+                                        .substring(0, 2)
+                                        .toUpperCase(),
+                                    style: TextStyle(
+                                        fontSize: 24,
+                                        decoration: TextDecoration.underline,
+                                        decorationThickness: 2.0),
+                                  ),
                                 ),
                               );
                             },
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30.0),
-                              ),
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                            ),
-                            child: Container(
-                              width: double.infinity,
-                              height: 50,
-                              padding: EdgeInsets.all(10),
-                              child: Text(
-                                expenses[index].name,
-                                textAlign: TextAlign.center,
-                              ),
+                          ),
+                        );
+                      }
+                      return Center(
+                        child: Text("Error Loading Members"),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    title: Text(
+                      "Expenses",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  // Add a new expense
+                  ElevatedButton(
+                    onPressed: () {
+                      // Navigate to add expense page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                AddExpensePage(widget.trip.id, members)),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    ),
+                    child: Container(
+                      width: double.infinity,
+                      height: 50,
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Icon(Icons.add),
+                    ),
+                  ),
+                  // Display a ListView of the expenses associated with the trip
+                  FutureBuilder<List<Expense>?>(
+                    future: TripCRUD.listExpenses(widget.trip.id),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Skeletonizer(
+                          child: SizedBox(
+                            height: 300.0, // Adjust height as necessary
+                            child: ListView.builder(
+                              scrollDirection: Axis.vertical,
+                              itemCount: 5,
+                              itemBuilder: (context, index) {
+                                return ExpenseSkeleton();
+                              },
                             ),
                           ),
                         );
-                      },
-                    ),
-                  );
-                }
-                return Center(
-                  child: Text("Error Loading Expenses"),
-                );
-              },
-            ),
-            // Delete Trip
-            Center(
-              child: ElevatedButton(
-                onPressed: Globals.user?.userId != widget.trip.leaderId
-                    ? null
-                    : () async {
-                        await TripCRUD.deleteTrip(widget.trip.id)
-                            .then((response) {
-                          if (response == null) {
-                            showOverlay(
-                                "There Was an Error Deleting Your Trip.",
-                                context);
-                            return;
-                          }
-                          // Go back to the last screen
-                          Navigator.pop(context);
-                        });
-                      },
-                child: Icon(Icons.delete),
+                      } else if (snapshot.data!.isEmpty) {
+                        return Center(
+                          child: Text("No Expenses Found"),
+                        );
+                      } else if (snapshot.hasData) {
+                        List<Expense> expenses = snapshot.data!;
+                        return SizedBox(
+                          height: 300.0, // Adjust height as necessary
+                          child: ListView.builder(
+                            scrollDirection: Axis.vertical,
+                            itemCount: expenses.length,
+                            itemBuilder: (context, index) {
+                              // Grab the member
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ViewExpensePage(expenses[index]),
+                                      ),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                  ),
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: 50,
+                                    padding: EdgeInsets.all(10),
+                                    child: Text(
+                                      expenses[index].name,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      }
+                      return Center(
+                        child: Text("Error Loading Expenses"),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+          Center(
+            child: ElevatedButton(
+              onPressed: Globals.user?.userId != widget.trip.leaderId
+                  ? null
+                  : () async {
+                      await TripCRUD.deleteTrip(widget.trip.id)
+                          .then((response) {
+                        if (response == null) {
+                          showOverlay("There Was an Error Deleting Your Trip.",
+                              context);
+                          return;
+                        }
+                        // Go back to the last screen
+                        Navigator.pop(context);
+                      });
+                    },
+              child: Icon(Icons.delete),
+            ),
+          ),
+        ],
       ),
     );
   }

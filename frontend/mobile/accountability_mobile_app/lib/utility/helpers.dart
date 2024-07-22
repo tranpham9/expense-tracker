@@ -41,6 +41,16 @@ String? validateText(String validateType, String validateText) {
       } else if (!validateText.contains(RegExp(r'^[a-zA-Z\s]+$'))) {
         return "Can only have letters and spaces";
       }
+    case "cost":
+      if (validateText.isEmpty) {
+        return null;
+      }
+      // Make sure there are only 2 numbers after the decimal point
+      else if (!RegExp(r'^\d+(,\d{3})*(\.\d{0,2})?$').hasMatch(validateText)) {
+        return "Prices must follow '\$XX.XX";
+      } else {
+        return null;
+      }
     default:
       return null;
   }

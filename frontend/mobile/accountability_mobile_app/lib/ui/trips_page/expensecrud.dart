@@ -137,13 +137,25 @@ class AddExpensePage extends StatefulWidget {
 class _AddExpensePageState extends State<AddExpensePage> {
   // Grab text that will be entered by the user
   final TextEditingController nameController = TextEditingController();
+  String? nameError;
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController costController = TextEditingController();
+  String? costError;
   late List<bool> isChecked;
 
   @override
   void initState() {
     super.initState();
+    nameController.addListener(() {
+      setState(() {
+        nameError = validateText("description", nameController.text);
+      });
+    });
+    costController.addListener(() {
+      setState(() {
+        costError = validateText("cost", costController.text);
+      });
+    });
     isChecked = List.generate(widget.members.length, (index) => false);
   }
 
@@ -155,113 +167,128 @@ class _AddExpensePageState extends State<AddExpensePage> {
         title: const Text("Add an Expense"),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child: ListView(
-          // Have our list of containers that will take in text input
-          children: <Widget>[
-            // Enter nameController
-            Container(
+      body: Column(
+        children: [
+          Expanded(
+            child: Padding(
               padding: const EdgeInsets.all(10),
-              child: TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Name',
-                ),
+              child: ListView(
+                // Have our list of containers that will take in text input
+                children: <Widget>[
+                  // Enter Name
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    child: TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Name',
+                        errorText: nameError,
+                      ),
+                    ),
+                  ),
+                  // Enter Description
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    child: TextField(
+                      controller: descriptionController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Description',
+                      ),
+                    ),
+                  ),
+                  // Enter costController
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    child: TextField(
+                      keyboardType: TextInputType.number,
+                      controller: costController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Cost',
+                        errorText: costError,
+                      ),
+                    ),
+                  ),
+                  // Add Members to the Expense
+                  // TODO: Get this to be in some sort of grid view??
+                  SingleChildScrollView(
+                    child: isChecked.isEmpty
+                        ? SizedBox.shrink()
+                        : SizedBox(
+                            height: 200,
+                            child: ListView.builder(
+                              itemCount: widget.members.length,
+                              itemBuilder: (context, index) {
+                                return CheckboxListTile(
+                                  // The member that you want to add
+                                  title: Text(widget.members[index].name),
+                                  value: isChecked[index],
+                                  tristate: false,
+                                  // Switch the value when you click
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      isChecked[index] = value!;
+                                    });
+                                  },
+                                  activeColor: Colors.white,
+                                  checkColor: Theme.of(context).primaryColor,
+                                );
+                              },
+                            ),
+                          ),
+                  ),
+                ],
               ),
             ),
-            // Enter descriptionController
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: TextField(
-                controller: descriptionController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Description',
-                ),
+          ),
+          // Confirm Add Expense
+          Container(
+            height: 50,
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            child: ElevatedButton(
+              onPressed: (disableButton([nameError, costError],
+                      [nameController.text, costController.text]))
+                  ? null
+                  : () async {
+                      List<String> addMembers = [];
+                      // Only add members if they are checked
+                      for (int i = 0; i < isChecked.length; i++) {
+                        if (isChecked[i]) {
+                          addMembers.add(widget.members[i].userId!);
+                          print('Adding ${widget.members[i].name}\n');
+                        }
+                      }
+                      // Go through and collect the memberIds of the selected checkboxes
+                      await ExpenseCRUD.create(
+                              widget.tripId,
+                              nameController.text,
+                              descriptionController.text,
+                              double.parse(
+                                      costController.text.replaceAll(',', ''))
+                                  .toDouble(),
+                              addMembers)
+                          .then((response) {
+                        if (response == null) {
+                          print("There was an error");
+                          showOverlay(
+                              "There Was an Error Create Expense. Try Again.",
+                              context);
+                          return;
+                        }
+                        // Go back to the last screen
+                        Navigator.pop(context);
+                      });
+                    },
+              child: const Text(
+                'Add Expense',
+                style: TextStyle(color: Colors.white),
               ),
             ),
-            // Enter costController
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: TextField(
-                controller: costController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Cost',
-                ),
-              ),
-            ),
-            // Add Members to the Expense
-            // TODO: Get this to be in some sort of grid view??
-            SingleChildScrollView(
-              child: SizedBox(
-                height: 200,
-                // Ensure we don't display if there aren't any members
-                child: isChecked.isEmpty
-                    ? null
-                    : ListView.builder(
-                        itemCount: widget.members.length,
-                        itemBuilder: (context, index) {
-                          return CheckboxListTile(
-                            // The member that you want to add
-                            title: Text(widget.members[index].name),
-                            value: isChecked[index],
-                            tristate: false,
-                            // Switch the value when you click
-                            onChanged: (bool? value) {
-                              setState(() {
-                                isChecked[index] = value!;
-                              });
-                            },
-                            activeColor: Colors.white,
-                            checkColor: Theme.of(context).primaryColor,
-                          );
-                        }),
-              ),
-            ),
-            // Confirm Add Expense
-            Container(
-              height: 50,
-              padding: const EdgeInsets.all(10),
-              child: ElevatedButton(
-                child: const Text(
-                  'Add Expense',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () async {
-                  List<String> addMembers = [];
-                  // Only add members if they are checked
-                  for (int i = 0; i < isChecked.length; i++) {
-                    if (isChecked[i]) {
-                      addMembers.add(widget.members[i].userId!);
-                      print('Adding ${widget.members[i].name}\n');
-                    }
-                  }
-                  // Go through and collect the memberIds of the selected checkboxes
-                  await ExpenseCRUD.create(
-                          widget.tripId,
-                          nameController.text,
-                          descriptionController.text,
-                          double.parse(costController.text).toDouble(),
-                          addMembers)
-                      .then((response) {
-                    if (response == null) {
-                      print("There was an error");
-                      showOverlay(
-                          "There Was an Error Create Expense. Try Again.",
-                          context);
-                      return;
-                    }
-                    // Go back to the last screen
-                    Navigator.pop(context);
-                  });
-                },
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
