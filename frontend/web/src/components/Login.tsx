@@ -79,7 +79,10 @@ export default function Login({ onSuccessfulLogin = () => {} }) {
                 onClick={handleForgotPassword}
                 color="info"
                 size="large"
-                sx={{ m: 1, fontWeight: "bold" }}
+                sx={{
+                    m: 1,
+                    fontWeight: "bold",
+                }}
             >
                 {/* when bold, the t makes it look like the spacing to the left and right of it is the same, so I added an extra space (via a non-breaking space) */}
                 Forgot &nbsp;Password

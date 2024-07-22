@@ -1,4 +1,4 @@
-import { Avatar, AvatarGroup, Badge, Box, Button, Chip, Divider, Grid, IconButton, Paper, Stack, Tooltip, Typography } from "@mui/material";
+import { Alert, Avatar, AvatarGroup, Badge, Box, Button, Chip, Divider, Grid, IconButton, Paper, Snackbar, Stack, Tooltip, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 // import { getInitials } from "../utility/Manipulation";
 import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
@@ -22,6 +22,9 @@ export default function Expenses() {
     const members = useSignal<Member[]>([]);
     const expenses = useSignal<Expense[] | null>(null);
     const query = useSignal("");
+
+    const isSnackbarOpen = useSignal(false);
+    const snackbarContents = useSignal<{ message: string; severity: "success" | "error" }>({ message: "", severity: "success" });
 
     // https://stackoverflow.com/questions/74413650/what-is-difference-between-usenavigate-and-redirect-in-react-route-v6
     const navigate = useNavigate();
@@ -262,14 +265,67 @@ export default function Expenses() {
                 >
                     {currentTrip.value?.name}
                 </Typography>
-                <Divider orientation="vertical" flexItem />
-                <Typography
-                    variant="body1"
-                    flexShrink={0}
+                <Divider
+                    orientation="vertical"
+                    flexItem
+                />
+                <Tooltip
+                    title={<Typography variant="body2">Copy Join Code</Typography>}
+                    arrow
                 >
-                    {currentTrip.value?.inviteCode}
-                </Typography>
-                <Divider orientation="vertical" flexItem />
+                    <Button
+                        onClick={() =>
+                            navigator.clipboard
+                                .writeText(currentTrip.value?.inviteCode.toString() || "")
+                                .then(() => {
+                                    isSnackbarOpen.value = true;
+                                    snackbarContents.value = {
+                                        message: "Succesfully copied join code.",
+                                        severity: "success",
+                                    };
+                                })
+                                .catch(() => {
+                                    isSnackbarOpen.value = true;
+                                    snackbarContents.value = {
+                                        message: "Failed to copy join code.",
+                                        severity: "error",
+                                    };
+                                })
+                        }
+                        variant="text"
+                        color="info"
+                        size="large"
+                        sx={{
+                            p: "2px",
+                            flexShrink: 0,
+                            fontWeight: "bold",
+                        }}
+                    >
+                        Code: {currentTrip.value?.inviteCode}
+                    </Button>
+                </Tooltip>
+                <Snackbar
+                    key={Math.random()}
+                    anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                    open={isSnackbarOpen.value}
+                    autoHideDuration={5000}
+                    onClose={() => {
+                        isSnackbarOpen.value = false;
+                    }}
+                >
+                    <Paper elevation={1}>
+                        <Alert
+                            severity={snackbarContents.value.severity}
+                            variant="outlined"
+                        >
+                            {snackbarContents.value.message}
+                        </Alert>
+                    </Paper>
+                </Snackbar>
+                <Divider
+                    orientation="vertical"
+                    flexItem
+                />
                 {/* <Typography>{currentTripInfo.value.description}</Typography> */}
                 {/* <Stack direction="row" spacing={1} overflow="auto"> */}
                 <Box
