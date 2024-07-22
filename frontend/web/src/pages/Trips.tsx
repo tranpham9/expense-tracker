@@ -169,7 +169,7 @@ export default function Trips() {
                             textAlign="right"
                         >
                             <Tooltip
-                                title="Edit"
+                                title={<Typography variant="body2">Edit</Typography>}
                                 arrow
                             >
                                 <IconButton
@@ -184,7 +184,7 @@ export default function Trips() {
                                 </IconButton>
                             </Tooltip>
                             <Tooltip
-                                title="Delete"
+                                title={<Typography variant="body2">Delete</Typography>}
                                 arrow
                             >
                                 <IconButton
@@ -200,7 +200,7 @@ export default function Trips() {
                             </Tooltip>
                             {/* TODO: find out if these tooltips have any issues at the bottom of the page (probably not since there is enough of a gap from the pagination at the bottom anyway) */}
                             <Tooltip
-                                title="Open Expenses"
+                                title={<Typography variant="body2">Open Expenses</Typography>}
                                 arrow
                             >
                                 <IconButton
@@ -241,7 +241,7 @@ export default function Trips() {
                     onSearch={(query) => performSearch(query, 1)}
                 />
                 <Tooltip
-                    title="Create Trip"
+                    title={<Typography variant="body2">Create Trip</Typography>}
                     arrow
                 >
                     <IconButton

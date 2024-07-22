@@ -255,7 +255,7 @@ export default function Navbar() {
 
                         {isLoggedIn.value ? (
                             <Box sx={{ flexGrow: 0 }}>
-                                <Tooltip title="Open options">
+                                <Tooltip title={<Typography variant="body2">Open options</Typography>}>
                                     <IconButton
                                         onClick={handleOpenUserMenu}
                                         sx={{ p: 0 }}

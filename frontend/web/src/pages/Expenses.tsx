@@ -141,9 +141,11 @@ export default function Expenses() {
                                     <Tooltip
                                         title={
                                             <Box textAlign="center">
-                                                {payerName} (Payer)
-                                                <br />
-                                                Owed {getFormattedCurrency(expense.cost - amountOwedPer)}
+                                                <Typography variant="body2">
+                                                    {payerName} (Payer)
+                                                    <br />
+                                                    Owed {getFormattedCurrency(expense.cost - amountOwedPer)}
+                                                </Typography>
                                             </Box>
                                         }
                                         arrow
@@ -182,10 +184,12 @@ export default function Expenses() {
                                                     key={memberId}
                                                     title={
                                                         <Box textAlign="center">
-                                                            {memberName}
-                                                            {isMemberTheUser ? " (You)" : ""}
-                                                            <br />
-                                                            Owes {getFormattedCurrency(amountOwedPer)}
+                                                            <Typography variant="body2">
+                                                                {memberName}
+                                                                {isMemberTheUser ? " (You)" : ""}
+                                                                <br />
+                                                                Owes {getFormattedCurrency(amountOwedPer)}
+                                                            </Typography>
                                                         </Box>
                                                     }
                                                     arrow
@@ -281,11 +285,13 @@ export default function Expenses() {
                             key={i}
                             title={
                                 <Box textAlign="center">
-                                    {member.name}
-                                    {member.isLeader ? " (Leader)" : ""}
-                                    <br />
-                                    {/* TODO: impl */}
-                                    You owe them {getFormattedCurrency(0)}
+                                    <Typography variant="body2">
+                                        {member.name}
+                                        {member.isLeader ? " (Leader)" : ""}
+                                        <br />
+                                        {/* TODO: impl */}
+                                        You owe them {getFormattedCurrency(0)}
+                                    </Typography>
                                 </Box>
                             }
                             arrow
@@ -343,7 +349,7 @@ export default function Expenses() {
                     // }}
                 />
                 <Tooltip
-                    title="Create Expense"
+                    title={<Typography variant="body2">Create Expense</Typography>}
                     arrow
                 >
                     <IconButton
