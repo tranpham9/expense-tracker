@@ -49,6 +49,7 @@ export type Expense = {
     memberIds: string[];
 };
 type TripsListExpensesResponse = { expenses: Expense[] };
+type TripsDeleteResponse = object;
 
 export type Responses = {
     refreshJWT: RefreshJWTResponse;
@@ -63,4 +64,5 @@ export type Responses = {
     "trips/create": TripsCreateResponse;
     "trips/getMembers": TripsGetMembersResponse;
     "trips/listExpenses": TripsListExpensesResponse;
+    "trips/delete": TripsDeleteResponse;
 };

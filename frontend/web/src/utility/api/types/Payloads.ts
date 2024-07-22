@@ -28,6 +28,7 @@ type TripsCreatePayload = {
 };
 type TripsGetMembersPayload = { tripId: string };
 type TripsListExpensesPayload = { tripId: string };
+type TripsDeletePayload = { tripId: string };
 
 export type Payloads = {
     refreshJWT: RefreshJWTPayload;
@@ -42,4 +43,5 @@ export type Payloads = {
     "trips/create": TripsCreatePayload;
     "trips/getMembers": TripsGetMembersPayload;
     "trips/listExpenses": TripsListExpensesPayload;
+    "trips/delete": TripsDeletePayload;
 };
