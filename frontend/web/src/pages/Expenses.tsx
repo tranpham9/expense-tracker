@@ -36,6 +36,34 @@ export default function Expenses() {
     // FIXME: maybe the expenses button should also only be enabled in the navbar if a tripid is specified (otherwise, redirect user to trips page)
     // const expenses = useSignal<Expense[] | null>(null);
 
+    const loadAllData = (tripId: string) => {
+        request(
+            "trips/getMembers",
+            { tripId },
+            (response) => {
+                console.log(response);
+                // makes leader first, then sorts rest normally
+                response.members.sort((member1, member2) => +member2.isLeader - +member1.isLeader || member1.name.localeCompare(member2.name));
+                console.log(response);
+                members.value = response.members;
+            },
+            (errorMessage) => {
+                console.log(errorMessage);
+            }
+        );
+        request(
+            "trips/listExpenses",
+            { tripId },
+            (response) => {
+                console.log(response);
+                expenses.value = response.expenses;
+            },
+            (errorMessage) => {
+                console.log(errorMessage);
+            }
+        );
+    };
+
     // NOTE: this also runs when isLoggedIn is first computed
     useSignalEffect(() => {
         if (isLoggedIn.value) {
@@ -43,31 +71,7 @@ export default function Expenses() {
             // untracked(defaultSearch);
 
             if (currentTrip.value) {
-                request(
-                    "trips/getMembers",
-                    { tripId: currentTrip.value._id },
-                    (response) => {
-                        console.log(response);
-                        // makes leader first, then sorts rest normally
-                        response.members.sort((member1, member2) => +member2.isLeader - +member1.isLeader || member1.name.localeCompare(member2.name));
-                        console.log(response);
-                        members.value = response.members;
-                    },
-                    (errorMessage) => {
-                        console.log(errorMessage);
-                    }
-                );
-                request(
-                    "trips/listExpenses",
-                    { tripId: currentTrip.value._id },
-                    (response) => {
-                        console.log(response);
-                        expenses.value = response.expenses;
-                    },
-                    (errorMessage) => {
-                        console.log(errorMessage);
-                    }
-                );
+                loadAllData(currentTrip.value._id);
             } else {
                 console.log("<no trip selected>");
                 navigate("/trips");
@@ -417,7 +421,6 @@ export default function Expenses() {
                         sx={{ p: "10px", ml: 1 }}
                         onClick={() => {
                             isCreateExpenseOverlayVisible.value = true;
-                            // isCreateTripOverlayVisible.value = true;
                         }}
                     >
                         <AddIcon />
@@ -429,7 +432,8 @@ export default function Expenses() {
                 isCreateExpenseOverlayVisible={isCreateExpenseOverlayVisible}
                 tripMembers={members}
                 onSuccessfulCreate={() => {
-                    // TODO: IMPL
+                    isCreateExpenseOverlayVisible.value = false;
+                    loadAllData(currentTrip.value!._id);
                 }}
             />
         </>

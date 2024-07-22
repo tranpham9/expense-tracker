@@ -23,7 +23,6 @@ export default function CreateExpenseOverlay({
     const isProcessing = useSignal(false);
     const name = useSignal("");
     const description = useSignal("");
-    // const cost = useSignal("$0.00");
     const cost = useSignal("");
     const errorMessage = useSignal("");
     const memberIds = useSignal<string[]>([]);
