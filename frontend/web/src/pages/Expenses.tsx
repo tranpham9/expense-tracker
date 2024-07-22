@@ -139,12 +139,32 @@ export default function Expenses() {
                                         borderColor: "secondary.contrastText",
                                     }}
                                 >
-                                    {getInitials(members.value.find((member) => member._id === expense.payerId)?.name || "")}
+                                    {getInitials(members.value.find((member) => member._id === expense.payerId)?.name || userInfo.value?.name || "")}
                                 </Avatar>
                                 <AvatarGroup>
-                                    {expense.memberIds.map((memberId) => (
-                                        <Avatar key={memberId}>{getInitials(members.value.find((member) => member._id === memberId)?.name || "")}</Avatar>
-                                    ))}
+                                    {expense.memberIds.map((memberId) => {
+                                        const memberName = members.value.find((member) => member._id === memberId)?.name || userInfo.value?.name || "";
+                                        if (memberName === userInfo.value?.name) {
+                                            console.warn("Should match logged in user; does it?", memberId === userInfo.value.userId);
+                                        }
+
+                                        return (
+                                            <Tooltip
+                                                key={memberId}
+                                                title={
+                                                    <Box textAlign="center">
+                                                        {memberName}
+                                                        <br />
+                                                        {/* TODO: impl */}
+                                                        Owes {getFormattedCurrency(expense.cost / (expense.memberIds.length + 1))}
+                                                    </Box>
+                                                }
+                                                arrow
+                                            >
+                                                <Avatar>{getInitials(memberName)}</Avatar>
+                                            </Tooltip>
+                                        );
+                                    })}
                                 </AvatarGroup>
                             </Grid>
                             <Grid
