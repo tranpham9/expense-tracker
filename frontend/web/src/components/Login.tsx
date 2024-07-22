@@ -76,11 +76,13 @@ export default function Login({ onSuccessfulLogin = () => {} }) {
             <br />
             <Button
                 variant="text"
-                sx={{ m: 1 }}
                 onClick={handleForgotPassword}
                 color="info"
+                size="large"
+                sx={{ m: 1, fontWeight: "bold" }}
             >
-                Forgot Password
+                {/* when bold, the t makes it look like the spacing to the left and right of it is the same, so I added an extra space (via a non-breaking space) */}
+                Forgot &nbsp;Password
             </Button>
             <br />
             {errorMessage.value && (

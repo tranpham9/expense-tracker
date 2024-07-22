@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Box, Tab, Tabs } from "@mui/material";
+import { Box, Tab, Tabs, Typography } from "@mui/material";
 
 import Modal from "./Modal";
 import Signup from "./Signup";
@@ -25,8 +25,8 @@ export default function AccountOverlay({ isAccountOverlayVisible }: { isAccountO
                         onChange={handleTabChange}
                         centered
                     >
-                        <Tab label="Login" />
-                        <Tab label="Signup" />
+                        <Tab label={<Typography fontWeight="bold">Login</Typography>} />
+                        <Tab label={<Typography fontWeight="bold">Signup</Typography>} />
                     </Tabs>
                 </Box>
                 {activeTab ? (

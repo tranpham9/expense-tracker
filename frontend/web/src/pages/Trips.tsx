@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/inputs/SearchBar";
-import { Box, Divider, Grid, IconButton, Pagination, Paper, Stack, Tooltip, Typography } from "@mui/material";
+import { Box, Grid, IconButton, Pagination, Paper, Stack, Tooltip, Typography } from "@mui/material";
 import { isLoggedIn, userInfo } from "../Signals/Account";
 import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import { request } from "../utility/api/API";
