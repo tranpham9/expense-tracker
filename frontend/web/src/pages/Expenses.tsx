@@ -3,7 +3,7 @@ import AddIcon from "@mui/icons-material/Add";
 // import { getInitials } from "../utility/Manipulation";
 import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import { useNavigate } from "react-router-dom";
-import { isLoggedIn } from "../Signals/Account";
+import { isLoggedIn, userInfo } from "../Signals/Account";
 import { request } from "../utility/api/API";
 import { Expense, Member } from "../utility/api/types/Responses";
 import { currentTrip } from "../Signals/Trip";
@@ -86,117 +86,133 @@ export default function Expenses() {
                         expense.name.toLocaleLowerCase().includes(searchTerm) || expense.description.toLocaleLowerCase().includes(searchTerm) || getFormattedCurrency(expense.cost).includes(searchTerm)
                     ); // || members.value.some((member) => expense.memberIds.includes(member.))
                 })
-                .map((expense, i) => (
-                    <Paper
-                        key={i}
-                        elevation={10}
-                        sx={{
-                            m: 1,
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                        }}
-                    >
-                        <Grid
-                            container
-                            p={2}
-                            spacing={2}
-                            alignItems="center"
+                .map((expense, i) => {
+                    const payerName = members.value.find((member) => member._id === expense.payerId)?.name || userInfo.value?.name || "";
+                    const amountOwedPer = expense.cost / (expense.memberIds.length + 1);
+
+                    return (
+                        <Paper
+                            key={i}
+                            elevation={10}
+                            sx={{
+                                m: 1,
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                            }}
                         >
                             <Grid
-                                item
-                                xs={3}
-                                sm={2}
+                                container
+                                p={2}
+                                spacing={2}
+                                alignItems="center"
                             >
-                                <Typography>{expense.name}</Typography>
-                            </Grid>
-                            <Grid
-                                item
-                                xs={3}
-                                sm={4}
-                            >
-                                {/* FIXME: should probably be Typography? */}
-                                <Box whiteSpace="pre-wrap">{expense.description}</Box>
-                            </Grid>
-                            <Grid
-                                item
-                                xs={1}
-                                sm={1}
-                            >
-                                {getFormattedCurrency(expense.cost)}
-                            </Grid>
-                            {/* TODO: maybe make this look nicer at smaller screen sizes */}
-                            <Grid
-                                item
-                                xs={2}
-                                sm={3}
-                                display="flex"
-                                gap={1}
-                            >
-                                <Avatar
-                                    sx={{
-                                        border: "2px solid",
-                                        borderColor: "secondary.contrastText",
-                                    }}
+                                <Grid
+                                    item
+                                    xs={3}
+                                    sm={2}
                                 >
-                                    {getInitials(members.value.find((member) => member._id === expense.payerId)?.name || userInfo.value?.name || "")}
-                                </Avatar>
-                                <AvatarGroup>
-                                    {expense.memberIds.map((memberId) => {
-                                        const memberName = members.value.find((member) => member._id === memberId)?.name || userInfo.value?.name || "";
-                                        if (memberName === userInfo.value?.name) {
-                                            console.warn("Should match logged in user; does it?", memberId === userInfo.value.userId);
+                                    <Typography>{expense.name}</Typography>
+                                </Grid>
+                                <Grid
+                                    item
+                                    xs={3}
+                                    sm={4}
+                                >
+                                    {/* FIXME: should probably be Typography? */}
+                                    <Box whiteSpace="pre-wrap">{expense.description}</Box>
+                                </Grid>
+                                <Grid
+                                    item
+                                    xs={1}
+                                    sm={1}
+                                >
+                                    {getFormattedCurrency(expense.cost)}
+                                </Grid>
+                                {/* TODO: maybe make this look nicer at smaller screen sizes */}
+                                <Grid
+                                    item
+                                    xs={2}
+                                    sm={3}
+                                    display="flex"
+                                    gap={1}
+                                >
+                                    <Tooltip
+                                        title={
+                                            <Box textAlign="center">
+                                                {payerName} (Payer)
+                                                <br />
+                                                Owed {getFormattedCurrency(expense.cost - amountOwedPer)}
+                                            </Box>
                                         }
+                                        arrow
+                                    >
+                                        <Avatar
+                                            sx={{
+                                                border: "2px solid",
+                                                borderColor: "secondary.contrastText",
+                                            }}
+                                        >
+                                            {getInitials(payerName)}
+                                        </Avatar>
+                                    </Tooltip>
+                                    <AvatarGroup>
+                                        {expense.memberIds.map((memberId) => {
+                                            const memberName = members.value.find((member) => member._id === memberId)?.name || userInfo.value?.name || "";
+                                            if (memberName === userInfo.value?.name) {
+                                                console.warn("Should match logged in user; does it?", memberId === userInfo.value.userId);
+                                            }
 
-                                        return (
-                                            <Tooltip
-                                                key={memberId}
-                                                title={
-                                                    <Box textAlign="center">
-                                                        {memberName}
-                                                        <br />
-                                                        {/* TODO: impl */}
-                                                        Owes {getFormattedCurrency(expense.cost / (expense.memberIds.length + 1))}
-                                                    </Box>
-                                                }
-                                                arrow
-                                            >
-                                                <Avatar>{getInitials(memberName)}</Avatar>
-                                            </Tooltip>
-                                        );
-                                    })}
-                                </AvatarGroup>
-                            </Grid>
-                            <Grid
-                                item
-                                xs={3}
-                                sm={2}
-                                textAlign="right"
-                            >
-                                <IconButton
-                                    type="button"
-                                    sx={{ p: "5px" }}
-                                    aria-label="edit"
-                                    onClick={() => {
-                                        // TODO: impl
-                                    }}
+                                            return (
+                                                <Tooltip
+                                                    key={memberId}
+                                                    title={
+                                                        <Box textAlign="center">
+                                                            {memberName}
+                                                            <br />
+                                                            {/* TODO: impl */}
+                                                            Owes {getFormattedCurrency(amountOwedPer)}
+                                                        </Box>
+                                                    }
+                                                    arrow
+                                                >
+                                                    <Avatar>{getInitials(memberName)}</Avatar>
+                                                </Tooltip>
+                                            );
+                                        })}
+                                    </AvatarGroup>
+                                </Grid>
+                                <Grid
+                                    item
+                                    xs={3}
+                                    sm={2}
+                                    textAlign="right"
                                 >
-                                    <EditIcon />
-                                </IconButton>
-                                <IconButton
-                                    type="button"
-                                    sx={{ p: "5px" }}
-                                    aria-label="delete"
-                                    onClick={() => {
-                                        // TODO: impl
-                                    }}
-                                >
-                                    <DeleteIcon />
-                                </IconButton>
+                                    <IconButton
+                                        type="button"
+                                        sx={{ p: "5px" }}
+                                        aria-label="edit"
+                                        onClick={() => {
+                                            // TODO: impl
+                                        }}
+                                    >
+                                        <EditIcon />
+                                    </IconButton>
+                                    <IconButton
+                                        type="button"
+                                        sx={{ p: "5px" }}
+                                        aria-label="delete"
+                                        onClick={() => {
+                                            // TODO: impl
+                                        }}
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </Grid>
                             </Grid>
-                        </Grid>
-                    </Paper>
-                ))}
+                        </Paper>
+                    );
+                })}
         </Stack>
     );
 
@@ -235,6 +251,7 @@ export default function Expenses() {
                     }}
                 >
                     {members.value.map((member, i) => (
+                        <Tooltip
                             key={i}
                             title={
                                 <Box textAlign="center">
