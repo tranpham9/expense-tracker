@@ -1,4 +1,4 @@
-import { Avatar, AvatarGroup, Box, Button, Chip, Divider, Grid, IconButton, Paper, Stack, Tooltip, Typography } from "@mui/material";
+import { Avatar, AvatarGroup, Badge, Box, Button, Chip, Divider, Grid, IconButton, Paper, Stack, Tooltip, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 // import { getInitials } from "../utility/Manipulation";
 import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
@@ -87,7 +87,8 @@ export default function Expenses() {
                     ); // || members.value.some((member) => expense.memberIds.includes(member.))
                 })
                 .map((expense, i) => {
-                    const payerName = members.value.find((member) => member._id === expense.payerId)?.name || userInfo.value?.name || "";
+                    const isPayerTheUser = expense.payerId === userInfo.value?.userId;
+                    const payerName = members.value.find((member) => member._id === expense.payerId)?.name || (isPayerTheUser && userInfo.value?.name) || "";
                     const amountOwedPer = expense.cost / (expense.memberIds.length + 1);
 
                     return (
@@ -147,21 +148,34 @@ export default function Expenses() {
                                         }
                                         arrow
                                     >
-                                        <Avatar
-                                            sx={{
-                                                border: "2px solid",
-                                                borderColor: "secondary.contrastText",
+                                        <Badge
+                                            overlap="circular"
+                                            variant="dot"
+                                            badgeContent=" "
+                                            color="error"
+                                            anchorOrigin={{
+                                                vertical: "bottom",
+                                                horizontal: "right",
                                             }}
+                                            invisible={!isPayerTheUser}
                                         >
-                                            {getInitials(payerName)}
-                                        </Avatar>
+                                            <Avatar
+                                                sx={{
+                                                    border: "2px solid",
+                                                    borderColor: "secondary.contrastText",
+                                                    // accounts for border
+                                                    width: 44,
+                                                    height: 44,
+                                                }}
+                                            >
+                                                {getInitials(payerName)}
+                                            </Avatar>
+                                        </Badge>
                                     </Tooltip>
-                                    <AvatarGroup>
+                                    <AvatarGroup sx={{ pl: 1 }}>
                                         {expense.memberIds.map((memberId) => {
-                                            const memberName = members.value.find((member) => member._id === memberId)?.name || userInfo.value?.name || "";
-                                            if (memberName === userInfo.value?.name) {
-                                                console.warn("Should match logged in user; does it?", memberId === userInfo.value.userId);
-                                            }
+                                            const isMemberTheUser = memberId === userInfo.value?.userId;
+                                            const memberName = members.value.find((member) => member._id === memberId)?.name || (isMemberTheUser && userInfo.value?.name) || "";
 
                                             return (
                                                 <Tooltip
@@ -170,13 +184,24 @@ export default function Expenses() {
                                                         <Box textAlign="center">
                                                             {memberName}
                                                             <br />
-                                                            {/* TODO: impl */}
                                                             Owes {getFormattedCurrency(amountOwedPer)}
                                                         </Box>
                                                     }
                                                     arrow
                                                 >
-                                                    <Avatar>{getInitials(memberName)}</Avatar>
+                                                    <Badge
+                                                        overlap="circular"
+                                                        variant="dot"
+                                                        badgeContent=" "
+                                                        color="error"
+                                                        anchorOrigin={{
+                                                            vertical: "bottom",
+                                                            horizontal: "right",
+                                                        }}
+                                                        invisible={!isMemberTheUser}
+                                                    >
+                                                        <Avatar sx={{ width: 40, height: 40 }}>{getInitials(memberName)}</Avatar>
+                                                    </Badge>
                                                 </Tooltip>
                                             );
                                         })}
