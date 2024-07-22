@@ -8,8 +8,9 @@ export default function StyledInput({
     error = "",
     required = true,
     useMultiline = false,
-    onChange = () => {},
-    onEnterKey = () => {},
+    // These have no default values on purpose!
+    onChange,
+    onEnterKey,
 }: // onKeyDown = () => {},
 {
     type?: HTMLInputTypeAttribute;
