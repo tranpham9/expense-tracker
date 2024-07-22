@@ -12,6 +12,7 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
     useSignals();
 
     // FIXME: make name be required non-empty; the API doesn't allow it to be empty
+    // NOTE: there is no need to wipe these since creating a trip redirects to expenses page (which completely removes these variables from existence)
     const isProcessing = useSignal(false);
     const name = useSignal("");
     const description = useSignal("");
