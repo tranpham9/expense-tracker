@@ -183,6 +183,7 @@ export default function Expenses() {
                                                     title={
                                                         <Box textAlign="center">
                                                             {memberName}
+                                                            {isMemberTheUser ? " (You)" : ""}
                                                             <br />
                                                             Owes {getFormattedCurrency(amountOwedPer)}
                                                         </Box>
