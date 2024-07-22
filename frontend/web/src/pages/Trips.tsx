@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/inputs/SearchBar";
-import { Box, Grid, IconButton, Pagination, Paper, Stack, Typography } from "@mui/material";
+import { Box, Divider, Grid, IconButton, Pagination, Paper, Stack, Typography } from "@mui/material";
 import { isLoggedIn, userInfo } from "../Signals/Account";
 import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import { request } from "../utility/api/API";
@@ -133,6 +133,13 @@ export default function Trips() {
                         >
                             <Typography>{trip.name}</Typography>
                         </Grid>
+                        <Divider
+                            orientation="vertical"
+                            flexItem
+                            // right margin of -1px is required to not break grid ( https://stackoverflow.com/questions/63712269/material-ui-using-divider-breaks-the-grid )
+                            // top margin of 2 is done to account for outer grid padding of 2 which is only accounted for in the bottom maring of this element for some reason
+                            sx={{ mr: "-1px", mt: 2 }}
+                        />
                         <Grid
                             item
                             xs={2}
@@ -147,6 +154,13 @@ export default function Trips() {
                                 {trip.description}
                             </Box>
                         </Grid>
+                        <Divider
+                            orientation="vertical"
+                            flexItem
+                            // right margin of -1px is required to not break grid ( https://stackoverflow.com/questions/63712269/material-ui-using-divider-breaks-the-grid )
+                            // top margin of 2 is done to account for outer grid padding of 2 which is only accounted for in the bottom maring of this element for some reason
+                            sx={{ mr: "-1px", mt: 2 }}
+                        />
                         <Grid
                             item
                             xs={5}

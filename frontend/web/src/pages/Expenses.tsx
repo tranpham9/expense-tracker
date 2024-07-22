@@ -193,12 +193,14 @@ export default function Expenses() {
                 >
                     {currentTrip.value?.name}
                 </Typography>
+                <Divider orientation="vertical" flexItem />
                 <Typography
                     variant="body1"
                     flexShrink={0}
                 >
                     {currentTrip.value?.inviteCode}
                 </Typography>
+                <Divider orientation="vertical" flexItem />
                 {/* <Typography>{currentTripInfo.value.description}</Typography> */}
                 {/* <Stack direction="row" spacing={1} overflow="auto"> */}
                 <Box
@@ -249,11 +251,11 @@ export default function Expenses() {
                         avatar={<Avatar>JZ</Avatar>}
                         label="$2.48"
                     />
-                    <Chip
+                    {/* <Chip
                         avatar={<Avatar>JZ</Avatar>}
                         label="$2.48"
                     />
-                    {/* <Chip
+                    <Chip
                         avatar={<Avatar>JZ</Avatar>}
                         label="$2.48"
                     />
