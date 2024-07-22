@@ -51,7 +51,7 @@ class _ViewExpensePage extends State<ViewExpensePage> {
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                   trailing: Text(
-                    "\$${widget.expense.cost}",
+                    "\$${widget.expense.cost?.toDouble()}",
                     style: TextStyle(fontSize: 15),
                   ),
                 )),
@@ -244,7 +244,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                           widget.tripId,
                           nameController.text,
                           descriptionController.text,
-                          double.parse(costController.text),
+                          double.parse(costController.text).toDouble(),
                           addMembers)
                       .then((response) {
                     if (response == null) {

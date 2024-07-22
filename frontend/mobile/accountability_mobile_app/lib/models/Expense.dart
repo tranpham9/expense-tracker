@@ -26,11 +26,11 @@ class Expense {
     required this.description,
   });
 
-  factory Expense.fromJson(Map<String, dynamic> json) => Expense(
+  factory Expense.fromJson(Map<dynamic, dynamic> json) => Expense(
         id: json["_id"],
         name: json["name"],
         tripId: json["tripId"],
-        cost: json["cost"],
+        cost: double.parse(json["cost"].toString()),
         description: json["description"],
       );
 

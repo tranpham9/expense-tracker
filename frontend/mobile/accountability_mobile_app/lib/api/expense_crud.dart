@@ -16,7 +16,7 @@ class ExpenseCRUD {
                 'tripId': tripId,
                 'name': name,
                 'description': description,
-                'cost': cost,
+                'cost': cost.toDouble(),
                 'memberIds': memberIds
               }));
       // If there was an error, don't refresh jwt
