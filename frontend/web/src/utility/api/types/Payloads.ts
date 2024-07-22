@@ -22,13 +22,21 @@ type TripsSearchPaylod = {
     query?: string;
     page?: number;
 };
-type TripsCreatePayload = {
-    name?: string;
+export type TripsCreatePayload = {
+    name: string;
     description?: string;
 };
 type TripsGetMembersPayload = { tripId: string };
 type TripsListExpensesPayload = { tripId: string };
 type TripsDeletePayload = { tripId: string };
+
+export type ExpensesCreatePayload = {
+    tripId: string;
+    name: string;
+    description?: string;
+    cost: number;
+    memberIds: string[];
+};
 
 export type Payloads = {
     refreshJWT: RefreshJWTPayload;
@@ -44,4 +52,6 @@ export type Payloads = {
     "trips/getMembers": TripsGetMembersPayload;
     "trips/listExpenses": TripsListExpensesPayload;
     "trips/delete": TripsDeletePayload;
+
+    "expenses/create": ExpensesCreatePayload;
 };
