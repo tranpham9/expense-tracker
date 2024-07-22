@@ -18,7 +18,7 @@ class ViewTripPage extends StatefulWidget {
 }
 
 class _ViewTripsPage extends State<ViewTripPage> {
-  late List<User> members;
+  late List<User> members = [];
   static Future<int?> deleteTrip(String tripId) async {
     return await TripCRUD.deleteTrip(tripId);
   }

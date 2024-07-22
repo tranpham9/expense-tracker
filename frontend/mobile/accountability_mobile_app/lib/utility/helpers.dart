@@ -12,7 +12,7 @@ String? validateText(String validateType, String validateText) {
     case "email":
       if (validateText.isEmpty) {
         return null;
-      } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+      } else if (!RegExp(r'^[\w-\.\+]+@([\w-]+\.)+[\w-]{2,4}$')
           .hasMatch(validateText)) {
         return "Must be a valid email";
       } else {

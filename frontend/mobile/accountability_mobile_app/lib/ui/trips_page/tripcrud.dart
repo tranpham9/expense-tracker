@@ -1,6 +1,7 @@
 // Display all of the different pages related to the different CRUD operations for each trip
 import 'package:accountability_mobile_app/api/trip_crud.dart';
 import 'package:flutter/material.dart';
+import '../../api/expense_crud.dart';
 import '../../models/Expense.dart';
 import '../../models/Trip.dart';
 import '../../models/User.dart';
@@ -14,8 +15,8 @@ class AddTripsPage extends StatefulWidget {
 
 class _AddTripsPageState extends State<AddTripsPage> {
   // Grab text that will be entered by the user
-  final TextEditingController name = TextEditingController();
-  final TextEditingController notes = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
   // The user can enter a trip code to join someone else's trip
   final TextEditingController code = TextEditingController();
   String? codeError;
@@ -23,8 +24,8 @@ class _AddTripsPageState extends State<AddTripsPage> {
   // Show a pop up overlay after a successful registration
   OverlayEntry? _overlayEntry;
   // Create a trip with the user as the leader
-  Future<int?> createTrip(String name, String description) async {
-    return await TripCRUD.createTrip(name, description);
+  Future<int?> createTrip(String nameController, String description) async {
+    return await TripCRUD.createTrip(nameController, description);
   }
 
   // Show a given pop up overlay
@@ -59,25 +60,25 @@ class _AddTripsPageState extends State<AddTripsPage> {
                   style: TextStyle(fontSize: 20),
                 )),
               ),
-              // Enter Name
+              // Enter nameController
               Container(
                 padding: const EdgeInsets.all(10),
                 child: TextField(
-                  controller: name,
+                  controller: nameController,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Name',
                   ),
                 ),
               ),
-              // Enter Notes
+              // Enter descriptionController
               Container(
                 padding: const EdgeInsets.all(10),
                 child: TextField(
-                  controller: notes,
+                  controller: descriptionController,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: 'Notes',
+                    labelText: 'Description',
                   ),
                 ),
               ),
@@ -93,7 +94,8 @@ class _AddTripsPageState extends State<AddTripsPage> {
                   ),
                   onPressed: () {
                     // Create a trip with the current user as the leader
-                    createTrip(name.text, notes.text).then((response) {
+                    createTrip(nameController.text, descriptionController.text)
+                        .then((response) {
                       // Display an error message to the user
                       if (response == null) {
                         _showOverlay(
@@ -101,7 +103,8 @@ class _AddTripsPageState extends State<AddTripsPage> {
                         return;
                       }
                       // Display success to the user
-                      _showOverlay("Successfully created ${name.text}!");
+                      _showOverlay(
+                          "Successfully created ${nameController.text}!");
                       return;
                     });
                   },
@@ -204,11 +207,11 @@ class _JoinTripState extends State<JoinTrip> {
 }
 
 // TODO: Implement some realtime updating
-// Name & Description Widgets (Only for the owner of the trip)
+// nameController & Description Widgets (Only for the owner of the trip)
 class EditNameNotesPage extends StatefulWidget {
-  // Each trip has both a name and notes associated with it
+  // Each trip has both a nameController and descriptionController associated with it
   final Trip trip;
-  // Make sure to pass the name and notes of the trip to the function
+  // Make sure to pass the nameController and descriptionController of the trip to the function
   const EditNameNotesPage(this.trip);
 
   @override
@@ -230,21 +233,21 @@ class _EditNameNotesPage extends State<EditNameNotesPage> {
   }
 
   static Future<int?> updateTrip(
-      String tripId, String name, String description) async {
-    return await TripCRUD.updateTrip(tripId, name, description);
+      String tripId, String nameController, String description) async {
+    return await TripCRUD.updateTrip(tripId, nameController, description);
   }
 
   Widget build(BuildContext context) {
     // Build the page
     return AlertDialog(
-      title: Text("Edit Name And Description"),
+      title: Text("Edit nameController And Description"),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           TextFormField(
             controller: nameController,
             decoration: InputDecoration(
-              labelText: 'Trip Name',
+              labelText: 'Trip nameController',
             ),
           ),
           SizedBox(
@@ -277,7 +280,7 @@ class _EditNameNotesPage extends State<EditNameNotesPage> {
                     descriptionController.text)
                 .then((response) {
               if (response == null) {
-                print("Error editing names/notes");
+                print("Error editing nameControllers/descriptionController");
                 return;
               }
             });
@@ -298,7 +301,7 @@ class _EditNameNotesPage extends State<EditNameNotesPage> {
 class ViewMemberPage extends StatefulWidget {
   // Pass the member we want to look at
   final User member;
-  // Make sure to pass the name and notes of the trip to the function
+  // Make sure to pass the nameController and descriptionController of the trip to the function
   const ViewMemberPage(this.member);
 
   @override
@@ -338,9 +341,9 @@ class _ViewMemberPage extends State<ViewMemberPage> {
 
 // Expense Related Widgets
 class ViewExpensePage extends StatefulWidget {
-  // Each trip has both a name and notes associated with it
+  // Each trip has both a nameController and descriptionController associated with it
   final Expense expense;
-  // Make sure to pass the name and notes of the trip to the function
+  // Make sure to pass the nameController and descriptionController of the trip to the function
   const ViewExpensePage(this.expense);
 
   @override
@@ -363,12 +366,12 @@ class _ViewExpensePage extends State<ViewExpensePage> {
         child: Column(
           // Have our list of containers that will take in text input
           children: <Widget>[
-            // Display notes
+            // Display descriptionController
             Container(
                 padding: const EdgeInsets.all(10),
                 child: ListTile(
                   leading: Text(
-                    "Notes",
+                    "descriptionController",
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                   trailing: Text(
@@ -376,7 +379,7 @@ class _ViewExpensePage extends State<ViewExpensePage> {
                     style: TextStyle(fontSize: 15),
                   ),
                 )),
-            // Display cost
+            // Display costController
             Container(
                 padding: const EdgeInsets.all(10),
                 child: ListTile(
@@ -464,7 +467,7 @@ class AddExpensePage extends StatefulWidget {
   final String tripId;
   // Our list of members (User objects)
   final List<User> members;
-  // Make sure to pass the name and notes of the trip to the function
+  // Make sure to pass the nameController and descriptionController of the trip to the function
   const AddExpensePage(this.tripId, this.members);
 
   @override
@@ -473,9 +476,16 @@ class AddExpensePage extends StatefulWidget {
 
 class _AddExpensePageState extends State<AddExpensePage> {
   // Grab text that will be entered by the user
-  final TextEditingController name = TextEditingController();
-  final TextEditingController notes = TextEditingController();
-  final TextEditingController cost = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController costController = TextEditingController();
+  late List<bool> isChecked;
+
+  @override
+  void initState() {
+    super.initState();
+    isChecked = List.generate(widget.members.length, (index) => false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -490,87 +500,95 @@ class _AddExpensePageState extends State<AddExpensePage> {
         child: ListView(
           // Have our list of containers that will take in text input
           children: <Widget>[
-            // Enter Name
+            // Enter nameController
             Container(
               padding: const EdgeInsets.all(10),
               child: TextField(
-                controller: name,
+                controller: nameController,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'Name',
+                  labelText: 'nameController',
                 ),
               ),
             ),
-            // Enter Notes
+            // Enter descriptionController
             Container(
               padding: const EdgeInsets.all(10),
               child: TextField(
-                controller: notes,
+                controller: descriptionController,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'Notes',
+                  labelText: 'descriptionController',
                 ),
               ),
             ),
-            // Enter Cost
+            // Enter costController
             Container(
               padding: const EdgeInsets.all(10),
               child: TextField(
                 obscureText: true,
-                controller: cost,
+                controller: costController,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'Cost',
+                  labelText: 'costController',
                 ),
               ),
             ),
             // Add Members to the Expense
-            // TODO: Fix this, when checked the new state isn't saved
+            // TODO: Get this to be in some sort of grid view??
             SizedBox(
               height: 200,
-              child: ListView.builder(
-                  itemCount: widget.members.length,
-                  itemBuilder: (context, index) {
-                    // Set up a list of isChecked bool's to keep track of who is added to the list
-                    List<bool> isChecked =
-                        List.generate(widget.members.length, (index) => false);
-                    return CheckboxListTile(
-                      // The member that you want to add
-                      title: Text(widget.members[index].name),
-                      value: isChecked[index],
-                      tristate: false,
-                      // Switch the value when you click
-                      onChanged: (bool? pressed) {
-                        setState(() {
-                          print("State BEFORE: ${isChecked[index]}");
-                          isChecked[index] = pressed!;
-                          print("State AFTER: ${isChecked[index]}");
-                          return;
-                        });
-                      },
-                      activeColor: Theme.of(context).primaryColor,
-                      checkColor: Colors.white,
-                    );
-                  }),
+              // Ensure we don't display if there aren't any members
+              child: isChecked.isEmpty
+                  ? null
+                  : ListView.builder(
+                      itemCount: widget.members.length,
+                      itemBuilder: (context, index) {
+                        return CheckboxListTile(
+                          // The member that you want to add
+                          title: Text(widget.members[index].name),
+                          value: isChecked[index],
+                          tristate: false,
+                          // Switch the value when you click
+                          onChanged: (bool? value) {
+                            setState(() {
+                              isChecked[index] = value!;
+                            });
+                          },
+                          activeColor: Colors.white,
+                          checkColor: Theme.of(context).primaryColor,
+                        );
+                      }),
             ),
             // Confirm Add Expense
             Container(
               height: 50,
               padding: const EdgeInsets.all(10),
               child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                ),
                 child: const Text(
                   'Add Expense',
                   style: TextStyle(color: Colors.white),
                 ),
-                onPressed: () {
-                  // TODO: Call the API to add the expense. Add that expense to the current trip
-                  // Figure out best way to map how much each person spent...(HARD PART)
-
-                  // Go back to the last screen
-                  Navigator.pop(context);
+                onPressed: () async {
+                  List<String> addMembers = [];
+                  // Only add members if they are checked
+                  for (int i = 0; i < isChecked.length; i++) {
+                    if (isChecked[i]) {
+                      addMembers.add(widget.members[i].userId!);
+                      print('Adding ${widget.members[i].name}\n');
+                    }
+                  }
+                  // Go through and collect the memberIds of the selected checkboxes
+                  await ExpenseCRUD.create(
+                          widget.tripId,
+                          nameController.text,
+                          descriptionController.text,
+                          double.parse(costController.text),
+                          addMembers)
+                      .then((response) {
+                    // Go back to the last screen
+                    Navigator.pop(context);
+                  });
                 },
               ),
             ),

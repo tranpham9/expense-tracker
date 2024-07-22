@@ -20,4 +20,5 @@ class Config {
   static const String listExpenseAPI = '/trips/listExpenses';
   static const String getMembersAPI = '/trips/getMembers';
   // Expenses
+  static const String createExpenseAPI = '/expenses/create';
 }
