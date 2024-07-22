@@ -3,7 +3,7 @@ import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
 import { useRef } from "react";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Tooltip } from "@mui/material";
 
 /* TODO: should this clear on submit or not? */
 export default function SearchBar({
@@ -69,15 +69,19 @@ export default function SearchBar({
 
             {isBuffering && <CircularProgress size={20} />}
 
-            <IconButton
-                type="button"
-                disabled={isBuffering}
-                sx={{ p: "10px" }}
-                aria-label="search"
-                onClick={triggerSearch}
+            <Tooltip
+                title="Search Trips"
+                arrow
             >
-                <SearchIcon />
-            </IconButton>
+                <IconButton
+                    type="button"
+                    disabled={isBuffering}
+                    sx={{ p: "10px" }}
+                    onClick={triggerSearch}
+                >
+                    <SearchIcon />
+                </IconButton>
+            </Tooltip>
         </Paper>
     );
 }

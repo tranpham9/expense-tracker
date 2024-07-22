@@ -330,17 +330,21 @@ export default function Expenses() {
                     //     query.value = currentQuery;
                     // }}
                 />
-                <IconButton
-                    type="button"
-                    // disabled={*}
-                    sx={{ p: "10px", ml: 1 }}
-                    aria-label="add"
-                    onClick={() => {
-                        // isCreateTripOverlayVisible.value = true;
-                    }}
+                <Tooltip
+                    title="Create Expense"
+                    arrow
                 >
-                    <AddIcon />
-                </IconButton>
+                    <IconButton
+                        type="button"
+                        // disabled={*}
+                        sx={{ p: "10px", ml: 1 }}
+                        onClick={() => {
+                            // isCreateTripOverlayVisible.value = true;
+                        }}
+                    >
+                        <AddIcon />
+                    </IconButton>
+                </Tooltip>
             </Box>
             {expenses.value ? <RenderedExpenses /> : <LoadingSkeleton />}
         </>

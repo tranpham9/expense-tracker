@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/inputs/SearchBar";
-import { Box, Divider, Grid, IconButton, Pagination, Paper, Stack, Typography } from "@mui/material";
+import { Box, Divider, Grid, IconButton, Pagination, Paper, Stack, Tooltip, Typography } from "@mui/material";
 import { isLoggedIn, userInfo } from "../Signals/Account";
 import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import { request } from "../utility/api/API";
@@ -168,40 +168,53 @@ export default function Trips() {
                             md={2}
                             textAlign="right"
                         >
-                            <IconButton
-                                type="button"
-                                disabled={trip.leaderId !== userInfo.value?.userId}
-                                sx={{ p: "5px" }}
-                                aria-label="edit"
-                                onClick={() => {
-                                    // TODO: impl
-                                }}
+                            <Tooltip
+                                title="Edit"
+                                arrow
                             >
-                                <EditIcon />
-                            </IconButton>
-                            <IconButton
-                                type="button"
-                                disabled={trip.leaderId !== userInfo.value?.userId}
-                                sx={{ p: "5px" }}
-                                aria-label="delete"
-                                onClick={() => {
-                                    // TODO: impl
-                                }}
+                                <IconButton
+                                    type="button"
+                                    disabled={trip.leaderId !== userInfo.value?.userId}
+                                    sx={{ p: "5px" }}
+                                    onClick={() => {
+                                        // TODO: impl
+                                    }}
+                                >
+                                    <EditIcon />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip
+                                title="Delete"
+                                arrow
                             >
-                                <DeleteIcon />
-                            </IconButton>
-                            <IconButton
-                                type="button"
-                                // disabled={*}
-                                sx={{ p: "5px" }}
-                                aria-label="open trip"
-                                onClick={() => {
-                                    currentTrip.value = trip;
-                                    navigate("/expenses");
-                                }}
+                                <IconButton
+                                    type="button"
+                                    disabled={trip.leaderId !== userInfo.value?.userId}
+                                    sx={{ p: "5px" }}
+                                    onClick={() => {
+                                        // TODO: impl
+                                    }}
+                                >
+                                    <DeleteIcon />
+                                </IconButton>
+                            </Tooltip>
+                            {/* TODO: find out if these tooltips have any issues at the bottom of the page (probably not since there is enough of a gap from the pagination at the bottom anyway) */}
+                            <Tooltip
+                                title="Open Expenses"
+                                arrow
                             >
-                                <OpenExpensesIcon />
-                            </IconButton>
+                                <IconButton
+                                    type="button"
+                                    // disabled={*}
+                                    sx={{ p: "5px" }}
+                                    onClick={() => {
+                                        currentTrip.value = trip;
+                                        navigate("/expenses");
+                                    }}
+                                >
+                                    <OpenExpensesIcon />
+                                </IconButton>
+                            </Tooltip>
                         </Grid>
                     </Grid>
                 </Paper>
@@ -227,17 +240,21 @@ export default function Trips() {
                     }}
                     onSearch={(query) => performSearch(query, 1)}
                 />
-                <IconButton
-                    type="button"
-                    // disabled={*}
-                    sx={{ p: "10px", ml: 1 }}
-                    aria-label="add"
-                    onClick={() => {
-                        isCreateTripOverlayVisible.value = true;
-                    }}
+                <Tooltip
+                    title="Create Trip"
+                    arrow
                 >
-                    <AddIcon />
-                </IconButton>
+                    <IconButton
+                        type="button"
+                        // disabled={*}
+                        sx={{ p: "10px", ml: 1 }}
+                        onClick={() => {
+                            isCreateTripOverlayVisible.value = true;
+                        }}
+                    >
+                        <AddIcon />
+                    </IconButton>
+                </Tooltip>
             </Box>
             {!trips.value || trips.value.length ? <LinkedPagination isEnabled={!!trips.value} /> : <></>}
             {trips.value ? <RenderedTrips /> : <LoadingSkeleton />}
