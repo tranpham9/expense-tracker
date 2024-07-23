@@ -15,6 +15,14 @@ class TripsPage extends StatefulWidget {
 class _TripsPageState extends State<TripsPage> {
   // Grab the search field when we want to search
   final TextEditingController _searchQuery = TextEditingController();
+  // display the trips for the user
+  late List<Trip> trips;
+  // Search for the trips, then rebuild the widget
+  void _search() async {
+    setState(() async {
+      trips = await TripCRUD.getTrips(0, _searchQuery.text) ?? [];
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,10 +47,9 @@ class _TripsPageState extends State<TripsPage> {
                 ),
                 prefixIcon: IconButton(
                   icon: const Icon(Icons.search),
-                  onPressed: () {
-                    // TODO: Perform a search and filter the matches to the top
-                    // Call api to return a list of trips that match the search and redraw them to the screen
+                  onPressed: () async {
                     print(_searchQuery.text);
+                    _search();
                   },
                 ),
                 border: OutlineInputBorder(
@@ -65,8 +72,8 @@ class _TripsPageState extends State<TripsPage> {
                       ),
                     );
                   } else if (snapshot.hasData) {
-                    // TODO: Might be able to factor 'trips' so we can perform search operation
-                    List<Trip> trips = snapshot.data!;
+                    // Grab the list of trips for the whole page
+                    trips = snapshot.data!;
                     return ListView.builder(
                       itemBuilder: (context, index) => ListTile(
                         title: Text(trips[index].name),

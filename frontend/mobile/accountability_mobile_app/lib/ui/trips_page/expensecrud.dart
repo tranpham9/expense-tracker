@@ -22,21 +22,24 @@ class ViewExpensePage extends StatefulWidget {
 class _ViewExpensePage extends State<ViewExpensePage> {
   // View all members of an EXPENSE
   late List<User>? expenseMembers;
+  late String payerName;
 
   // @override
-  // Future<void> initState() async {
-  //   super.initState();
-
-  //   // Create a list of the members which took place in the expense
-  //   // for (int i = 0; i < widget.allMembers.length; i++) {
-  //   //   for (int j = 0; j < expense.memberIds!.length; j++) {
-  //   //     // Keep track of who is in the expense
-  //   //     if (expense.memberIds![i] == (widget.allMembers[i].userId)) {
-  //   //       expenseMembers!.add(widget.allMembers[i]);
-  //   //     }
-  //   //   }
-  //   // }
-  // }
+  void initState() async {
+    super.initState();
+    // Loop over the trip members and identify who paid
+    // for(int i=0; i<widget.allMembers.length; i++){
+    // }
+    // Create a list of the members which took place in the expense
+    // for (int i = 0; i < widget.allMembers.length; i++) {
+    //   for (int j = 0; j < expense.memberIds!.length; j++) {
+    //     // Keep track of who is in the expense
+    //     if (expense.memberIds![i] == (widget.allMembers[i].userId)) {
+    //       expenseMembers!.add(widget.allMembers[i]);
+    //     }
+    //   }
+    // }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -298,6 +301,17 @@ class EditExpenseCost extends StatefulWidget {
 
 class _EditExpenseCost extends State<EditExpenseCost> {
   TextEditingController costController = TextEditingController();
+  String? costError;
+  @override
+  void initState() {
+    // Make sure we display the current cost of the expense
+    costController.text = widget.expense!.cost.toString();
+    costController.addListener(() {
+      setState(() {
+        costError = validateText("cost", costController.text);
+      });
+    });
+  }
 
   Widget build(BuildContext context) {
     // Build the page
@@ -311,6 +325,7 @@ class _EditExpenseCost extends State<EditExpenseCost> {
             controller: costController,
             decoration: InputDecoration(
               labelText: 'Cost',
+              errorText: costError,
             ),
           ),
         ],

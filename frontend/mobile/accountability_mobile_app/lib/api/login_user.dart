@@ -25,7 +25,7 @@ class LoginUser {
       Globals.user = userFromJson(jsonEncode(response.data));
       // Store the jwt
       await UserManager.saveJwt(response.data['jwt']);
-      // Grab the bio too
+      // Grab the bio too (change maybe at some point)
       Globals.user!.bio = await UserCRUD.getBio(Globals.user!.userId);
 
       // Successful login

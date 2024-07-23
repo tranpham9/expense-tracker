@@ -1,8 +1,6 @@
 // Display all of the different pages related to the different CRUD operations for each trip
-import 'package:accountability_mobile_app/api/expense_crud.dart';
 import 'package:accountability_mobile_app/api/trip_crud.dart';
 import 'package:flutter/material.dart';
-import '../../models/Expense.dart';
 import '../../models/Trip.dart';
 import '../../models/User.dart';
 import '../../utility/helpers.dart';
