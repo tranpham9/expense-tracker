@@ -159,7 +159,7 @@ class _ViewExpensePage extends State<ViewExpensePage> {
             //                 ),
             //               ),
             //       ),
-            // Confirm Edit
+            // Confirm Edit (for the user)
             Container(
               height: 50,
               padding: const EdgeInsets.all(10),
@@ -175,6 +175,22 @@ class _ViewExpensePage extends State<ViewExpensePage> {
                   // Go back to the last screen
                   Navigator.pop(context);
                 },
+              ),
+            ),
+            Center(
+              child: ElevatedButton(
+                // Navigate to confirm delete delete
+                onPressed: () async {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DeleteExpenseWidget(
+                          expenseId: widget.expense.id,
+                          name: widget.expense.name),
+                    ),
+                  );
+                },
+                child: Icon(Icons.delete),
               ),
             ),
           ],
@@ -507,6 +523,53 @@ class _AddExpensePageState extends State<AddExpensePage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class DeleteExpenseWidget extends StatefulWidget {
+  final String expenseId;
+  final String name;
+  // Pass a trip to the widget
+  const DeleteExpenseWidget(
+      {super.key, required this.expenseId, required this.name});
+
+  @override
+  State<DeleteExpenseWidget> createState() => _DeleteExpenseWidget();
+}
+
+class _DeleteExpenseWidget extends State<DeleteExpenseWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text("Confirm Expense Deletion"),
+      content: Text('Are you sure you want to delete "${widget.name}"?'),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('NO'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            // Call the API
+            await ExpenseCRUD.delete(widget.expenseId)!.then((response) {
+              if (response == null) {
+                showOverlay(
+                    "There Was an Error Deleting Your Expense.", context);
+                return;
+              }
+              // Go back to the last screen
+              Navigator.pop(context);
+            });
+            // Success! Show success overlay
+            showOverlay('Successfully Deleted "${widget.name}"', context);
+            Navigator.pop(context);
+          },
+          child: const Text('YES'),
+        ),
+      ],
     );
   }
 }

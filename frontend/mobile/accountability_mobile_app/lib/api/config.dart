@@ -23,4 +23,5 @@ class Config {
   static const String createExpenseAPI = '/expenses/create';
   static const String getExpenseAPI = '/expenses/get';
   static const String updateExpenseAPI = '/expenses/update';
+  static const String deleteExpenseAPI = '/expenses/delete';
 }
