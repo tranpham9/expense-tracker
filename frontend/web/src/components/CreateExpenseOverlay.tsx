@@ -25,9 +25,10 @@ export default function CreateExpenseOverlay({
     const name = useSignal("");
     const description = useSignal("");
     const cost = useSignal("");
+    const isCostValid = useComputed(() => !!cost.value.match(/^\$([0-9]+|[0-9]*\.[0-9]{2})$/));
     const errorMessage = useSignal("");
     const memberIds = useSignal<string[]>([]);
-    const canCreate = useComputed(() => name.value && isCostValid() && !isProcessing.value);
+    const canCreate = useComputed<boolean>(() => !!(name.value && !isProcessing.value && isCostValid.value));
 
     const hasInteractedWithName = useSignal(false);
     const hasInteractedWithCost = useSignal(false);
@@ -64,8 +65,6 @@ export default function CreateExpenseOverlay({
             }
         );
     };
-
-    const isCostValid = () => !!cost.value.match(/^\$([0-9]+|[0-9]*\.[0-9]{2})$/);
 
     useSignalEffect(() => {
         console.log("list of selected members for expense changed to", memberIds.value);
@@ -174,7 +173,7 @@ export default function CreateExpenseOverlay({
                 <br />
                 <StyledInput
                     label="Cost"
-                    error={!hasInteractedWithCost.value || isCostValid() ? "" : "Must be a valid USD format"}
+                    error={!hasInteractedWithCost.value || isCostValid.value ? "" : "Must be a valid USD format"}
                     // onKeyDown={(event) => {
                     //     event.key
                     // }}
