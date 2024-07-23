@@ -19,9 +19,17 @@ class _TripsPageState extends State<TripsPage> {
   late List<Trip> trips;
   // Search for the trips, then rebuild the widget
   void _search() async {
-    setState(() async {
-      trips = await TripCRUD.getTrips(0, _searchQuery.text) ?? [];
+    List<Trip>? searchTrips =
+        await TripCRUD.getTrips(0, _searchQuery.text) ?? [];
+    setState(() {
+      trips = searchTrips;
+      return;
     });
+  }
+
+  @override
+  void initState() {
+    _searchQuery.text = "";
   }
 
   @override
@@ -59,7 +67,7 @@ class _TripsPageState extends State<TripsPage> {
             ),
             Expanded(
               child: FutureBuilder<List<Trip>?>(
-                future: TripCRUD.getTrips(0, ""),
+                future: TripCRUD.getTrips(0, _searchQuery.text),
                 builder: (context, snapshot) {
                   // Display the loading skeleton for the trips
                   if (snapshot.connectionState == ConnectionState.waiting) {
