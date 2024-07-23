@@ -55,15 +55,17 @@ export default function CreateExpenseOverlay({
         );
     };
 
+    const isCostValid = () => !!cost.value.match(/^\$([0-9]+|[0-9]*\.[0-9]{2})$/);
+
     useSignalEffect(() => {
         console.log("list of selected members for expense changed to", memberIds.value);
     });
 
     useSignalEffect(() => {
         if (!isCreateExpenseOverlayVisible.value) {
-            console.log("expense overlay was closed; resetting all values");
+            console.log("create expense overlay was closed; resetting all values");
 
-            // reset all values (it seems that only the non-primitive one needs to get reset for some reason [memberIds], but I'm doing all of them just in case)
+            // reset all values (with the way that the StyledInputs work, they are one-way with information; their values changing updates these signals but not the other way around; accordingly, these all need to get wiped)
             name.value = "";
             description.value = "";
             cost.value = "";
@@ -139,7 +141,7 @@ export default function CreateExpenseOverlay({
                 <br />
                 <StyledInput
                     label="Name"
-                    // error={error}
+                    error={name.value ? "" : "Must be nonempty"}
                     onChange={(event) => {
                         name.value = event.target.value;
                     }}
@@ -158,7 +160,7 @@ export default function CreateExpenseOverlay({
                 <br />
                 <StyledInput
                     label="Cost"
-                    // error={error}
+                    error={isCostValid() ? "" : "Must be a valid USD format"}
                     // onKeyDown={(event) => {
                     //     event.key
                     // }}
@@ -198,7 +200,7 @@ export default function CreateExpenseOverlay({
                 )}
                 <Button
                     variant="contained"
-                    disabled={isProcessing.value}
+                    disabled={!name.value || !isCostValid() || isProcessing.value}
                     sx={{ m: "10px" }}
                     onClick={attemptCreateExpense}
                 >
