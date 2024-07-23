@@ -4,45 +4,38 @@ import { useComputed, useSignal, useSignalEffect, useSignals } from "@preact/sig
 import StyledInput from "./inputs/StyledInput";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { request } from "../utility/api/API";
-import { useNavigate } from "react-router-dom";
-import { currentTrip } from "../Signals/Trip";
-import { TripsCreatePayload } from "../utility/api/types/Payloads";
 
-export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCreateTripOverlayVisible: Signal<boolean> }) {
+export default function JoinTripOverlay({ isJoinTripOverlayVisible, onSuccessfulJoin = () => {} }: { isJoinTripOverlayVisible: Signal<boolean>; onSuccessfulJoin?: () => void }) {
     useSignals();
 
     // FIXME: make name be required non-empty; the API doesn't allow it to be empty
     // NOTE: there is no need to wipe these since creating a trip redirects to expenses page (which completely removes these variables from existence)
     const isProcessing = useSignal(false);
 
-    const name = useSignal("");
-    const description = useSignal("");
+    const inviteCode = useSignal("");
+    const canJoin = useComputed(() => !isProcessing.value && !!inviteCode.value.match(/^[0-9]{6}$/));
     const errorMessage = useSignal("");
-    const canCreate = useComputed(() => name.value && !isProcessing.value);
 
-    const hasInteractedWithName = useSignal(false);
+    const hasInteractedWithInviteCode = useSignal(false);
 
-    const navigate = useNavigate();
-
-    const attemptCreateTrip = () => {
-        if (!canCreate.value) {
-            console.log("Can't create trip");
+    const attemptJoinTrip = () => {
+        if (!canJoin.value) {
+            console.log("Can't join trip");
             return;
         }
 
         isProcessing.value = true;
 
-        const tripInfo: TripsCreatePayload = { name: name.value, description: description.value };
         request(
-            "trips/create",
-            tripInfo,
+            "trips/join",
+            { inviteCode: inviteCode.value },
             (response) => {
                 console.log(response);
 
                 isProcessing.value = false;
-                currentTrip.value = response.trip;
+                isJoinTripOverlayVisible.value = false;
 
-                navigate("/expenses");
+                onSuccessfulJoin();
             },
             (currentErrorMessage) => {
                 console.log(currentErrorMessage);
@@ -54,46 +47,52 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
     };
 
     useSignalEffect(() => {
-        if (!isCreateTripOverlayVisible.value) {
-            console.log("create trip overlay was closed; resetting all values");
+        if (!isJoinTripOverlayVisible.value) {
+            console.log("join trip overlay was closed; resetting all values");
 
             // reset all values (with the way that the StyledInputs work, they are one-way with information; their values changing updates these signals but not the other way around; accordingly, these all need to get wiped)
-            name.value = "";
-            description.value = "";
+            inviteCode.value = "";
             errorMessage.value = "";
 
-            hasInteractedWithName.value = false;
+            hasInteractedWithInviteCode.value = false;
         }
     });
 
     return (
-        <Modal isOpen={isCreateTripOverlayVisible}>
+        <Modal isOpen={isJoinTripOverlayVisible}>
             <Box
                 sx={{
                     textAlign: "center",
                     pt: "10px",
                 }}
             >
-                <Typography variant="h5">Create Trip</Typography>
+                <Typography variant="h5">Join Trip</Typography>
                 <br />
                 <StyledInput
-                    label="Name"
-                    error={name.value || !hasInteractedWithName.value ? "" : "Must be nonempty"}
+                    label="Invite Code"
+                    error={!hasInteractedWithInviteCode.value || inviteCode.value ? "" : "Must be a six-digit number"}
+                    // onKeyDown={(event) => {
+                    //     event.key
+                    // }}
                     onChange={(event) => {
-                        name.value = event.target.value;
-                        hasInteractedWithName.value = true;
+                        hasInteractedWithInviteCode.value = true;
+
+                        if (!event.target.value) {
+                            inviteCode.value = event.target.value;
+                            return;
+                        }
+
+                        // if(event.target.value.match(/[^0-9.$]/)) {
+                        //     event.target.value = cost.value;
+                        // }
+
+                        if (event.target.value.match(/^[0-9]{0,6}$/)) {
+                            inviteCode.value = event.target.value;
+                        } else {
+                            event.target.value = inviteCode.value;
+                        }
                     }}
-                    onEnterKey={attemptCreateTrip}
-                />
-                <br />
-                <StyledInput
-                    label="Description"
-                    required={false}
-                    useMultiline={true}
-                    // error={error}
-                    onChange={(event) => {
-                        description.value = event.target.value;
-                    }}
+                    onEnterKey={attemptJoinTrip}
                 />
                 <br />
                 {errorMessage.value && (
@@ -108,9 +107,9 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
                 )}
                 <Button
                     variant="contained"
-                    disabled={!canCreate.value}
+                    disabled={!canJoin.value}
                     sx={{ m: "10px" }}
-                    onClick={attemptCreateTrip}
+                    onClick={attemptJoinTrip}
                 >
                     {isProcessing.value ? <CircularProgress size={24} /> : "Submit"}
                 </Button>

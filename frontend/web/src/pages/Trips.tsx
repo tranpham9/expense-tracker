@@ -14,6 +14,8 @@ import OpenExpensesIcon from "@mui/icons-material/AttachMoney";
 import CreateTripOverlay from "../components/CreateTripOverlay";
 import { currentTrip } from "../Signals/Trip";
 import LoadingSkeleton from "../components/LoadingSkeleton";
+import JoinGroupIcon from "@mui/icons-material/GroupAdd";
+import JoinTripOverlay from "../components/JoinTripOverlay";
 
 // TODO: potentially make search term and current page persistent by pulling their signals out of the function
 
@@ -29,6 +31,7 @@ export default function Trips() {
     const currentPage = useSignal(1);
     const pageCount = useSignal(1);
     const isCreateTripOverlayVisible = useSignal(false);
+    const isJoinTripOverlayVisible = useSignal(false);
     const activeDeleteConfirmationDialog = useSignal(""); // houses the id of the current trip which has a confirmation dialog open for it
 
     // NOTE: this also runs when isLoggedIn is first computed
@@ -316,6 +319,21 @@ export default function Trips() {
                         <AddIcon />
                     </IconButton>
                 </Tooltip>
+                <Tooltip
+                    title={<Typography variant="body2">Join Trip</Typography>}
+                    arrow
+                >
+                    <IconButton
+                        type="button"
+                        // disabled={*}
+                        sx={{ p: "10px", ml: 1 }}
+                        onClick={() => {
+                            isJoinTripOverlayVisible.value = true;
+                        }}
+                    >
+                        <JoinGroupIcon />
+                    </IconButton>
+                </Tooltip>
             </Box>
             {!trips.value || trips.value.length ? <LinkedPagination isEnabled={!!trips.value} /> : <></>}
             {trips.value ? <RenderedTrips /> : <LoadingSkeleton />}
@@ -323,6 +341,7 @@ export default function Trips() {
             {/* {!isBuffering.value && trips.value ? <RenderedTrips /> : <LoadingSkeleton />} */}
             <LinkedPagination isEnabled={!!trips.value} />
             <CreateTripOverlay isCreateTripOverlayVisible={isCreateTripOverlayVisible} />
+            <JoinTripOverlay isJoinTripOverlayVisible={isJoinTripOverlayVisible} />
         </>
     );
 }
