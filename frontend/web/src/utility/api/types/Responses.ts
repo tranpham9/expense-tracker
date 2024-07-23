@@ -50,6 +50,7 @@ export type Expense = {
 };
 type TripsListExpensesResponse = { expenses: Expense[] };
 type TripsDeleteResponse = object;
+type TripsJoinResponse = object;
 
 type ExpensesCreateResponse = { expenseId: string };
 type ExpensesDeleteResponse = object;
@@ -68,6 +69,7 @@ export type Responses = {
     "trips/getMembers": TripsGetMembersResponse;
     "trips/listExpenses": TripsListExpensesResponse;
     "trips/delete": TripsDeleteResponse;
+    "trips/join": TripsJoinResponse;
 
     "expenses/create": ExpensesCreateResponse;
     "expenses/delete": ExpensesDeleteResponse;

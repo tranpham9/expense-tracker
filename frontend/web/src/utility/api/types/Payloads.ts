@@ -29,6 +29,7 @@ export type TripsCreatePayload = {
 type TripsGetMembersPayload = { tripId: string };
 type TripsListExpensesPayload = { tripId: string };
 type TripsDeletePayload = { tripId: string };
+type TripsJoinPayload = { inviteCode: string };
 
 export type ExpensesCreatePayload = {
     tripId: string;
@@ -53,6 +54,7 @@ export type Payloads = {
     "trips/getMembers": TripsGetMembersPayload;
     "trips/listExpenses": TripsListExpensesPayload;
     "trips/delete": TripsDeletePayload;
+    "trips/join": TripsJoinPayload;
 
     "expenses/create": ExpensesCreatePayload;
     "expenses/delete": ExpensesDeletePayload;
