@@ -90,6 +90,7 @@ class _ViewTripsPage extends State<ViewTripPage> {
                           child: Text("No Members Found"),
                         );
                       } else if (snapshot.hasData) {
+                        // Save the members of the **WHOLE** trip
                         members = snapshot.data!;
                         return SizedBox(
                           height: 90,
@@ -168,6 +169,7 @@ class _ViewTripsPage extends State<ViewTripPage> {
                   ),
                   // Display a ListView of the expenses associated with the trip
                   FutureBuilder<List<Expense>?>(
+                    // TODO: This will be changed
                     future: TripCRUD.listExpenses(widget.trip.id),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
@@ -204,8 +206,10 @@ class _ViewTripsPage extends State<ViewTripPage> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            ViewExpensePage(expenses[index]),
+                                        // just pass the expense it self along with ALL of the members of the trip
+                                        // so that way we can add/remove people should we chose to
+                                        builder: (context) => ViewExpensePage(
+                                            expenses[index], members),
                                       ),
                                     );
                                   },

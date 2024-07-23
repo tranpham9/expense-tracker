@@ -1,5 +1,7 @@
 import 'package:accountability_mobile_app/utility/helpers.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import '../../api/expense_crud.dart';
 import '../../models/Expense.dart';
 import '../../models/User.dart';
@@ -7,8 +9,10 @@ import '../../models/User.dart';
 class ViewExpensePage extends StatefulWidget {
   // Each trip has both a nameController and descriptionController associated with it
   final Expense expense;
+  // Pass the list of ALL users in the TRIP
+  final List<User> allMembers;
   // Make sure to pass the nameController and descriptionController of the trip to the function
-  const ViewExpensePage(this.expense);
+  const ViewExpensePage(this.expense, this.allMembers);
 
   @override
   State<ViewExpensePage> createState() => _ViewExpensePage();
@@ -16,6 +20,24 @@ class ViewExpensePage extends StatefulWidget {
 
 // TODO: Need to decide how we want to implement the edit functionality here...
 class _ViewExpensePage extends State<ViewExpensePage> {
+  // View all members of an EXPENSE
+  late List<User>? expenseMembers;
+
+  // @override
+  // Future<void> initState() async {
+  //   super.initState();
+
+  //   // Create a list of the members which took place in the expense
+  //   // for (int i = 0; i < widget.allMembers.length; i++) {
+  //   //   for (int j = 0; j < expense.memberIds!.length; j++) {
+  //   //     // Keep track of who is in the expense
+  //   //     if (expense.memberIds![i] == (widget.allMembers[i].userId)) {
+  //   //       expenseMembers!.add(widget.allMembers[i]);
+  //   //     }
+  //   //   }
+  //   // }
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,32 +51,63 @@ class _ViewExpensePage extends State<ViewExpensePage> {
         child: Column(
           // Have our list of containers that will take in text input
           children: <Widget>[
-            // Display descriptionController
-            Container(
-                padding: const EdgeInsets.all(10),
-                child: ListTile(
-                  leading: Text(
-                    "Description",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      ListTile(
+                        title: Text(widget.expense.name),
+                        subtitle: Text('Name'),
+                      ),
+                      ListTile(
+                        title: Text(widget.expense.description.isEmpty
+                            ? '"Empty Description"'
+                            : widget.expense.description),
+                        subtitle: Text('Description'),
+                      )
+                    ],
                   ),
-                  trailing: Text(
-                    widget.expense.description,
-                    style: TextStyle(fontSize: 15),
+                ),
+                // Edit Name and Description of the expense
+                ElevatedButton(
+                    onPressed: () {
+                      // Navigate to the name and notes edit page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditExpenseNameNotesPage(
+                            widget.expense,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Icon(Icons.edit))
+              ],
+            ),
+            // Display Cost
+            Row(
+              children: [
+                Expanded(
+                  child: ListTile(
+                    title: Text('${widget.expense.cost}'),
+                    subtitle: Text('Cost'),
                   ),
-                )),
-            // Display costController
-            Container(
-                padding: const EdgeInsets.all(10),
-                child: ListTile(
-                  leading: Text(
-                    "Cost",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                  ),
-                  trailing: Text(
-                    "\$${widget.expense.cost?.toDouble()}",
-                    style: TextStyle(fontSize: 15),
-                  ),
-                )),
+                ),
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditExpenseCost(
+                            widget.expense,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Icon(Icons.attach_money))
+              ],
+            ),
             // Display Payer
             // might not do this either
             // Container(
@@ -79,22 +132,33 @@ class _ViewExpensePage extends State<ViewExpensePage> {
                 ),
               ),
             ),
-            // Display Members (might not do this)
-            // Expanded(
-            //   // Build a list of all of the members in the trip
-            //   child: ListView.builder(
-            //     itemBuilder: (context, index) {
-            //       String member = widget.expense.membersIds[index];
-            //       return ListTile(
-            //         title: Text(
-            //           member,
-            //           style: TextStyle(fontSize: 15),
-            //         ),
-            //       );
-            //     },
-            //     itemCount: widget.expense.membersIds.length,
-            //   ),
-            // ),
+            // TODO: Display ALL members as check boxes and allow the user to select/deselect to edit this table
+            // SingleChildScrollView(
+            //         child: members!.isEmpty
+            //             ? SizedBox.shrink()
+            //             : SizedBox(
+            //                 height: 200,
+            //                 child: ListView.builder(
+            //                   itemCount: members!.length,
+            //                   itemBuilder: (context, index) {
+            //                     return CheckboxListTile(
+            //                       // The member that you want to add
+            //                       title: Text(members[index].name),
+            //                       value: isChecked[index],
+            //                       tristate: false,
+            //                       // Switch the value when you click
+            //                       onChanged: (bool? value) {
+            //                         setState(() {
+            //                           isChecked[index] = value!;
+            //                         });
+            //                       },
+            //                       activeColor: Colors.white,
+            //                       checkColor: Theme.of(context).primaryColor,
+            //                     );
+            //                   },
+            //                 ),
+            //               ),
+            //       ),
             // Confirm Edit
             Container(
               height: 50,
@@ -116,6 +180,159 @@ class _ViewExpensePage extends State<ViewExpensePage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class EditExpenseNameNotesPage extends StatefulWidget {
+  // Pass the expense that you want to change to
+  final Expense? expense;
+  // Make sure to pass the nameController and descriptionController of the trip to the function
+  const EditExpenseNameNotesPage(this.expense);
+
+  @override
+  State<EditExpenseNameNotesPage> createState() => _EditExpenseNameNotesPage();
+}
+
+class _EditExpenseNameNotesPage extends State<EditExpenseNameNotesPage> {
+  TextEditingController nameController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+
+  @override
+  void initState() {
+    nameController.text = widget.expense!.name;
+    descriptionController.text = widget.expense!.description.isEmpty
+        ? '"Empty Description"'
+        : widget.expense!.description;
+  }
+
+  Widget build(BuildContext context) {
+    // Build the page
+    return AlertDialog(
+      title: Text("Edit Name And Description"),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          TextFormField(
+            controller: nameController,
+            decoration: InputDecoration(
+              labelText: 'Name',
+            ),
+          ),
+          SizedBox(
+            height: 25,
+          ),
+          TextFormField(
+            controller: descriptionController,
+            decoration: InputDecoration(
+              labelText: 'Description',
+            ),
+            maxLines: null,
+          ),
+          SizedBox(height: 20.0),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Cancel'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            widget.expense!.name = nameController.text;
+            widget.expense!.description = descriptionController.text;
+            // We ONLY send the updated name and description because those are the only things that changed
+            await ExpenseCRUD.update(
+                    widget.expense!.id,
+                    widget.expense!.name,
+                    widget.expense!.description,
+                    widget.expense!.cost,
+                    widget.expense!.memberIds)
+                .then((response) {
+              if (response == null) {
+                print("Error editing Name/Description");
+                return;
+              }
+            });
+            // Go back to the last screen
+            Navigator.pop(context);
+            return;
+          },
+          child: Text(
+            'Save',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class EditExpenseCost extends StatefulWidget {
+  // Pass the expense that you want to change to
+  final Expense? expense;
+  // Make sure to pass the nameController and descriptionController of the trip to the function
+  const EditExpenseCost(this.expense);
+
+  @override
+  State<EditExpenseCost> createState() => _EditExpenseCost();
+}
+
+class _EditExpenseCost extends State<EditExpenseCost> {
+  TextEditingController costController = TextEditingController();
+
+  Widget build(BuildContext context) {
+    // Build the page
+    return AlertDialog(
+      title: Text("Edit Cost"),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          TextFormField(
+            keyboardType: TextInputType.number,
+            controller: costController,
+            decoration: InputDecoration(
+              labelText: 'Cost',
+            ),
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Cancel'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            // Convert the text to a double
+            widget.expense!.cost = double.parse(costController.text);
+            // We ONLY send the updated name and description because those are the only things that changed
+            await ExpenseCRUD.update(
+                    widget.expense!.id,
+                    widget.expense!.name,
+                    widget.expense!.description,
+                    widget.expense!.cost,
+                    widget.expense!.memberIds)
+                .then((response) {
+              if (response == null) {
+                print("Error editing Name/Description");
+                return;
+              }
+            });
+            // Go back to the last screen
+            Navigator.pop(context);
+            return;
+          },
+          child: Text(
+            'Save',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -198,7 +415,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                       ),
                     ),
                   ),
-                  // Enter costController
+                  // Enter Cost
                   Container(
                     padding: const EdgeInsets.all(10),
                     child: TextField(

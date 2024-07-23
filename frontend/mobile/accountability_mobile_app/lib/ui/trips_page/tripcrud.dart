@@ -1,6 +1,8 @@
 // Display all of the different pages related to the different CRUD operations for each trip
+import 'package:accountability_mobile_app/api/expense_crud.dart';
 import 'package:accountability_mobile_app/api/trip_crud.dart';
 import 'package:flutter/material.dart';
+import '../../models/Expense.dart';
 import '../../models/Trip.dart';
 import '../../models/User.dart';
 import '../../utility/helpers.dart';
@@ -178,10 +180,10 @@ class _JoinTripState extends State<JoinTrip> {
 }
 
 // TODO: Implement some realtime updating
-// nameController & Description Widgets (Only for the owner of the trip)
+// Either pass a trip or an expense. Either one you will be able to update the name and description
 class EditNameNotesPage extends StatefulWidget {
   // Each trip has both a nameController and descriptionController associated with it
-  final Trip trip;
+  final Trip? trip;
   // Make sure to pass the nameController and descriptionController of the trip to the function
   const EditNameNotesPage(this.trip);
 
@@ -189,18 +191,21 @@ class EditNameNotesPage extends StatefulWidget {
   State<EditNameNotesPage> createState() => _EditNameNotesPage();
 }
 
-// TODO: This is kind of messed up... Should be an overlay
 class _EditNameNotesPage extends State<EditNameNotesPage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
   @override
   void initState() {
-    // Set the text fields to the current values
-    nameController.text = widget.trip.name;
-    descriptionController.text = widget.trip.description.isEmpty
-        ? '"Empty Description"'
-        : widget.trip.description;
+    // We are editing a trip
+    if (widget.trip != null) {
+      // Set the text fields to the current values
+      nameController.text = widget.trip!.name;
+      descriptionController.text = widget.trip!.description.isEmpty
+          ? '"Empty Description"'
+          : widget.trip!.description;
+      return;
+    }
   }
 
   Widget build(BuildContext context) {
@@ -213,7 +218,7 @@ class _EditNameNotesPage extends State<EditNameNotesPage> {
           TextFormField(
             controller: nameController,
             decoration: InputDecoration(
-              labelText: 'Trip nameController',
+              labelText: 'Name',
             ),
           ),
           SizedBox(
@@ -238,20 +243,22 @@ class _EditNameNotesPage extends State<EditNameNotesPage> {
         ),
         ElevatedButton(
           onPressed: () async {
-            // Save the changes and go back to the screen
-            widget.trip.name = nameController.text;
-            widget.trip.description = descriptionController.text;
-            // TODO: Write the changes with the API and reflect those changes on the page
-            await TripCRUD.updateTrip(widget.trip.id, nameController.text,
-                    descriptionController.text)
-                .then((response) {
-              if (response == null) {
-                print("Error editing nameControllers/descriptionController");
-                return;
-              }
-            });
-            // Go back to the last screen
-            Navigator.pop(context);
+            // Save the changes for the trip
+            if (widget.trip != null) {
+              widget.trip!.name = nameController.text;
+              widget.trip!.description = descriptionController.text;
+              await TripCRUD.updateTrip(widget.trip!.id, nameController.text,
+                      descriptionController.text)
+                  .then((response) {
+                if (response == null) {
+                  print("Error editing Name/Description");
+                  return;
+                }
+              });
+              // Go back to the last screen
+              Navigator.pop(context);
+              return;
+            }
           },
           child: Text(
             'Save',
