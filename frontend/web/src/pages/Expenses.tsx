@@ -1,4 +1,4 @@
-import { Alert, Avatar, AvatarGroup, Badge, Box, Button, Chip, Divider, Grid, IconButton, Paper, Snackbar, Stack, Tooltip, Typography } from "@mui/material";
+import { Alert, Avatar, AvatarGroup, Badge, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Grid, IconButton, Paper, Snackbar, Stack, Tooltip, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 // import { getInitials } from "../utility/Manipulation";
 import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
@@ -28,6 +28,7 @@ export default function Expenses() {
     const snackbarContents = useSignal<{ message: string; severity: "success" | "error" }>({ message: "", severity: "success" });
 
     const isCreateExpenseOverlayVisible = useSignal(false);
+    const activeDeleteConfirmationDialog = useSignal(""); // houses the id of the current expense which has a confirmation dialog open for it
 
     // https://stackoverflow.com/questions/74413650/what-is-difference-between-usenavigate-and-redirect-in-react-route-v6
     const navigate = useNavigate();
@@ -61,6 +62,19 @@ export default function Expenses() {
             (errorMessage) => {
                 console.log(errorMessage);
             }
+        );
+    };
+
+    const performDelete = (expenseId: string) => {
+        request(
+            "expenses/delete",
+            { expenseId },
+            (response) => {
+                console.log(response);
+
+                loadAllData(currentTrip.value!._id);
+            },
+            console.error
         );
     };
 
@@ -244,16 +258,56 @@ export default function Expenses() {
                                         >
                                             <EditIcon />
                                         </IconButton>
-                                        <IconButton
-                                            type="button"
-                                            sx={{ p: "5px" }}
-                                            aria-label="delete"
-                                            onClick={() => {
-                                                // TODO: impl
+                                        <Tooltip
+                                            title={<Typography variant="body2">Delete</Typography>}
+                                            arrow
+                                        >
+                                            <IconButton
+                                                type="button"
+                                                sx={{ p: "5px" }}
+                                                onClick={() => {
+                                                    activeDeleteConfirmationDialog.value = expense._id;
+                                                }}
+                                            >
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Dialog
+                                            open={activeDeleteConfirmationDialog.value === expense._id}
+                                            onClose={() => {
+                                                activeDeleteConfirmationDialog.value = "";
                                             }}
                                         >
-                                            <DeleteIcon />
-                                        </IconButton>
+                                            <Paper elevation={2}>
+                                                <DialogTitle>{"Confirm Expense Deletion"}</DialogTitle>
+                                                <DialogContent>
+                                                    <DialogContentText whiteSpace="pre-wrap">
+                                                        Are you sure you want to delete "{expense.name}"?{"\n"}This is not reversible.
+                                                    </DialogContentText>
+                                                </DialogContent>
+                                                <DialogActions sx={{ pb: 2, pr: 2 }}>
+                                                    <Button
+                                                        variant="contained"
+                                                        onClick={() => {
+                                                            activeDeleteConfirmationDialog.value = "";
+                                                        }}
+                                                        sx={{ mr: 1 }}
+                                                    >
+                                                        No
+                                                    </Button>
+                                                    <Button
+                                                        variant="contained"
+                                                        onClick={() => {
+                                                            activeDeleteConfirmationDialog.value = "";
+
+                                                            performDelete(expense._id);
+                                                        }}
+                                                    >
+                                                        Yes
+                                                    </Button>
+                                                </DialogActions>
+                                            </Paper>
+                                        </Dialog>
                                     </Grid>
                                 </Grid>
                             </Paper>
