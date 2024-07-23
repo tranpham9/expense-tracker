@@ -37,6 +37,7 @@ export type ExpensesCreatePayload = {
     cost: number;
     memberIds: string[];
 };
+type ExpensesDeletePayload = { expenseId: string };
 
 export type Payloads = {
     refreshJWT: RefreshJWTPayload;
@@ -54,4 +55,5 @@ export type Payloads = {
     "trips/delete": TripsDeletePayload;
 
     "expenses/create": ExpensesCreatePayload;
+    "expenses/delete": ExpensesDeletePayload;
 };
