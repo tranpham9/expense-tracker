@@ -341,7 +341,12 @@ export default function Trips() {
             {/* {!isBuffering.value && trips.value ? <RenderedTrips /> : <LoadingSkeleton />} */}
             <LinkedPagination isEnabled={!!trips.value} />
             <CreateTripOverlay isCreateTripOverlayVisible={isCreateTripOverlayVisible} />
-            <JoinTripOverlay isJoinTripOverlayVisible={isJoinTripOverlayVisible} />
+            <JoinTripOverlay
+                isJoinTripOverlayVisible={isJoinTripOverlayVisible}
+                onSuccessfulJoin={() => {
+                    performSearch(searchInputText.value, currentPage.value);
+                }}
+            />
         </>
     );
 }
