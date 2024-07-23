@@ -69,20 +69,21 @@ export default function SearchBar({
 
             {isBuffering && <CircularProgress size={20} />}
 
-            {/* This tooltip gives an error from MUI whenever the icon button is disabled since the tooltip needs the button to be enabled to show the tooltip, but that's exactly how I want the behavior to be (i.e. do not show a tooltip when disabled).  Furthermore, it seems this has been an "unsolved" issue for a while now: https://github.com/mui/material-ui/issues/8416
-            Fortunately, keeping it this way does not *seem* to impact anything. */}
             <Tooltip
-                title={<Typography variant="body2">Search Trips</Typography>}
+                title={<Typography variant="body2">Search Trips{isBuffering ? " (Loading)" : ""}</Typography>}
                 arrow
             >
-                <IconButton
-                    type="button"
-                    disabled={isBuffering}
-                    sx={{ p: "10px" }}
-                    onClick={triggerSearch}
-                >
-                    <SearchIcon />
-                </IconButton>
+                {/* Required so that the tooltip works even when the button is disabled ( https://mui.com/material-ui/react-tooltip/#disabled-elements ) */}
+                <span>
+                    <IconButton
+                        type="button"
+                        disabled={isBuffering}
+                        sx={{ p: "10px" }}
+                        onClick={triggerSearch}
+                    >
+                        <SearchIcon />
+                    </IconButton>
+                </span>
             </Tooltip>
         </Paper>
     );

@@ -196,34 +196,40 @@ export default function Trips() {
                                 textAlign="right"
                             >
                                 <Tooltip
-                                    title={<Typography variant="body2">Edit</Typography>}
+                                    title={<Typography variant="body2">Edit{trip.leaderId !== userInfo.value?.userId ? " (Must Be Leader)" : ""}</Typography>}
                                     arrow
                                 >
-                                    <IconButton
-                                        type="button"
-                                        disabled={trip.leaderId !== userInfo.value?.userId}
-                                        sx={{ p: "5px" }}
-                                        onClick={() => {
-                                            // TODO: impl
-                                        }}
-                                    >
-                                        <EditIcon />
-                                    </IconButton>
+                                    {/* Required so that the tooltip works even when the button is disabled ( https://mui.com/material-ui/react-tooltip/#disabled-elements ) */}
+                                    <span>
+                                        <IconButton
+                                            type="button"
+                                            disabled={trip.leaderId !== userInfo.value?.userId}
+                                            sx={{ p: "5px" }}
+                                            onClick={() => {
+                                                // TODO: impl
+                                            }}
+                                        >
+                                            <EditIcon />
+                                        </IconButton>
+                                    </span>
                                 </Tooltip>
                                 <Tooltip
-                                    title={<Typography variant="body2">Delete</Typography>}
+                                    title={<Typography variant="body2">Delete{trip.leaderId !== userInfo.value?.userId ? " (Must Be Leader)" : ""}</Typography>}
                                     arrow
                                 >
-                                    <IconButton
-                                        type="button"
-                                        disabled={trip.leaderId !== userInfo.value?.userId}
-                                        sx={{ p: "5px" }}
-                                        onClick={() => {
-                                            activeDeleteConfirmationDialog.value = trip._id;
-                                        }}
-                                    >
-                                        <DeleteIcon />
-                                    </IconButton>
+                                    {/* Required so that the tooltip works even when the button is disabled ( https://mui.com/material-ui/react-tooltip/#disabled-elements ) */}
+                                    <span>
+                                        <IconButton
+                                            type="button"
+                                            disabled={trip.leaderId !== userInfo.value?.userId}
+                                            sx={{ p: "5px" }}
+                                            onClick={() => {
+                                                activeDeleteConfirmationDialog.value = trip._id;
+                                            }}
+                                        >
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </span>
                                 </Tooltip>
                                 <Dialog
                                     open={activeDeleteConfirmationDialog.value === trip._id}
