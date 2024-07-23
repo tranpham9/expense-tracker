@@ -92,186 +92,196 @@ export default function Trips() {
     };
 
     // TODO: potentially extract this to its own file?  (This would be low pirority though, since linked pagination isn't needed anywhere else)
-    const LinkedPagination = ({ isEnabled = true }) => (
-        <Box
-            sx={{
-                m: 1,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-            }}
-        >
-            <Pagination
-                count={pageCount.value}
-                color="primary"
-                page={currentPage.value}
-                disabled={!isEnabled}
-                onChange={(_event, page) => {
-                    // TODO: might want to instead make this a part of the disabled state, though it might be a bit clunky if all the buttons are constantly going between disabled and not
-                    if (isBuffering.value) {
-                        console.log("can't search while a search request is inflight");
-                        return;
-                    }
+    const LinkedPagination = ({ isEnabled = true }) => {
+        // NOTE: this seemingly wasn't needed (so maybe the way this component was instantiated within the top-level return properly propogated changes, i.e. rerendering), but I want to avoid any potiential bugs down the line
+        useSignals();
 
-                    currentPage.value = page;
-                    performSearch(searchInputText.value, page);
+        return (
+            <Box
+                sx={{
+                    m: 1,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
                 }}
-            />
-        </Box>
-    );
+            >
+                <Pagination
+                    count={pageCount.value}
+                    color="primary"
+                    page={currentPage.value}
+                    disabled={!isEnabled}
+                    onChange={(_event, page) => {
+                        // TODO: might want to instead make this a part of the disabled state, though it might be a bit clunky if all the buttons are constantly going between disabled and not
+                        if (isBuffering.value) {
+                            console.log("can't search while a search request is inflight");
+                            return;
+                        }
 
-    const RenderedTrips = () => (
-        <Stack sx={{ textAlign: "center", mx: { md: 4 } }}>
-            {trips.value?.map((trip, i) => (
-                <Paper
-                    key={i}
-                    elevation={10}
-                    sx={{
-                        m: 1,
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
+                        currentPage.value = page;
+                        performSearch(searchInputText.value, page);
                     }}
-                >
-                    <Grid
-                        container
-                        p={2}
-                        spacing={2}
-                        alignItems="center"
+                />
+            </Box>
+        );
+    };
+
+    const RenderedTrips = () => {
+        // NOTE: this seemingly wasn't needed (so maybe the way this component was instantiated within the top-level return properly propogated changes, i.e. rerendering), but I want to avoid any potiential bugs down the line
+        useSignals();
+
+        return (
+            <Stack sx={{ textAlign: "center", mx: { md: 4 } }}>
+                {trips.value?.map((trip, i) => (
+                    <Paper
+                        key={i}
+                        elevation={10}
+                        sx={{
+                            m: 1,
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }}
                     >
                         <Grid
-                            item
-                            xs={5}
-                            sm={4}
-                            md={2}
+                            container
+                            p={2}
+                            spacing={2}
+                            alignItems="center"
                         >
-                            <Typography>{trip.name}</Typography>
-                        </Grid>
-                        {/* Unfortunately, these don't work well with grid spacing (it ends up making the sections look offset) */}
-                        {/* <Divider
+                            <Grid
+                                item
+                                xs={5}
+                                sm={4}
+                                md={2}
+                            >
+                                <Typography>{trip.name}</Typography>
+                            </Grid>
+                            {/* Unfortunately, these don't work well with grid spacing (it ends up making the sections look offset) */}
+                            {/* <Divider
                             orientation="vertical"
                             flexItem
                             // right margin of -1px is required to not break grid ( https://stackoverflow.com/questions/63712269/material-ui-using-divider-breaks-the-grid )
                             // top margin of 2 is done to account for outer grid padding of 2 which is only accounted for in the bottom maring of this element for some reason
                             sx={{ mr: "-1px", mt: 2 }}
                         /> */}
-                        <Grid
-                            item
-                            xs={2}
-                            sm={4}
-                            md={8}
-                        >
-                            <Box
-                                display="inline-block"
-                                textAlign="left"
-                                whiteSpace="pre-wrap"
+                            <Grid
+                                item
+                                xs={2}
+                                sm={4}
+                                md={8}
                             >
-                                {trip.description}
-                            </Box>
-                        </Grid>
-                        {/* <Divider
+                                <Box
+                                    display="inline-block"
+                                    textAlign="left"
+                                    whiteSpace="pre-wrap"
+                                >
+                                    {trip.description}
+                                </Box>
+                            </Grid>
+                            {/* <Divider
                             orientation="vertical"
                             flexItem
                             // right margin of -1px is required to not break grid ( https://stackoverflow.com/questions/63712269/material-ui-using-divider-breaks-the-grid )
                             // top margin of 2 is done to account for outer grid padding of 2 which is only accounted for in the bottom maring of this element for some reason
                             sx={{ mr: "-1px", mt: 2 }}
                         /> */}
-                        <Grid
-                            item
-                            xs={5}
-                            sm={4}
-                            md={2}
-                            textAlign="right"
-                        >
-                            <Tooltip
-                                title={<Typography variant="body2">Edit</Typography>}
-                                arrow
+                            <Grid
+                                item
+                                xs={5}
+                                sm={4}
+                                md={2}
+                                textAlign="right"
                             >
-                                <IconButton
-                                    type="button"
-                                    disabled={trip.leaderId !== userInfo.value?.userId}
-                                    sx={{ p: "5px" }}
-                                    onClick={() => {
-                                        // TODO: impl
+                                <Tooltip
+                                    title={<Typography variant="body2">Edit</Typography>}
+                                    arrow
+                                >
+                                    <IconButton
+                                        type="button"
+                                        disabled={trip.leaderId !== userInfo.value?.userId}
+                                        sx={{ p: "5px" }}
+                                        onClick={() => {
+                                            // TODO: impl
+                                        }}
+                                    >
+                                        <EditIcon />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip
+                                    title={<Typography variant="body2">Delete</Typography>}
+                                    arrow
+                                >
+                                    <IconButton
+                                        type="button"
+                                        disabled={trip.leaderId !== userInfo.value?.userId}
+                                        sx={{ p: "5px" }}
+                                        onClick={() => {
+                                            activeDeleteConfirmationDialog.value = trip._id;
+                                        }}
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </Tooltip>
+                                <Dialog
+                                    open={activeDeleteConfirmationDialog.value === trip._id}
+                                    onClose={() => {
+                                        activeDeleteConfirmationDialog.value = "";
                                     }}
                                 >
-                                    <EditIcon />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip
-                                title={<Typography variant="body2">Delete</Typography>}
-                                arrow
-                            >
-                                <IconButton
-                                    type="button"
-                                    disabled={trip.leaderId !== userInfo.value?.userId}
-                                    sx={{ p: "5px" }}
-                                    onClick={() => {
-                                        activeDeleteConfirmationDialog.value = trip._id;
-                                    }}
-                                >
-                                    <DeleteIcon />
-                                </IconButton>
-                            </Tooltip>
-                            <Dialog
-                                open={activeDeleteConfirmationDialog.value === trip._id}
-                                onClose={() => {
-                                    activeDeleteConfirmationDialog.value = "";
-                                }}
-                            >
-                                <Paper elevation={2}>
-                                    <DialogTitle>{"Confirm Trip Deletion"}</DialogTitle>
-                                    <DialogContent>
-                                        <DialogContentText whiteSpace="pre-wrap">
-                                            Are you sure you want to delete "{trip.name}"?{"\n"}This will also delete all associated expenses.
-                                        </DialogContentText>
-                                    </DialogContent>
-                                    <DialogActions sx={{ pb: 2, pr: 2 }}>
-                                        <Button
-                                            variant="contained"
-                                            onClick={() => {
-                                                activeDeleteConfirmationDialog.value = "";
-                                            }}
-                                            sx={{ mr: 1 }}
-                                        >
-                                            No
-                                        </Button>
-                                        <Button
-                                            variant="contained"
-                                            onClick={() => {
-                                                activeDeleteConfirmationDialog.value = "";
+                                    <Paper elevation={2}>
+                                        <DialogTitle>{"Confirm Trip Deletion"}</DialogTitle>
+                                        <DialogContent>
+                                            <DialogContentText whiteSpace="pre-wrap">
+                                                Are you sure you want to delete "{trip.name}"?{"\n"}This will also delete all associated expenses.
+                                            </DialogContentText>
+                                        </DialogContent>
+                                        <DialogActions sx={{ pb: 2, pr: 2 }}>
+                                            <Button
+                                                variant="contained"
+                                                onClick={() => {
+                                                    activeDeleteConfirmationDialog.value = "";
+                                                }}
+                                                sx={{ mr: 1 }}
+                                            >
+                                                No
+                                            </Button>
+                                            <Button
+                                                variant="contained"
+                                                onClick={() => {
+                                                    activeDeleteConfirmationDialog.value = "";
 
-                                                performDelete(trip._id);
-                                            }}
-                                        >
-                                            Yes
-                                        </Button>
-                                    </DialogActions>
-                                </Paper>
-                            </Dialog>
-                            {/* TODO: find out if these tooltips have any issues at the bottom of the page (probably not since there is enough of a gap from the pagination at the bottom anyway) */}
-                            <Tooltip
-                                title={<Typography variant="body2">Open Expenses</Typography>}
-                                arrow
-                            >
-                                <IconButton
-                                    type="button"
-                                    // disabled={*}
-                                    sx={{ p: "5px" }}
-                                    onClick={() => {
-                                        currentTrip.value = trip;
-                                        navigate("/expenses");
-                                    }}
+                                                    performDelete(trip._id);
+                                                }}
+                                            >
+                                                Yes
+                                            </Button>
+                                        </DialogActions>
+                                    </Paper>
+                                </Dialog>
+                                {/* TODO: find out if these tooltips have any issues at the bottom of the page (probably not since there is enough of a gap from the pagination at the bottom anyway) */}
+                                <Tooltip
+                                    title={<Typography variant="body2">Open Expenses</Typography>}
+                                    arrow
                                 >
-                                    <OpenExpensesIcon />
-                                </IconButton>
-                            </Tooltip>
+                                    <IconButton
+                                        type="button"
+                                        // disabled={*}
+                                        sx={{ p: "5px" }}
+                                        onClick={() => {
+                                            currentTrip.value = trip;
+                                            navigate("/expenses");
+                                        }}
+                                    >
+                                        <OpenExpensesIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </Paper>
-            ))}
-        </Stack>
-    );
+                    </Paper>
+                ))}
+            </Stack>
+        );
+    };
 
     return (
         <>
