@@ -181,8 +181,10 @@ export default function CreateExpenseOverlay({
                         hasInteractedWithCost.value = true;
 
                         if (!event.target.value) {
+                            cost.value = event.target.value;
                             return;
                         }
+
                         // cost.value = event.target.value;
                         // if (!cost.value && event.target.value !== "$") {
                         if (!event.target.value.startsWith("$")) {
