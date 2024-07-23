@@ -1,6 +1,6 @@
 import { Signal } from "@preact/signals-react";
 import Modal from "./Modal";
-import { useSignal, useSignals } from "@preact/signals-react/runtime";
+import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import StyledInput from "./inputs/StyledInput";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { request } from "../utility/api/API";
@@ -44,6 +44,17 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
         );
     };
 
+    useSignalEffect(() => {
+        if (!isCreateTripOverlayVisible.value) {
+            console.log("create trips overlay was closed; resetting all values");
+
+            // reset all values (with the way that the StyledInputs work, they are one-way with information; their values changing updates these signals but not the other way around; accordingly, these all need to get wiped)
+            name.value = "";
+            description.value = "";
+            errorMessage.value = "";
+        }
+    });
+
     return (
         <Modal isOpen={isCreateTripOverlayVisible}>
             <Box
@@ -56,7 +67,7 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
                 <br />
                 <StyledInput
                     label="Name"
-                    // error={error}
+                    error={name.value ? "" : "Must be nonempty"}
                     onChange={(event) => {
                         name.value = event.target.value;
                     }}
@@ -85,8 +96,7 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
                 )}
                 <Button
                     variant="contained"
-                    // disabled={!hasValidSignup || isProcessing}
-                    disabled={isProcessing.value}
+                    disabled={!name.value || isProcessing.value}
                     sx={{ m: "10px" }}
                     onClick={attemptCreateTrip}
                 >
