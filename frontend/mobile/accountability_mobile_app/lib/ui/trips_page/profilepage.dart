@@ -8,6 +8,11 @@ import 'package:flutter/cupertino.dart';
 // Profile Page Widget
 class ProfilePage extends StatelessWidget {
   @override
+  void initState() async {
+    Globals.user!.bio = await UserCRUD.getBio(Globals.user!.userId);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       // Display the title at the top of the screen

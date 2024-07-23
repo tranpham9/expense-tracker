@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import '../globals.dart';
 import '../models/User.dart';
 import '../models/UserManager.dart';
+import 'user_crud.dart';
 
 class LoginUser {
   static Future<int?> login(String email, String password) async {
@@ -24,6 +25,8 @@ class LoginUser {
       Globals.user = userFromJson(jsonEncode(response.data));
       // Store the jwt
       await UserManager.saveJwt(response.data['jwt']);
+      // Grab the bio too
+      Globals.user!.bio = await UserCRUD.getBio(Globals.user!.userId);
 
       // Successful login
       return 200;

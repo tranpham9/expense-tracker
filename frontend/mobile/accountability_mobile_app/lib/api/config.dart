@@ -10,6 +10,7 @@ class Config {
   // User
   static const String forgotPasswordAPI = '/users/forgotPassword';
   static const String updateUserAPI = '/users/update';
+  static const String getUserAPI = '/users/get';
   // Trips
   static const String searchTripsAPI = '/trips/search';
   static const String createTripAPI = '/trips/create';
