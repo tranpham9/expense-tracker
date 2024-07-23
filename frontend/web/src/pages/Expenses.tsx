@@ -45,7 +45,7 @@ export default function Expenses() {
                 console.log(response);
                 // makes leader first, then sorts rest normally
                 response.members.sort((member1, member2) => +member2.isLeader - +member1.isLeader || member1.name.localeCompare(member2.name));
-                console.log(response);
+                console.log("sorted members", response);
                 members.value = response.members;
             },
             (errorMessage) => {

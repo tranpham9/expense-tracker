@@ -1,6 +1,6 @@
 import { Signal } from "@preact/signals-react";
 import Modal from "./Modal";
-import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
+import { useComputed, useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import StyledInput from "./inputs/StyledInput";
 import { Box, Button, Checkbox, Chip, CircularProgress, FormControl, InputLabel, MenuItem, OutlinedInput, Select, Typography } from "@mui/material";
 import { request } from "../utility/api/API";
@@ -26,8 +26,14 @@ export default function CreateExpenseOverlay({
     const cost = useSignal("");
     const errorMessage = useSignal("");
     const memberIds = useSignal<string[]>([]);
+    const canCreate = useComputed(() => name.value && isCostValid() && !isProcessing.value);
 
     const attemptCreateExpense = () => {
+        if (!canCreate.value) {
+            console.log("Can't create expense");
+            return;
+        }
+
         const expenseInfo: ExpensesCreatePayload = {
             name: name.value,
             description: description.value,
@@ -184,6 +190,7 @@ export default function CreateExpenseOverlay({
                             event.target.value = cost.value;
                         }
                     }}
+                    onEnterKey={attemptCreateExpense}
                 />
                 <br />
                 <MembersSelector />
@@ -200,7 +207,7 @@ export default function CreateExpenseOverlay({
                 )}
                 <Button
                     variant="contained"
-                    disabled={!name.value || !isCostValid() || isProcessing.value}
+                    disabled={!canCreate.value}
                     sx={{ m: "10px" }}
                     onClick={attemptCreateExpense}
                 >

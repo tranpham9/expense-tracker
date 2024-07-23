@@ -1,6 +1,6 @@
 import { Signal } from "@preact/signals-react";
 import Modal from "./Modal";
-import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
+import { useComputed, useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import StyledInput from "./inputs/StyledInput";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { request } from "../utility/api/API";
@@ -17,10 +17,16 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
     const name = useSignal("");
     const description = useSignal("");
     const errorMessage = useSignal("");
+    const canCreate = useComputed(() => name.value && !isProcessing.value);
 
     const navigate = useNavigate();
 
     const attemptCreateTrip = () => {
+        if (!canCreate.value) {
+            console.log("Can't create trip");
+            return;
+        }
+
         isProcessing.value = true;
 
         const tripInfo: TripsCreatePayload = { name: name.value, description: description.value };
@@ -67,7 +73,6 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
                 <br />
                 <StyledInput
                     label="Name"
-                    error={name.value ? "" : "Must be nonempty"}
                     onChange={(event) => {
                         name.value = event.target.value;
                     }}
@@ -96,7 +101,7 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
                 )}
                 <Button
                     variant="contained"
-                    disabled={!name.value || isProcessing.value}
+                    disabled={!canCreate.value}
                     sx={{ m: "10px" }}
                     onClick={attemptCreateTrip}
                 >
