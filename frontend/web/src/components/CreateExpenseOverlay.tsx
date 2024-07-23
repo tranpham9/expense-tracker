@@ -21,12 +21,16 @@ export default function CreateExpenseOverlay({
 
     // FIXME: need to do input validation to ensure that name and cost are filled!
     const isProcessing = useSignal(false);
+
     const name = useSignal("");
     const description = useSignal("");
     const cost = useSignal("");
     const errorMessage = useSignal("");
     const memberIds = useSignal<string[]>([]);
     const canCreate = useComputed(() => name.value && isCostValid() && !isProcessing.value);
+
+    const hasInteractedWithName = useSignal(false);
+    const hasInteractedWithCost = useSignal(false);
 
     const attemptCreateExpense = () => {
         if (!canCreate.value) {
@@ -77,6 +81,9 @@ export default function CreateExpenseOverlay({
             cost.value = "";
             errorMessage.value = "";
             memberIds.value = [];
+
+            hasInteractedWithName.value = false;
+            hasInteractedWithCost.value = false;
         }
     });
 
@@ -147,9 +154,10 @@ export default function CreateExpenseOverlay({
                 <br />
                 <StyledInput
                     label="Name"
-                    error={name.value ? "" : "Must be nonempty"}
+                    error={name.value || !hasInteractedWithName.value ? "" : "Must be nonempty"}
                     onChange={(event) => {
                         name.value = event.target.value;
+                        hasInteractedWithName.value = true;
                     }}
                     onEnterKey={attemptCreateExpense}
                 />
@@ -166,11 +174,13 @@ export default function CreateExpenseOverlay({
                 <br />
                 <StyledInput
                     label="Cost"
-                    error={isCostValid() ? "" : "Must be a valid USD format"}
+                    error={!hasInteractedWithCost.value || isCostValid() ? "" : "Must be a valid USD format"}
                     // onKeyDown={(event) => {
                     //     event.key
                     // }}
                     onChange={(event) => {
+                        hasInteractedWithCost.value = true;
+
                         if (!event.target.value) {
                             return;
                         }

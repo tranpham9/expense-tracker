@@ -14,10 +14,13 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
     // FIXME: make name be required non-empty; the API doesn't allow it to be empty
     // NOTE: there is no need to wipe these since creating a trip redirects to expenses page (which completely removes these variables from existence)
     const isProcessing = useSignal(false);
+
     const name = useSignal("");
     const description = useSignal("");
     const errorMessage = useSignal("");
     const canCreate = useComputed(() => name.value && !isProcessing.value);
+
+    const hasInteractedWithName = useSignal(false);
 
     const navigate = useNavigate();
 
@@ -58,6 +61,8 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
             name.value = "";
             description.value = "";
             errorMessage.value = "";
+
+            hasInteractedWithName.value = false;
         }
     });
 
@@ -73,8 +78,10 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
                 <br />
                 <StyledInput
                     label="Name"
+                    error={name.value || !hasInteractedWithName.value ? "" : "Must be nonempty"}
                     onChange={(event) => {
                         name.value = event.target.value;
+                        hasInteractedWithName.value = true;
                     }}
                     onEnterKey={attemptCreateTrip}
                 />
