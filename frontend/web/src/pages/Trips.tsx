@@ -16,6 +16,7 @@ import { currentTrip } from "../Signals/Trip";
 import LoadingSkeleton from "../components/LoadingSkeleton";
 import JoinGroupIcon from "@mui/icons-material/GroupAdd";
 import JoinTripOverlay from "../components/JoinTripOverlay";
+import EditTripOverlay from "../components/EditTripOverlay";
 
 // TODO: potentially make search term and current page persistent by pulling their signals out of the function
 
@@ -33,6 +34,7 @@ export default function Trips() {
     const isCreateTripOverlayVisible = useSignal(false);
     const isJoinTripOverlayVisible = useSignal(false);
     const activeDeleteConfirmationDialog = useSignal(""); // houses the id of the current trip which has a confirmation dialog open for it
+    const tripToEdit = useSignal<Trip | null>(null);
 
     // NOTE: this also runs when isLoggedIn is first computed
     useSignalEffect(() => {
@@ -206,7 +208,7 @@ export default function Trips() {
                                             disabled={trip.leaderId !== userInfo.value?.userId}
                                             sx={{ p: "5px" }}
                                             onClick={() => {
-                                                // TODO: impl
+                                                tripToEdit.value = trip;
                                             }}
                                         >
                                             <EditIcon />
@@ -350,6 +352,12 @@ export default function Trips() {
             <JoinTripOverlay
                 isJoinTripOverlayVisible={isJoinTripOverlayVisible}
                 onSuccessfulJoin={() => {
+                    performSearch(searchInputText.value, currentPage.value);
+                }}
+            />
+            <EditTripOverlay
+                tripToEdit={tripToEdit}
+                onSuccessfulEdit={() => {
                     performSearch(searchInputText.value, currentPage.value);
                 }}
             />

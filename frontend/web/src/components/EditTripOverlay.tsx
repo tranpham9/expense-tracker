@@ -4,43 +4,77 @@ import { useComputed, useSignal, useSignalEffect, useSignals } from "@preact/sig
 import StyledInput from "./inputs/StyledInput";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { request } from "../utility/api/API";
-import { useNavigate } from "react-router-dom";
-import { currentTrip } from "../Signals/Trip";
-import { TripsCreatePayload } from "../utility/api/types/Payloads";
+import { TripsUpdatePayload } from "../utility/api/types/Payloads";
+import { Trip } from "../utility/api/types/Responses";
 
-export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCreateTripOverlayVisible: Signal<boolean> }) {
+export default function EditTripOverlay({ tripToEdit, onSuccessfulEdit = () => {} }: { tripToEdit: Signal<Trip | null>; onSuccessfulEdit?: () => void }) {
     useSignals();
+
+    // can't use computed for this since the modal needs to be able to edit this signal
+    // const isEditTripOverlayVisible = useComputed(() => !!tripToEdit.value);
+    const isEditTripOverlayVisible = useSignal(false);
 
     const isProcessing = useSignal(false);
 
     const name = useSignal("");
     const description = useSignal("");
     const errorMessage = useSignal("");
-    const canCreate = useComputed(() => name.value && !isProcessing.value);
+    const canEdit = useComputed(() => name.value && !isProcessing.value);
 
     const hasInteractedWithName = useSignal(false);
 
-    const navigate = useNavigate();
+    // when trip to edit passed in changes, overlay should become visible
+    useSignalEffect(() => {
+        if (tripToEdit.value) {
+            console.log("edit trip overlay was opened; setting up values");
 
-    const attemptCreateTrip = () => {
-        if (!canCreate.value) {
-            console.log("Can't create trip");
+            isEditTripOverlayVisible.value = true;
+            hasInteractedWithName.value = false;
+
+            // This is quite a neat/interesting syntax imo ( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment#binding_and_assignment )
+            ({ name: name.value, description: description.value } = tripToEdit.value);
+            errorMessage.value = "";
+        }
+    });
+
+    // wipe trip to edit when overlay becomes hidden (from successful edit or closing of modal)
+    useSignalEffect(() => {
+        if (!isEditTripOverlayVisible.value) {
+            tripToEdit.value = null;
+        }
+    });
+
+    // useSignalEffect(() => {
+    //     if(isEditTripOverlayVisible.value) {
+    //         console.log("edit trip overlay was opened; setting up values");
+
+    //         name.value = trips.;
+    //         description.value = "";
+    //         errorMessage.value = "";
+
+    //         hasInteractedWithName.value = false;
+    //     }
+    // });
+
+    const attemptEditTrip = () => {
+        if (!canEdit.value) {
+            console.log("Can't edit trip");
             return;
         }
 
         isProcessing.value = true;
 
-        const tripInfo: TripsCreatePayload = { name: name.value, description: description.value };
+        const tripInfo: TripsUpdatePayload = { tripId: tripToEdit.value!._id, name: name.value, description: description.value };
         request(
-            "trips/create",
+            "trips/update",
             tripInfo,
             (response) => {
                 console.log(response);
 
                 isProcessing.value = false;
-                currentTrip.value = response.trip;
+                isEditTripOverlayVisible.value = false;
 
-                navigate("/expenses");
+                onSuccessfulEdit();
             },
             (currentErrorMessage) => {
                 console.log(currentErrorMessage);
@@ -51,37 +85,25 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
         );
     };
 
-    useSignalEffect(() => {
-        if (!isCreateTripOverlayVisible.value) {
-            console.log("create trip overlay was closed; resetting all values");
-
-            // reset all values (with the way that the StyledInputs work, they are one-way with information; their values changing updates these signals but not the other way around; accordingly, these all need to get wiped)
-            name.value = "";
-            description.value = "";
-            errorMessage.value = "";
-
-            hasInteractedWithName.value = false;
-        }
-    });
-
     return (
-        <Modal isOpen={isCreateTripOverlayVisible}>
+        <Modal isOpen={isEditTripOverlayVisible}>
             <Box
                 sx={{
                     textAlign: "center",
                     pt: "10px",
                 }}
             >
-                <Typography variant="h5">Create Trip</Typography>
+                <Typography variant="h5">Edit Trip</Typography>
                 <br />
                 <StyledInput
                     label="Name"
                     error={name.value || !hasInteractedWithName.value ? "" : "Must be nonempty"}
+                    value={name.value}
                     onChange={(event) => {
                         name.value = event.target.value;
                         hasInteractedWithName.value = true;
                     }}
-                    onEnterKey={attemptCreateTrip}
+                    onEnterKey={attemptEditTrip}
                 />
                 <br />
                 <StyledInput
@@ -89,6 +111,7 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
                     required={false}
                     useMultiline={true}
                     // error={error}
+                    value={description.value}
                     onChange={(event) => {
                         description.value = event.target.value;
                     }}
@@ -106,9 +129,9 @@ export default function CreateTripOverlay({ isCreateTripOverlayVisible }: { isCr
                 )}
                 <Button
                     variant="contained"
-                    disabled={!canCreate.value}
+                    disabled={!canEdit.value}
                     sx={{ m: "10px" }}
-                    onClick={attemptCreateTrip}
+                    onClick={attemptEditTrip}
                 >
                     {isProcessing.value ? <CircularProgress size={24} /> : "Submit"}
                 </Button>
