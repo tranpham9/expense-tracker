@@ -19,7 +19,6 @@ export default function CreateExpenseOverlay({
 }) {
     useSignals();
 
-    // FIXME: need to do input validation to ensure that name and cost are filled!
     const isProcessing = useSignal(false);
 
     const name = useSignal("");
@@ -38,6 +37,8 @@ export default function CreateExpenseOverlay({
             console.log("Can't create expense");
             return;
         }
+
+        isProcessing.value = true;
 
         const expenseInfo: ExpensesCreatePayload = {
             name: name.value,
@@ -140,7 +141,6 @@ export default function CreateExpenseOverlay({
         );
     };
 
-    // FIXME: make name be required non-empty; the API doesn't allow it to be empty
     return (
         <Modal isOpen={isCreateExpenseOverlayVisible}>
             <Box
