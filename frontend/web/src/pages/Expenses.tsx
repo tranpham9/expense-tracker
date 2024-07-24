@@ -179,8 +179,13 @@ export default function Expenses() {
                                         xs={3}
                                         sm={4}
                                     >
-                                        {/* FIXME: should probably be Typography? */}
-                                        <Box whiteSpace="pre-wrap">{expense.description}</Box>
+                                        <Box
+                                            display="inline-block"
+                                            textAlign="left"
+                                            whiteSpace="pre-wrap"
+                                        >
+                                            {expense.description}
+                                        </Box>
                                     </Grid>
                                     <Grid
                                         item
