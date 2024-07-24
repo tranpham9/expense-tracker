@@ -498,7 +498,12 @@ paths:
               jwt:
                 type: string
                 description: Refreshed JWT
-                
+              unPaginatedTripCount:
+                type: number
+                description: Number of trips tied to the user
+              pageCount:
+                type: number
+                description: Number of resulting pages
         "401":
           description: "Authentication failure, invalid JWT"
           schema:
