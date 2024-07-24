@@ -75,7 +75,7 @@ export default function ForgotPasswordOverlay({ isForgotPasswordOverlayVisible }
                 )}
                 <Button
                     variant="contained"
-                    disabled={!email}
+                    disabled={!email || isProcessing.value}
                     sx={{ m: "10px" }}
                     onClick={attemptRequestResetPassword}
                 >
