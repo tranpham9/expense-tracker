@@ -34,7 +34,7 @@ export default function StyledInput({
             label={label}
             variant="outlined"
             multiline={useMultiline}
-            rows={3}
+            minRows={3}
             margin="dense"
             required={required}
             error={error !== ""}
