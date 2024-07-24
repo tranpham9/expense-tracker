@@ -9,8 +9,8 @@ export async function request<T extends keyof Payloads>(type: T, payload: Payloa
         const response = await fetch(`${BASE_API_PATH}/${type}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            // always pass in jwt where possible (api will ignore it if it's not needed)
-            body: JSON.stringify({ ...payload, jwt: userJWT.value }),
+            // always pass in jwt where possible (api will ignore it if it's not needed); the only exception is when a special jwt is used for reset password
+            body: JSON.stringify({ ...payload, ...(type !== "users/resetPassword" && { jwt: userJWT.value }) }),
         });
         switch (response.status) {
             // status OK

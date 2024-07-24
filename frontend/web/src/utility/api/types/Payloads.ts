@@ -16,7 +16,10 @@ type UsersUpdatePayload = {
     // isAuthenticatedRoute: true;
 };
 type UsersForgotPasswordPayload = { email: string };
-type UsersResetPasswordPayload = { newPassword: string };
+type UsersResetPasswordPayload = {
+    jwt: string;
+    newPassword: string;
+};
 
 type TripsSearchPaylod = {
     query?: string;
