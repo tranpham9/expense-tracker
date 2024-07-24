@@ -1,4 +1,5 @@
 import 'package:accountability_mobile_app/utility/helpers.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -28,6 +29,8 @@ class _ViewExpensePage extends State<ViewExpensePage> {
   late User payer;
   // Determine if you are apart of the expense. If so, you owe the payer
   bool inExpense = false;
+  // Give us the ability to format the doubles as prices in USD
+  final oCcy = new NumberFormat("#,##0.00", "en_US");
 
   // @override
   void initState() {
@@ -61,8 +64,8 @@ class _ViewExpensePage extends State<ViewExpensePage> {
 
   // Given the amount cost and number of people in the expense, divide the cost
   // amongst all of the members of the trip
-  double determinePayment(int membersLen, double? cost) {
-    return cost! / (membersLen + 1);
+  String determinePayment(int membersLen, double? cost) {
+    return "\$${oCcy.format(cost! / (membersLen + 1))}";
   }
 
   @override
@@ -118,7 +121,7 @@ class _ViewExpensePage extends State<ViewExpensePage> {
               children: [
                 Expanded(
                   child: ListTile(
-                    title: Text('${widget.expense.cost}'),
+                    title: Text('\$${oCcy.format(widget.expense.cost)}'),
                     subtitle: Text('Cost'),
                   ),
                 ),
