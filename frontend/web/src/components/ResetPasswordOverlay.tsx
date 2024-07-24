@@ -1,43 +1,42 @@
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 
 import Modal from "./Modal";
-import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
+import { useSignal, useSignals } from "@preact/signals-react/runtime";
 import { Signal } from "@preact/signals-react";
-import EmailInput from "./inputs/EmailInput";
 import { useState } from "react";
 import { request } from "../utility/api/API";
+import PasswordInput from "./inputs/PasswordInput";
+import { useNavigate } from "react-router-dom";
+import md5 from "md5";
 
-export default function ForgotPasswordOverlay({ isForgotPasswordOverlayVisible }: { isForgotPasswordOverlayVisible: Signal<boolean> }) {
+export default function ResetPasswordOverlay({ isResetPasswordOverlayVisible, jwt }: { isResetPasswordOverlayVisible: Signal<boolean>; jwt: string }) {
     useSignals();
 
     const isProcessing = useSignal(false);
     const errorMessage = useSignal("");
 
-    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
-    // reset email field to be invalid when closing
-    useSignalEffect(() => {
-        if (!isForgotPasswordOverlayVisible.value) {
-            setEmail("");
-        }
-    });
+    const navigate = useNavigate();
 
-    const attemptRequestResetPassword = () => {
-        if (!email) {
-            console.log("Can't request reset password");
+    const attemptResetPassword = () => {
+        if (!password) {
+            console.log("Can't reset password");
             return;
         }
 
         isProcessing.value = true;
 
         request(
-            "users/forgotPassword",
-            { email },
+            "users/resetPassword",
+            { jwt, newPassword: md5(password) },
             (response) => {
                 console.log(response);
 
                 isProcessing.value = false;
-                isForgotPasswordOverlayVisible.value = false;
+                isResetPasswordOverlayVisible.value = false;
+
+                navigate("/home");
             },
             (currentErrorMessage) => {
                 console.log(currentErrorMessage);
@@ -49,18 +48,18 @@ export default function ForgotPasswordOverlay({ isForgotPasswordOverlayVisible }
     };
 
     return (
-        <Modal isOpen={isForgotPasswordOverlayVisible}>
+        <Modal isOpen={isResetPasswordOverlayVisible}>
             <Box
                 sx={{
                     textAlign: "center",
                     pt: "10px",
                 }}
             >
-                <Typography variant="h5">Forgot Password</Typography>
+                <Typography variant="h5">Reset Password</Typography>
                 <br />
-                <EmailInput
-                    setEmail={setEmail}
-                    onEnterKey={attemptRequestResetPassword}
+                <PasswordInput
+                    setPassword={setPassword}
+                    onEnterKey={attemptResetPassword}
                 />
                 <br />
                 {errorMessage.value && (
@@ -75,9 +74,9 @@ export default function ForgotPasswordOverlay({ isForgotPasswordOverlayVisible }
                 )}
                 <Button
                     variant="contained"
-                    disabled={!email || isProcessing.value}
+                    disabled={!password || isProcessing.value}
                     sx={{ m: "10px" }}
-                    onClick={attemptRequestResetPassword}
+                    onClick={attemptResetPassword}
                 >
                     {isProcessing.value ? <CircularProgress size={24} /> : "Submit"}
                 </Button>
