@@ -54,6 +54,7 @@ type TripsDeleteResponse = object;
 type TripsJoinResponse = object;
 
 type ExpensesCreateResponse = { expenseId: string };
+type ExpensesUpdateResponse = object;
 type ExpensesDeleteResponse = object;
 
 export type Responses = {
@@ -74,5 +75,6 @@ export type Responses = {
     "trips/join": TripsJoinResponse;
 
     "expenses/create": ExpensesCreateResponse;
+    "expenses/update": ExpensesUpdateResponse;
     "expenses/delete": ExpensesDeleteResponse;
 };

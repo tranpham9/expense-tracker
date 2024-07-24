@@ -43,6 +43,13 @@ export type ExpensesCreatePayload = {
     cost: number;
     memberIds: string[];
 };
+export type ExpensesUpdatePayload = {
+    expenseId: string;
+    name?: string;
+    description?: string;
+    cost?: number;
+    memberIds: string[];
+};
 type ExpensesDeletePayload = { expenseId: string };
 
 export type Payloads = {
@@ -63,5 +70,6 @@ export type Payloads = {
     "trips/join": TripsJoinPayload;
 
     "expenses/create": ExpensesCreatePayload;
+    "expenses/update": ExpensesUpdatePayload;
     "expenses/delete": ExpensesDeletePayload;
 };
