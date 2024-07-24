@@ -198,6 +198,7 @@ class _ViewExpensePage extends State<ViewExpensePage> {
             // Confirm Edit (for the user)
             Container(
               height: 50,
+              width: double.infinity,
               padding: const EdgeInsets.all(10),
               child: ElevatedButton(
                 child: const Text(
