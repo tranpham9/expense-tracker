@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:accountability_mobile_app/api/config.dart';
 import 'package:accountability_mobile_app/models/UserManager.dart';
 import 'package:dio/dio.dart';
+import '../globals.dart';
 import '../models/Expense.dart';
 import '../models/Trip.dart';
 import '../models/User.dart';
@@ -37,7 +38,7 @@ class TripCRUD {
   }
 
   // Fetch a list of trips the user is in
-  static Future<List<Trip>?> getTrips(int page, String query) async {
+  static Future<List<Trip>?> search(int page, String query) async {
     // Create a connection client
     final Dio dio = new Dio();
 
@@ -56,13 +57,14 @@ class TripCRUD {
       if (response.statusCode != 200) {
         throw Exception("Failed to Fetch Trips");
       }
-      // Keep track of a list of trips that user is apart of
-      List<Trip> tripList = tripListFromJson(jsonEncode(response.data));
       // Store the jwt
       await UserManager.saveJwt(response.data['jwt']);
+      // Change the total amount of trips retrieved
+      Globals.unpaginatedTripCount = response.data['unpaginatedTripCount'];
+      Globals.totalPage = response.data['pageCount'];
 
       // Return the list of found trips
-      return tripList;
+      return tripListFromJson(jsonEncode(response.data['trips']));
     } on DioException catch (e) {
       print('Error: $e');
       // return nothing

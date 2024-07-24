@@ -13,25 +13,23 @@ class TripsPage extends StatefulWidget {
 }
 
 class _TripsPageState extends State<TripsPage> {
-  // Grab the search field when we want to search
   final TextEditingController _searchQuery = TextEditingController();
-  // display the trips for the user
   late List<Trip> trips;
-  // Search for the trips, then rebuild the widget
-  void _search() async {
-    List<Trip>? searchTrips =
-        await TripCRUD.getTrips(0, _searchQuery.text) ?? [];
-    setState(() {
-      trips = searchTrips;
-      return;
-    });
-  }
+  int page = 1;
 
   @override
   void initState() {
-    // On initial load, just load all of the trips
     super.initState();
     _search();
+  }
+
+  void _search() async {
+    print("searching with page number $page");
+    List<Trip>? searchTrips =
+        await TripCRUD.search(page, _searchQuery.text) ?? [];
+    setState(() {
+      trips = searchTrips;
+    });
   }
 
   @override
@@ -58,7 +56,6 @@ class _TripsPageState extends State<TripsPage> {
                 prefixIcon: IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: () async {
-                    print(_searchQuery.text);
                     _search();
                   },
                 ),
@@ -67,11 +64,39 @@ class _TripsPageState extends State<TripsPage> {
                 ),
               ),
             ),
+            // Display Pagination controls
+            ButtonBar(
+              children: [
+                // Page back
+                TextButton(
+                  onPressed: () {
+                    if (page > 1) {
+                      setState(() {
+                        page--;
+                        _search();
+                      });
+                    }
+                  },
+                  child: Icon(Icons.arrow_back_ios),
+                ),
+                // Page forward
+                TextButton(
+                  onPressed: () {
+                    if (page < Globals.totalPage) {
+                      setState(() {
+                        page++;
+                        _search();
+                      });
+                    }
+                  },
+                  child: Icon(Icons.arrow_forward_ios),
+                ),
+              ],
+            ),
             Expanded(
               child: FutureBuilder<List<Trip>?>(
-                future: TripCRUD.getTrips(0, _searchQuery.text),
+                future: TripCRUD.search(page, _searchQuery.text),
                 builder: (context, snapshot) {
-                  // Display the loading skeleton for the trips
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Skeletonizer(
                       child: ListView.builder(
@@ -82,22 +107,23 @@ class _TripsPageState extends State<TripsPage> {
                       ),
                     );
                   } else if (snapshot.hasData) {
-                    // Grab the list of trips for the whole page
                     trips = snapshot.data!;
                     return ListView.builder(
                       itemBuilder: (context, index) => ListTile(
                         title: Text(trips[index].name),
                         subtitle: Text(trips[index].description),
                         trailing: Icon(
-                            trips[index].leaderId == Globals.user?.userId
-                                ? Icons.star
-                                : Icons.group),
+                          trips[index].leaderId == Globals.user?.userId
+                              ? Icons.star
+                              : Icons.group,
+                        ),
                         onTap: () async {
                           final result = await Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    ViewTripPage(trip: trips[index])),
+                              builder: (context) =>
+                                  ViewTripPage(trip: trips[index]),
+                            ),
                           );
                           if (result == true) {
                             _search();

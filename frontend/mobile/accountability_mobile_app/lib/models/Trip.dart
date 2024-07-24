@@ -4,8 +4,8 @@
 
 import 'dart:convert';
 
-List<Trip> tripListFromJson(String str) => List<Trip>.from(
-    json.decode(str)['trips'].map((x) => Trip.fromJson(x)).toList());
+List<Trip> tripListFromJson(String str) =>
+    List<Trip>.from(json.decode(str).map((x) => Trip.fromJson(x)).toList());
 
 Trip tripFromJson(String str) => Trip.fromJson(json.decode(str));
 

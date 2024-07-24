@@ -70,10 +70,7 @@ class _AddTripsPageState extends State<AddTripsPage> {
                 padding: const EdgeInsets.all(10),
                 width: double.infinity,
                 child: ElevatedButton(
-                  child: const Text(
-                    'Add Trip',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  child: Icon(Icons.add),
                   onPressed: () async {
                     // Create a trip with the current user as the leader
                     await TripCRUD.createTrip(
@@ -147,10 +144,7 @@ class _JoinTripState extends State<JoinTrip> {
               width: double.infinity,
               padding: const EdgeInsets.all(10),
               child: ElevatedButton(
-                child: const Text(
-                  'Join Trip',
-                  style: TextStyle(color: Colors.white),
-                ),
+                child: Icon(Icons.group_add),
                 onPressed: () async {
                   // Join another users trip
                   await TripCRUD.joinTrip(widget.code.text).then((response) {
