@@ -136,6 +136,8 @@ export default function Navbar() {
                             href="https://github.com/tranpham9/expense-tracker/"
                             target="_blank"
                             color="primary"
+                            aria-hidden="false"
+                            aria-label="Open GitHub Repository"
                             sx={{
                                 fontSize: 32,
                                 display: { xs: "none", md: "flex" },
@@ -195,6 +197,8 @@ export default function Navbar() {
                             href="https://github.com/tranpham9/expense-tracker/"
                             target="_blank"
                             color="primary"
+                            aria-hidden="false"
+                            aria-label="Open GitHub Repository"
                             sx={{
                                 fontSize: 32,
                                 display: { xs: "flex", md: "none" },
