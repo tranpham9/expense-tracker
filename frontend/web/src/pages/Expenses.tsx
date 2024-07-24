@@ -22,7 +22,7 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 // import { getInitials } from "../utility/Manipulation";
-import { useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
+import { useComputed, useSignal, useSignalEffect, useSignals } from "@preact/signals-react/runtime";
 import { useNavigate } from "react-router-dom";
 import { isLoggedIn, userInfo } from "../Signals/Account";
 import { request } from "../utility/api/API";
@@ -43,6 +43,11 @@ export default function Expenses() {
     useSignals();
 
     const members = useSignal<Member[]>([]);
+    const membersIncludingUser = useComputed(() => {
+        const { userId: _id, name, email, bio } = userInfo.value!;
+        const user: Member = { _id, name, email, bio, isLeader: false }; // just assume they aren't leader; this info (whether they are leader) isn't needed
+        return members.value.concat([user]);
+    });
     const expenses = useSignal<Expense[] | null>(null);
     const query = useSignal("");
 
@@ -522,7 +527,7 @@ export default function Expenses() {
             />
             <EditExpenseOverlay
                 expenseToEdit={expenseToEdit}
-                tripMembers={members}
+                tripMembersIncludingUser={membersIncludingUser}
                 onSuccessfulEdit={() => {
                     loadAllData(currentTrip.value!._id);
                 }}

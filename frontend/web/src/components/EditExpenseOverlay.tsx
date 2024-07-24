@@ -9,11 +9,11 @@ import { Expense, Member } from "../utility/api/types/Responses";
 
 export default function EditExpenseOverlay({
     expenseToEdit,
-    tripMembers,
+    tripMembersIncludingUser, // must include user since the user can edit an expense which someone else created, in which case, they should be aable to add/remove themself
     onSuccessfulEdit = () => {},
 }: {
     expenseToEdit: Signal<Expense | null>;
-    tripMembers: Signal<Member[]>;
+    tripMembersIncludingUser: Signal<Member[]>;
     onSuccessfulEdit?: () => void;
 }) {
     useSignals();
@@ -119,7 +119,7 @@ export default function EditExpenseOverlay({
                         return (
                             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                                 {selected.map((value) => {
-                                    const member = tripMembers.value.find((tripMember) => tripMember._id === value);
+                                    const member = tripMembersIncludingUser.value.find((tripMember) => tripMember._id === value);
                                     return (
                                         <Chip
                                             key={value}
@@ -132,20 +132,23 @@ export default function EditExpenseOverlay({
                         );
                     }}
                 >
-                    {tripMembers.value.map((tripMember) => (
-                        <MenuItem
-                            key={tripMember._id}
-                            value={tripMember._id}
-                            // style={{ fontWeight: memberIds.value.includes(tripMember._id) ? "bold" : "regular" }}
-                            // style={{ color: memberIds.value.includes(tripMember._id) ? "red" : "blue" }}
-                        >
-                            {/* {tripMember.name} ({tripMember.email}) */}
-                            <Checkbox checked={memberIds.value.includes(tripMember._id)} />
-                            {tripMember.name}
-                            {/* I don't think this is needed? */}
-                            {/* <ListItemText primary={tripMember.name} /> */}
-                        </MenuItem>
-                    ))}
+                    {tripMembersIncludingUser.value
+                        // exclude payer from list of options (this is necessary due to how there are no guarantees of who is modifying what expenses)
+                        .filter((tripMember) => tripMember._id !== expenseToEdit.value?.payerId)
+                        .map((tripMember) => (
+                            <MenuItem
+                                key={tripMember._id}
+                                value={tripMember._id}
+                                // style={{ fontWeight: memberIds.value.includes(tripMember._id) ? "bold" : "regular" }}
+                                // style={{ color: memberIds.value.includes(tripMember._id) ? "red" : "blue" }}
+                            >
+                                {/* {tripMember.name} ({tripMember.email}) */}
+                                <Checkbox checked={memberIds.value.includes(tripMember._id)} />
+                                {tripMember.name}
+                                {/* I don't think this is needed? */}
+                                {/* <ListItemText primary={tripMember.name} /> */}
+                            </MenuItem>
+                        ))}
                 </Select>
             </FormControl>
         );
