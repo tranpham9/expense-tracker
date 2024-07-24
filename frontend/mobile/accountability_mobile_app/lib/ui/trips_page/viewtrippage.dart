@@ -1,3 +1,4 @@
+import 'package:accountability_mobile_app/api/expense_crud.dart';
 import 'package:accountability_mobile_app/api/trip_crud.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -190,6 +191,7 @@ class _ViewTripsPage extends State<ViewTripPage> {
                           child: Text("No Expenses Found"),
                         );
                       } else if (snapshot.hasData) {
+                        // Remember that these are INCOMPLETE expense objects
                         List<Expense> expenses = snapshot.data!;
                         return SizedBox(
                           height: 300.0, // Adjust height as necessary
@@ -202,14 +204,17 @@ class _ViewTripsPage extends State<ViewTripPage> {
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 8.0),
                                 child: ElevatedButton(
-                                  onPressed: () {
+                                  onPressed: () async {
+                                    // Get the proper expense object with '/get'
+                                    Expense? curExp = await ExpenseCRUD.get(
+                                        expenses[index].id);
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         // just pass the expense it self along with ALL of the members of the trip
                                         // so that way we can add/remove people should we chose to
-                                        builder: (context) => ViewExpensePage(
-                                            expenses[index], members),
+                                        builder: (context) =>
+                                            ViewExpensePage(curExp!, members),
                                       ),
                                     );
                                   },
