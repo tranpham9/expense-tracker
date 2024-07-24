@@ -195,7 +195,7 @@ router.post("/update", async (req, res) => {
                     ...(name && { name }),
                     // allow explicitly setting the description to the empty string
                     ...((description || description === "") && { description }),
-                    ...(cost && { cost }),
+                    ...((cost || cost === 0) && { cost }),
                     ...(memberIds && { memberIds }),
                 },
             }
