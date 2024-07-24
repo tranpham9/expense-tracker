@@ -65,11 +65,13 @@ paths:
                   type: string
                 email:
                   type: string
+                bio:
+                  type: string
                 jwt:
                   type: string
                   description: Authenticated JWT
         "400":
-          description: Malformed request or JSON on front-end
+          description: "Malformed request or JSON on front-end"
           schema:
                 $ref: '#/definitions/ErrorInfo'
         "401":
@@ -92,7 +94,7 @@ paths:
         "200":
           description: Registration request successful, e-mail sent.
         "400":
-          description: Malformed request or JSON on front-end
+          description: "Malformed request or JSON on front-end"
           schema:
                 $ref: '#/definitions/ErrorInfo'
         "401":
@@ -133,7 +135,7 @@ paths:
                 type: string
                 description: Refreshed JWT
         "400":
-          description: Malformed request or JSON on front-end
+          description: "Malformed request or JSON on front-end"
           schema:
                 $ref: '#/definitions/ErrorInfo'
         "401":
@@ -173,7 +175,7 @@ paths:
                 type: string
                 description: Refreshed JWT
         "400":
-          description: Malformed request or JSON
+          description: "Malformed request or JSON"
           schema:
             $ref: '#/definitions/ErrorInfo'
         "401":
@@ -221,7 +223,7 @@ paths:
       summary: Once routed to the reset password page, allow the user to reset their password
       tags:
         - users
-      description: Grab the new password and reste it for that user
+      description: Grab the new password and reset it for that user
       parameters:
       - in: body
         name: Reset Password
@@ -359,7 +361,7 @@ paths:
                 type: string
                 description: Refreshed JWT
         "400":
-          description: Malformed request or JSON
+          description: "Malformed request or JSON"
           schema:
             $ref: '#/definitions/ErrorInfo'
   /trips/delete:
@@ -390,7 +392,7 @@ paths:
                 type: string
                 description: Refreshed JWT
         "400":
-          description: Malformed request or JSON
+          description: "Malformed request or JSON"
           schema:
             $ref: '#/definitions/ErrorInfo'
         "401":
@@ -428,7 +430,7 @@ paths:
                 type: string
                 description: Refreshed JWT
         "400":
-          description: Malformed request or JSON
+          description: "Malformed request or JSON"
           schema:
             $ref: '#/definitions/ErrorInfo'
         "401":
@@ -543,7 +545,7 @@ paths:
                 type: string
                 description: Refreshed JWT
         "400":
-          description: Malformed request or JSON
+          description: "Malformed request or JSON"
           schema:
             $ref: '#/definitions/ErrorInfo'
         "401":
@@ -600,7 +602,7 @@ paths:
                 type: string
                 description: Refreshed JWT
         "400":
-          description: Malformed request or JSON
+          description: "Malformed request or JSON"
           schema:
             $ref: '#/definitions/ErrorInfo'
         "401":
@@ -657,7 +659,7 @@ paths:
                 type: string
                 description: Refreshed JWT
         "400":
-          description: Malformed request or JSON
+          description: "Malformed request or JSON"
           schema:
             $ref: '#/definitions/ErrorInfo'
         "401":
@@ -712,7 +714,7 @@ paths:
                 type: string
                 description: Refreshed JWT
         "400":
-          description: Malformed request or JSON
+          description: "Malformed request or JSON"
           schema:
             $ref: '#/definitions/ErrorInfo'
         "401":
@@ -768,7 +770,7 @@ paths:
                 type: string
                 description: Refreshed JWT
         "400":
-          description: Malformed request or JSON
+          description: "Malformed request or JSON"
           schema:
             $ref: '#/definitions/ErrorInfo'
         "401":
@@ -807,7 +809,7 @@ paths:
                 type: string
                 description: Refreshed JWT
         "400":
-          description: Malformed request or JSON
+          description: "Malformed request or JSON"
           schema:
             $ref: '#/definitions/ErrorInfo'   
         "401":
