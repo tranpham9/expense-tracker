@@ -77,6 +77,7 @@ export default function SearchBar({
                 <span>
                     <IconButton
                         type="button"
+                        aria-label="Search Trips"
                         disabled={isBuffering}
                         sx={{ p: "10px" }}
                         onClick={triggerSearch}

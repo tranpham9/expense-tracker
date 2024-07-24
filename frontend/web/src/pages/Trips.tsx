@@ -205,6 +205,7 @@ export default function Trips() {
                                     <span>
                                         <IconButton
                                             type="button"
+                                            aria-label="Edit Trip"
                                             disabled={trip.leaderId !== userInfo.value?.userId}
                                             sx={{ p: "5px" }}
                                             onClick={() => {
@@ -223,6 +224,7 @@ export default function Trips() {
                                     <span>
                                         <IconButton
                                             type="button"
+                                            aria-label="Delete Trip"
                                             disabled={trip.leaderId !== userInfo.value?.userId}
                                             sx={{ p: "5px" }}
                                             onClick={() => {
@@ -276,7 +278,7 @@ export default function Trips() {
                                 >
                                     <IconButton
                                         type="button"
-                                        // disabled={*}
+                                        aria-label="Open Expenses"
                                         sx={{ p: "5px" }}
                                         onClick={() => {
                                             currentTrip.value = trip;
@@ -318,7 +320,7 @@ export default function Trips() {
                 >
                     <IconButton
                         type="button"
-                        // disabled={*}
+                        aria-label="Create Trip"
                         sx={{ p: "10px", ml: 1 }}
                         onClick={() => {
                             isCreateTripOverlayVisible.value = true;
@@ -333,7 +335,7 @@ export default function Trips() {
                 >
                     <IconButton
                         type="button"
-                        // disabled={*}
+                        aria-label="Join Trip"
                         sx={{ p: "10px", ml: 1 }}
                         onClick={() => {
                             isJoinTripOverlayVisible.value = true;
