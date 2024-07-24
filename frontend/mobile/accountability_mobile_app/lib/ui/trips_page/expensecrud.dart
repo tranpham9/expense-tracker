@@ -3,13 +3,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import '../../api/expense_crud.dart';
+import '../../globals.dart';
 import '../../models/Expense.dart';
 import '../../models/User.dart';
 
 class ViewExpensePage extends StatefulWidget {
   // Each trip has both a nameController and descriptionController associated with it
   final Expense expense;
-  // Pass the list of ALL users in the TRIP
+  // Pass the list of ALL users in the TRIP (except yourself)
   final List<User> allMembers;
   // Make sure to pass the nameController and descriptionController of the trip to the function
   const ViewExpensePage(this.expense, this.allMembers);
@@ -23,13 +24,30 @@ class _ViewExpensePage extends State<ViewExpensePage> {
   // View all members of an EXPENSE
   late List<User>? expenseMembers;
   late String payerName;
+  // Will find the payer of the tri
+  late User payer;
+  // Determine if you are apart of the expense. If so, you owe the payer
+  bool inExpense = false;
 
   // @override
-  void initState() async {
+  void initState() {
     super.initState();
-    // Loop over the trip members and identify who paid
-    // for(int i=0; i<widget.allMembers.length; i++){
-    // }
+    // Assign who the payer of the expense was
+    // You are the payer
+    if (widget.expense.payerId == Globals.user?.userId) {
+      payer = Globals.user!;
+    } else {
+      // Loop over the trip members and identify who paid
+      for (int i = 0; i < widget.allMembers.length; i++) {
+        // We've found the payer
+        if (widget.allMembers[i].userId == widget.expense.payerId) {
+          payer = widget.allMembers[i];
+          // You were in the expense, so you owe money
+          inExpense = true;
+          break;
+        }
+      }
+    }
     // Create a list of the members which took place in the expense
     // for (int i = 0; i < widget.allMembers.length; i++) {
     //   for (int j = 0; j < expense.memberIds!.length; j++) {
@@ -41,8 +59,15 @@ class _ViewExpensePage extends State<ViewExpensePage> {
     // }
   }
 
+  // Given the amount cost and number of people in the expense, divide the cost
+  // amongst all of the members of the trip
+  double determinePayment(int membersLen, double? cost) {
+    return cost! / (membersLen + 1);
+  }
+
   @override
   Widget build(BuildContext context) {
+    print("the payer of this expense was ${payer.name}");
     return Scaffold(
       // Display the title at the top of the screen
       appBar: AppBar(
@@ -112,20 +137,19 @@ class _ViewExpensePage extends State<ViewExpensePage> {
               ],
             ),
             // Display Payer
-            // might not do this either
-            // Container(
-            //   padding: const EdgeInsets.all(10),
-            //   child: ListTile(
-            //     leading: Text(
-            //       "Who Payed",
-            //       style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            //     ),
-            //     trailing: Text(
-            //       "${widget.expense.payerId} Payed",
-            //       style: TextStyle(fontSize: 15),
-            //     ),
-            //   ),
-            // ),
+            ListTile(
+              title: Text(
+                "${payer.name}",
+              ),
+              subtitle: Text("Who paid this expense?"),
+              // Display how much you will owe the payer
+              trailing: Text(
+                style: TextStyle(fontSize: 15),
+                inExpense == false
+                    ? "You Owe \$0.00"
+                    : "You Owe ${determinePayment(widget.expense.memberIds.length, widget.expense.cost)}",
+              ),
+            ),
             Container(
               padding: const EdgeInsets.all(10),
               child: ListTile(

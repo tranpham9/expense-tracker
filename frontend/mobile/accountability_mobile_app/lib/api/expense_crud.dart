@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:accountability_mobile_app/api/config.dart';
 import 'package:dio/dio.dart';
 import '../models/Expense.dart';
-import '../models/User.dart';
 import '../models/UserManager.dart';
 
 class ExpenseCRUD {
