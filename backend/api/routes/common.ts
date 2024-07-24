@@ -90,7 +90,7 @@ export type Trip = {
 export type Expense = {
     name: string;
     description: string;
-    cost: string;
+    cost: number;
     tripId: ObjectId;
     payerId: ObjectId;
     memberIds: ObjectId[];

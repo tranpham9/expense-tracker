@@ -29,8 +29,7 @@ router.post("/create", async (req, res) => {
         let { tripId, memberIds, description } = req.body;
         description ??= ""; // description not required
 
-        // TODO: figure out if cost will come in as a number vs a string
-        if (!tripId || !name || (!cost && cost !== 0) || !(memberIds instanceof Array)) {
+        if (!tripId || !name || !(typeof cost === "number") || !(memberIds instanceof Array)) {
             res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
             return;
         }
@@ -149,7 +148,7 @@ router.post("/update", async (req, res) => {
         // NOTE: for now, payer id can't be changed (implementing that might cause some issues; we can add it down the line if we have time [we probaly won't])
         let { expenseId, memberIds } = req.body;
         const { name, description, cost } = req.body;
-        if (!expenseId || !(memberIds instanceof Array)) {
+        if (!expenseId || !(memberIds instanceof Array) || (cost !== undefined && !(typeof cost === "number"))) {
             res.status(STATUS_BAD_REQUEST).json({ error: "Malformed request" });
             return;
         }
