@@ -5,6 +5,7 @@ export type UsersLoginResponse = {
     userId: string;
     name: string;
     email: string;
+    bio: string;
     // rest of the responses don't need to specify this explicitly
     jwt: string;
 };
