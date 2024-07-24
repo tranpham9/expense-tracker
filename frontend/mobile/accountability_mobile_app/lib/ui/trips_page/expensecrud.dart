@@ -16,11 +16,11 @@ class ViewExpensePage extends StatefulWidget {
   const ViewExpensePage(this.expense, this.allMembers);
 
   @override
-  State<ViewExpensePage> createState() => amongst();
+  State<ViewExpensePage> createState() => _ViewExpensePage();
 }
 
 // TODO: Need to decide how we want to implement the edit functionality here...
-class amongst extends State<ViewExpensePage> {
+class _ViewExpensePage extends State<ViewExpensePage> {
   // View all members of an EXPENSE
   late List<User>? expenseMembers;
   late String payerName;
