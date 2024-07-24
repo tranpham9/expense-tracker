@@ -1,7 +1,8 @@
-import { alpha } from "@mui/material";
+import { alpha, SvgIcon } from "@mui/material";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
+import Logo from "../assets/logo.svg?react";
 
 export default function Welcome() {
     return (
@@ -21,7 +22,16 @@ export default function Welcome() {
                     component="span"
                     color="primary.main"
                 >
-                    Accountability
+                    <Typography
+                        component="span"
+                        fontSize="inherit"
+                        noWrap // keeps the logo together with the text
+                    >
+                        <SvgIcon fontSize="inherit">
+                            <Logo />
+                        </SvgIcon>
+                        ccountability
+                    </Typography>
                 </Box>
             </Typography>
             <br />

@@ -135,6 +135,7 @@ export default function Navbar() {
                             component="a"
                             href="https://github.com/tranpham9/expense-tracker/"
                             target="_blank"
+                            color="primary"
                             sx={{
                                 fontSize: 32,
                                 display: { xs: "none", md: "flex" },
@@ -193,6 +194,7 @@ export default function Navbar() {
                             component="a"
                             href="https://github.com/tranpham9/expense-tracker/"
                             target="_blank"
+                            color="primary"
                             sx={{
                                 fontSize: 32,
                                 display: { xs: "flex", md: "none" },
