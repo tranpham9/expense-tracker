@@ -84,6 +84,7 @@ router.post("/login", async (req, res) => {
                 userId: foundUser._id,
                 name: foundUser.name,
                 email: foundUser.email,
+                bio: foundUser.bio,
                 jwt,
             });
         } else {
