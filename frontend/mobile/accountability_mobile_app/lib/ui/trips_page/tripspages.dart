@@ -30,7 +30,8 @@ class _TripsPageState extends State<TripsPage> {
   @override
   void initState() {
     // On initial load, just load all of the trips
-    _searchQuery.text = "";
+    super.initState();
+    _search();
   }
 
   @override
@@ -91,13 +92,16 @@ class _TripsPageState extends State<TripsPage> {
                             trips[index].leaderId == Globals.user?.userId
                                 ? Icons.star
                                 : Icons.group),
-                        onTap: () {
-                          Navigator.push(
+                        onTap: () async {
+                          final result = await Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
                                     ViewTripPage(trip: trips[index])),
                           );
+                          if (result == true) {
+                            _search();
+                          }
                         },
                       ),
                       itemCount: trips.length,

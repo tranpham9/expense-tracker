@@ -403,11 +403,11 @@ class _DeleteTripWidget extends State<DeleteTripWidget> {
                 return;
               }
               // Go back to the last screen
-              Navigator.pop(context);
+              Navigator.pop(context, true);
             });
             // Success! Show success overlay
             showOverlay('Successfully Deleted "${widget.name}"', context);
-            Navigator.pop(context);
+            Navigator.pop(context, true);
           },
           child: const Text('YES'),
         ),

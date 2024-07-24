@@ -1,0 +1,410 @@
+@startuml
+set namespaceSeparator ::
+
+class "accountability_mobile_app::globals.dart::Globals" {
+  {static} +FlutterSecureStorage storage
+  {static} -User? _user
+  {static} +User? user
+}
+
+"accountability_mobile_app::globals.dart::Globals" o-- "flutter_secure_storage::flutter_secure_storage.dart::FlutterSecureStorage"
+"accountability_mobile_app::globals.dart::Globals" o-- "accountability_mobile_app::models::User.dart::User"
+
+class "accountability_mobile_app::main.dart::ConsistentApp" {
+  {static} -String _title
+  {static} +ColorScheme colorScheme
+  +Widget build()
+}
+
+"accountability_mobile_app::main.dart::ConsistentApp" o-- "flutter::src::material::color_scheme.dart::ColorScheme"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "accountability_mobile_app::main.dart::ConsistentApp"
+
+class "accountability_mobile_app::models::Expense.dart::Expense" {
+  +String id
+  +String name
+  +String description
+  +String? tripId
+  +double? cost
+  +List<String> memberIds
+  +Map<String, dynamic> toJson()
+}
+
+class "accountability_mobile_app::models::Trip.dart::Trip" {
+  +String id
+  +String name
+  +String description
+  +List<String> memberIds
+  +String leaderId
+  +String inviteCode
+  +Map<String, dynamic> toJson()
+}
+
+class "accountability_mobile_app::models::User.dart::User" {
+  +String? userId
+  +String name
+  +String email
+  +String? bio
+  +bool? isLeader
+  +Map<String, dynamic> toJson()
+}
+
+class "accountability_mobile_app::models::UserManager.dart::UserManager" {
+  {static} -FlutterSecureStorage _storage
+  {static} +dynamic saveJwt()
+  {static} +dynamic getJwt()
+  {static} +dynamic deleteJwt()
+}
+
+"accountability_mobile_app::models::UserManager.dart::UserManager" o-- "flutter_secure_storage::flutter_secure_storage.dart::FlutterSecureStorage"
+
+class "accountability_mobile_app::ui::home_page::homepage.dart::HomePage" {
+  +State<HomePage> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "accountability_mobile_app::ui::home_page::homepage.dart::HomePage"
+
+class "accountability_mobile_app::ui::home_page::homepage.dart::_HomePage" {
+  +int selectedIndex
+  -List<Widget> _tabs
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "accountability_mobile_app::ui::home_page::homepage.dart::_HomePage"
+
+class "accountability_mobile_app::ui::landing_page::forgot_password.dart::ForgotPasswordDialog" {
+  +State<ForgotPasswordDialog> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "accountability_mobile_app::ui::landing_page::forgot_password.dart::ForgotPasswordDialog"
+
+class "accountability_mobile_app::ui::landing_page::forgot_password.dart::_ForgotPasswordDialogState" {
+  +TextEditingController recoveryEmail
+  +String? recoveryEmailError
+  +void initState()
+  +void dispose()
+  +Widget build()
+}
+
+"accountability_mobile_app::ui::landing_page::forgot_password.dart::_ForgotPasswordDialogState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "accountability_mobile_app::ui::landing_page::forgot_password.dart::_ForgotPasswordDialogState"
+
+class "accountability_mobile_app::ui::landing_page::login.dart::LoginPage" {
+  +State<LoginPage> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "accountability_mobile_app::ui::landing_page::login.dart::LoginPage"
+
+class "accountability_mobile_app::ui::landing_page::login.dart::_LoginPage" {
+  +TextEditingController email
+  +TextEditingController password
+  +String? emailError
+  +String? passwordError
+  +void initState()
+  +void dispose()
+  +Widget build()
+}
+
+"accountability_mobile_app::ui::landing_page::login.dart::_LoginPage" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "accountability_mobile_app::ui::landing_page::login.dart::_LoginPage"
+
+class "accountability_mobile_app::ui::landing_page::login.dart::LoginCredentials" {
+  +TextEditingController email
+  +TextEditingController password
+  +String? emailError
+  +String? passwordError
+  +Widget build()
+}
+
+"accountability_mobile_app::ui::landing_page::login.dart::LoginCredentials" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "accountability_mobile_app::ui::landing_page::login.dart::LoginCredentials"
+
+class "accountability_mobile_app::ui::landing_page::register.dart::RegisterPage" {
+  +State<RegisterPage> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "accountability_mobile_app::ui::landing_page::register.dart::RegisterPage"
+
+class "accountability_mobile_app::ui::landing_page::register.dart::_RegisterPage" {
+  +TextEditingController name
+  +TextEditingController email
+  +TextEditingController password
+  +String? passwordError
+  +String? emailError
+  +String? nameError
+  -OverlayEntry? _overlayEntry
+  +void initState()
+  +void dispose()
+  +Widget build()
+}
+
+"accountability_mobile_app::ui::landing_page::register.dart::_RegisterPage" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"accountability_mobile_app::ui::landing_page::register.dart::_RegisterPage" o-- "flutter::src::widgets::overlay.dart::OverlayEntry"
+"flutter::src::widgets::framework.dart::State" <|-- "accountability_mobile_app::ui::landing_page::register.dart::_RegisterPage"
+
+class "accountability_mobile_app::ui::landing_page::register.dart::RegisterCredentials" {
+  +TextEditingController name
+  +TextEditingController email
+  +TextEditingController password
+  +String? emailError
+  +String? nameError
+  +String? passwordError
+  +Widget build()
+}
+
+"accountability_mobile_app::ui::landing_page::register.dart::RegisterCredentials" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "accountability_mobile_app::ui::landing_page::register.dart::RegisterCredentials"
+
+class "accountability_mobile_app::ui::trips_page::expensecrud.dart::ViewExpensePage" {
+  +Expense expense
+  +List<User> allMembers
+  +State<ViewExpensePage> createState()
+}
+
+"accountability_mobile_app::ui::trips_page::expensecrud.dart::ViewExpensePage" o-- "accountability_mobile_app::models::Expense.dart::Expense"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "accountability_mobile_app::ui::trips_page::expensecrud.dart::ViewExpensePage"
+
+class "accountability_mobile_app::ui::trips_page::expensecrud.dart::_ViewExpensePage" {
+  +List<User>? expenseMembers
+  +String payerName
+  +void initState()
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "accountability_mobile_app::ui::trips_page::expensecrud.dart::_ViewExpensePage"
+
+class "accountability_mobile_app::ui::trips_page::expensecrud.dart::EditExpenseNameNotesPage" {
+  +Expense? expense
+  +State<EditExpenseNameNotesPage> createState()
+}
+
+"accountability_mobile_app::ui::trips_page::expensecrud.dart::EditExpenseNameNotesPage" o-- "accountability_mobile_app::models::Expense.dart::Expense"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "accountability_mobile_app::ui::trips_page::expensecrud.dart::EditExpenseNameNotesPage"
+
+class "accountability_mobile_app::ui::trips_page::expensecrud.dart::_EditExpenseNameNotesPage" {
+  +TextEditingController nameController
+  +TextEditingController descriptionController
+  +void initState()
+  +Widget build()
+}
+
+"accountability_mobile_app::ui::trips_page::expensecrud.dart::_EditExpenseNameNotesPage" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "accountability_mobile_app::ui::trips_page::expensecrud.dart::_EditExpenseNameNotesPage"
+
+class "accountability_mobile_app::ui::trips_page::expensecrud.dart::EditExpenseCost" {
+  +Expense? expense
+  +State<EditExpenseCost> createState()
+}
+
+"accountability_mobile_app::ui::trips_page::expensecrud.dart::EditExpenseCost" o-- "accountability_mobile_app::models::Expense.dart::Expense"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "accountability_mobile_app::ui::trips_page::expensecrud.dart::EditExpenseCost"
+
+class "accountability_mobile_app::ui::trips_page::expensecrud.dart::_EditExpenseCost" {
+  +TextEditingController costController
+  +String? costError
+  +void initState()
+  +Widget build()
+}
+
+"accountability_mobile_app::ui::trips_page::expensecrud.dart::_EditExpenseCost" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "accountability_mobile_app::ui::trips_page::expensecrud.dart::_EditExpenseCost"
+
+class "accountability_mobile_app::ui::trips_page::expensecrud.dart::AddExpensePage" {
+  +String tripId
+  +List<User> members
+  +State<AddExpensePage> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "accountability_mobile_app::ui::trips_page::expensecrud.dart::AddExpensePage"
+
+class "accountability_mobile_app::ui::trips_page::expensecrud.dart::_AddExpensePageState" {
+  +TextEditingController nameController
+  +String? nameError
+  +TextEditingController descriptionController
+  +TextEditingController costController
+  +String? costError
+  +List<bool> isChecked
+  +void initState()
+  +Widget build()
+}
+
+"accountability_mobile_app::ui::trips_page::expensecrud.dart::_AddExpensePageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "accountability_mobile_app::ui::trips_page::expensecrud.dart::_AddExpensePageState"
+
+class "accountability_mobile_app::ui::trips_page::expensecrud.dart::DeleteExpenseWidget" {
+  +String expenseId
+  +String name
+  +State<DeleteExpenseWidget> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "accountability_mobile_app::ui::trips_page::expensecrud.dart::DeleteExpenseWidget"
+
+class "accountability_mobile_app::ui::trips_page::expensecrud.dart::_DeleteExpenseWidget" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "accountability_mobile_app::ui::trips_page::expensecrud.dart::_DeleteExpenseWidget"
+
+class "accountability_mobile_app::ui::trips_page::profilepage.dart::ProfilePage" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "accountability_mobile_app::ui::trips_page::profilepage.dart::ProfilePage"
+
+class "accountability_mobile_app::ui::trips_page::profilepage.dart::EditProfile" {
+  +String credType
+  +String? intiCred
+  +State<EditProfile> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "accountability_mobile_app::ui::trips_page::profilepage.dart::EditProfile"
+
+class "accountability_mobile_app::ui::trips_page::profilepage.dart::_EditProfile" {
+  +TextEditingController credentialController
+  +String? credentialError
+  {static} +dynamic update()
+  +void initState()
+  +void validateCred()
+  +Widget build()
+}
+
+"accountability_mobile_app::ui::trips_page::profilepage.dart::_EditProfile" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "accountability_mobile_app::ui::trips_page::profilepage.dart::_EditProfile"
+
+class "accountability_mobile_app::ui::trips_page::tripcrud.dart::AddTripsPage" {
+  +State<AddTripsPage> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "accountability_mobile_app::ui::trips_page::tripcrud.dart::AddTripsPage"
+
+class "accountability_mobile_app::ui::trips_page::tripcrud.dart::_AddTripsPageState" {
+  +TextEditingController nameController
+  +TextEditingController descriptionController
+  +TextEditingController code
+  +String? codeError
+  +Widget build()
+}
+
+"accountability_mobile_app::ui::trips_page::tripcrud.dart::_AddTripsPageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "accountability_mobile_app::ui::trips_page::tripcrud.dart::_AddTripsPageState"
+
+class "accountability_mobile_app::ui::trips_page::tripcrud.dart::JoinTrip" {
+  +TextEditingController code
+  +String? codeError
+  +State<JoinTrip> createState()
+}
+
+"accountability_mobile_app::ui::trips_page::tripcrud.dart::JoinTrip" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "accountability_mobile_app::ui::trips_page::tripcrud.dart::JoinTrip"
+
+class "accountability_mobile_app::ui::trips_page::tripcrud.dart::_JoinTripState" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "accountability_mobile_app::ui::trips_page::tripcrud.dart::_JoinTripState"
+
+class "accountability_mobile_app::ui::trips_page::tripcrud.dart::EditNameNotesPage" {
+  +Trip? trip
+  +State<EditNameNotesPage> createState()
+}
+
+"accountability_mobile_app::ui::trips_page::tripcrud.dart::EditNameNotesPage" o-- "accountability_mobile_app::models::Trip.dart::Trip"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "accountability_mobile_app::ui::trips_page::tripcrud.dart::EditNameNotesPage"
+
+class "accountability_mobile_app::ui::trips_page::tripcrud.dart::_EditNameNotesPage" {
+  +TextEditingController nameController
+  +TextEditingController descriptionController
+  +void initState()
+  +Widget build()
+}
+
+"accountability_mobile_app::ui::trips_page::tripcrud.dart::_EditNameNotesPage" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "accountability_mobile_app::ui::trips_page::tripcrud.dart::_EditNameNotesPage"
+
+class "accountability_mobile_app::ui::trips_page::tripcrud.dart::ViewMemberPage" {
+  +User member
+  +State<ViewMemberPage> createState()
+}
+
+"accountability_mobile_app::ui::trips_page::tripcrud.dart::ViewMemberPage" o-- "accountability_mobile_app::models::User.dart::User"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "accountability_mobile_app::ui::trips_page::tripcrud.dart::ViewMemberPage"
+
+class "accountability_mobile_app::ui::trips_page::tripcrud.dart::_ViewMemberPage" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "accountability_mobile_app::ui::trips_page::tripcrud.dart::_ViewMemberPage"
+
+class "accountability_mobile_app::ui::trips_page::tripspages.dart::TripsPage" {
+  +State<TripsPage> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "accountability_mobile_app::ui::trips_page::tripspages.dart::TripsPage"
+
+class "accountability_mobile_app::ui::trips_page::tripspages.dart::_TripsPageState" {
+  -TextEditingController _searchQuery
+  +List<Trip> trips
+  -void _search()
+  +void initState()
+  +Widget build()
+}
+
+"accountability_mobile_app::ui::trips_page::tripspages.dart::_TripsPageState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State" <|-- "accountability_mobile_app::ui::trips_page::tripspages.dart::_TripsPageState"
+
+class "accountability_mobile_app::ui::trips_page::tripspages.dart::TripsSkeleton" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "accountability_mobile_app::ui::trips_page::tripspages.dart::TripsSkeleton"
+
+class "accountability_mobile_app::ui::trips_page::viewtrippage.dart::ViewTripPage" {
+  +Trip trip
+  +State<ViewTripPage> createState()
+}
+
+"accountability_mobile_app::ui::trips_page::viewtrippage.dart::ViewTripPage" o-- "accountability_mobile_app::models::Trip.dart::Trip"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "accountability_mobile_app::ui::trips_page::viewtrippage.dart::ViewTripPage"
+
+class "accountability_mobile_app::ui::trips_page::viewtrippage.dart::_ViewTripsPage" {
+  +List<User> members
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "accountability_mobile_app::ui::trips_page::viewtrippage.dart::_ViewTripsPage"
+
+class "accountability_mobile_app::ui::trips_page::viewtrippage.dart::MemberSkeleton" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "accountability_mobile_app::ui::trips_page::viewtrippage.dart::MemberSkeleton"
+
+class "accountability_mobile_app::ui::trips_page::viewtrippage.dart::ExpenseSkeleton" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "accountability_mobile_app::ui::trips_page::viewtrippage.dart::ExpenseSkeleton"
+
+class "accountability_mobile_app::ui::trips_page::viewtrippage.dart::EditNameNotes" {
+  +Trip trip
+  +Widget build()
+}
+
+"accountability_mobile_app::ui::trips_page::viewtrippage.dart::EditNameNotes" o-- "accountability_mobile_app::models::Trip.dart::Trip"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "accountability_mobile_app::ui::trips_page::viewtrippage.dart::EditNameNotes"
+
+class "accountability_mobile_app::ui::trips_page::viewtrippage.dart::DeleteTripWidget" {
+  +String tripId
+  +String name
+  +State<DeleteTripWidget> createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "accountability_mobile_app::ui::trips_page::viewtrippage.dart::DeleteTripWidget"
+
+class "accountability_mobile_app::ui::trips_page::viewtrippage.dart::_DeleteTripWidget" {
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State" <|-- "accountability_mobile_app::ui::trips_page::viewtrippage.dart::_DeleteTripWidget"
+
+
+@enduml
