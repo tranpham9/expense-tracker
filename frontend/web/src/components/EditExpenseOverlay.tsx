@@ -120,6 +120,7 @@ export default function EditExpenseOverlay({
                             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                                 {selected.map((value) => {
                                     const member = tripMembersIncludingUser.value.find((tripMember) => tripMember._id === value);
+
                                     return (
                                         <Chip
                                             key={value}
