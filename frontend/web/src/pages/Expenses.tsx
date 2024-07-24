@@ -49,6 +49,23 @@ export default function Expenses() {
         return members.value.concat([user]);
     });
     const expenses = useSignal<Expense[] | null>(null);
+    // 2D Map of the form [ower][owed] -> amountOwed ("ower" owes "owed" "amountOwed")
+    const amountsOwed = useComputed(() => {
+        const owedMap: Map<string, Map<string, number>> = new Map();
+        expenses.value?.forEach((expense) => {
+            expense.memberIds.forEach((memberId) => {
+                const owerMap = owedMap.get(memberId);
+                const amountOwed = expense.cost / (expense.memberIds.length + 1);
+                if (owerMap) {
+                    owerMap.set(expense.payerId, (owerMap.get(expense.payerId) || 0) + amountOwed);
+                } else {
+                    owedMap.set(memberId, new Map([[expense.payerId, amountOwed]]));
+                }
+            });
+        });
+
+        return owedMap;
+    });
     const query = useSignal("");
 
     const isSnackbarOpen = useSignal(false);
@@ -438,35 +455,37 @@ export default function Expenses() {
                         gap: 1,
                     }}
                 >
-                    {members.value.map((member, i) => (
-                        <Tooltip
-                            key={i}
-                            title={
-                                <Box textAlign="center">
-                                    <Typography variant="body2">
-                                        {member.name}
-                                        {member.isLeader ? " (Leader)" : ""}
-                                        <br />
-                                        {/* TODO: impl */}
-                                        You owe them {getFormattedCurrency(0)}
-                                    </Typography>
-                                </Box>
-                            }
-                            arrow
-                        >
-                            <Chip
-                                avatar={<Avatar>{getInitials(member.name)}</Avatar>}
-                                // TODO: impl
-                                label="$0.00"
-                                {...(member.isLeader && {
-                                    sx: {
-                                        border: "2px solid",
-                                        borderColor: "secondary.contrastText",
-                                    },
-                                })}
-                            />
-                        </Tooltip>
-                    ))}
+                    {members.value.map((member, i) => {
+                        const amountOwedFormatted = getFormattedCurrency(amountsOwed.value.get(userInfo.value?.userId || "INVALID_USER_ID")?.get(member._id) || 0);
+
+                        return (
+                            <Tooltip
+                                key={i}
+                                title={
+                                    <Box textAlign="center">
+                                        <Typography variant="body2">
+                                            {member.name}
+                                            {member.isLeader ? " (Leader)" : ""}
+                                            <br />
+                                            You owe them {amountOwedFormatted}
+                                        </Typography>
+                                    </Box>
+                                }
+                                arrow
+                            >
+                                <Chip
+                                    avatar={<Avatar>{getInitials(member.name)}</Avatar>}
+                                    label={amountOwedFormatted}
+                                    {...(member.isLeader && {
+                                        sx: {
+                                            border: "2px solid",
+                                            borderColor: "secondary.contrastText",
+                                        },
+                                    })}
+                                />
+                            </Tooltip>
+                        );
+                    })}
                 </Box>
                 {/* </Stack> */}
                 {/* <Grid
