@@ -19,7 +19,7 @@ export default function EditTripOverlay({ tripToEdit, onSuccessfulEdit = () => {
     const name = useSignal("");
     const description = useSignal("");
     const errorMessage = useSignal("");
-    const canEdit = useComputed(() => name.value && !isProcessing.value);
+    const canEdit = useComputed(() => !!(name.value && !isProcessing.value));
 
     const hasInteractedWithName = useSignal(false);
 
@@ -33,6 +33,7 @@ export default function EditTripOverlay({ tripToEdit, onSuccessfulEdit = () => {
 
             // This is quite a neat/interesting syntax imo ( https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment#binding_and_assignment )
             ({ name: name.value, description: description.value } = tripToEdit.value);
+
             errorMessage.value = "";
         }
     });
@@ -64,7 +65,11 @@ export default function EditTripOverlay({ tripToEdit, onSuccessfulEdit = () => {
 
         isProcessing.value = true;
 
-        const tripInfo: TripsUpdatePayload = { tripId: tripToEdit.value!._id, name: name.value, description: description.value };
+        const tripInfo: TripsUpdatePayload = {
+            tripId: tripToEdit.value!._id,
+            name: name.value,
+            description: description.value,
+        };
         request(
             "trips/update",
             tripInfo,
