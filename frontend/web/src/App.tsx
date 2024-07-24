@@ -9,11 +9,11 @@ import "./App.css";
 import { ThemeProvider } from "@emotion/react";
 import { CssBaseline } from "@mui/material";
 import { theme } from "./Theme";
-import Test from "./components/Test";
 import { useEffect } from "react";
 import { request } from "./utility/api/API";
 import { userJWT } from "./Signals/Account";
 import { useSignals } from "@preact/signals-react/runtime";
+import ResetPassword from "./pages/ResetPassword";
 
 export default function App() {
     useSignals();
@@ -49,10 +49,9 @@ export default function App() {
                         path={"/expenses"}
                         element={<Expenses />}
                     />
-                    {/* TODO: properly impl */}
                     <Route
-                        path={"/reset/:jwt"}
-                        element={<Test />}
+                        path={"/resetPassword/:jwt"}
+                        element={<ResetPassword />}
                     />
                 </Routes>
             </BrowserRouter>
