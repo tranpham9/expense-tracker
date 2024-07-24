@@ -130,7 +130,8 @@ router.post("/update", async (req, res) => {
             {
                 $set: {
                     ...(name && { name }),
-                    ...(description && { description }),
+                    // allow explicitly setting the description to the empty string
+                    ...((description || description === "") && { description }),
                 },
             }
         );
