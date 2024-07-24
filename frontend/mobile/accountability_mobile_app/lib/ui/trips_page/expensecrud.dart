@@ -22,9 +22,9 @@ class ViewExpensePage extends StatefulWidget {
 
 // TODO: Need to decide how we want to implement the edit functionality here...
 class _ViewExpensePage extends State<ViewExpensePage> {
-  // View all members of an EXPENSE
-  late List<User>? expenseMembers;
-  late String payerName;
+  // Keep a map of ALL members of the trip (w/o payer) and keep
+  // track of who was in the expense to being with
+  late Map<User?, bool?> expenseMembers;
   // Will find the payer of the tri
   late User payer;
   // Determine if you are apart of the expense. If so, you owe the payer
@@ -35,31 +35,35 @@ class _ViewExpensePage extends State<ViewExpensePage> {
   // @override
   void initState() {
     super.initState();
-    // Assign who the payer of the expense was
     // You are the payer
     if (widget.expense.payerId == Globals.user?.userId) {
       payer = Globals.user!;
     } else {
-      // Loop over the trip members and identify who paid
-      for (int i = 0; i < widget.allMembers.length; i++) {
-        // We've found the payer
-        if (widget.allMembers[i].userId == widget.expense.payerId) {
-          payer = widget.allMembers[i];
-          // You were in the expense, so you owe money
-          inExpense = true;
-          break;
-        }
+      // Identify who paid the expense out of ALL the trip members
+      payer = widget.allMembers
+          .firstWhere((member) => member.userId == widget.expense.payerId);
+      // Since the current user wasn't the payer, we need to add them to the 'allMembers' list before
+      // we try and determine if they were in the expense or not
+      widget.allMembers.add(Globals.user!);
+      // Note that the user WAS apart of the expense
+      if (widget.expense.memberIds.contains(Globals.user?.userId)) {
+        inExpense = true;
       }
     }
-    // Create a list of the members which took place in the expense
-    // for (int i = 0; i < widget.allMembers.length; i++) {
-    //   for (int j = 0; j < expense.memberIds!.length; j++) {
-    //     // Keep track of who is in the expense
-    //     if (expense.memberIds![i] == (widget.allMembers[i].userId)) {
-    //       expenseMembers!.add(widget.allMembers[i]);
-    //     }
-    //   }
-    // }
+    // Build a map which maps all users (w/o payer) who were either apart of the expense or weren't
+    expenseMembers = {
+      for (var user in widget.allMembers)
+        if (user.userId != widget.expense.payerId)
+          user: widget.expense.memberIds.contains(user.userId)
+    };
+
+    //TESTING: just print out the map
+    // Create a new map with user names as keys
+    Map<String, bool> expenseMembersWithNames = {
+      for (var entry in expenseMembers.entries) entry.key!.name: entry.value!
+    };
+    print(
+        "The Trip ${widget.expense.name}, payer ${payer.name}:\n $expenseMembersWithNames\n");
   }
 
   // Given the amount cost and number of people in the expense, divide the cost
@@ -70,7 +74,6 @@ class _ViewExpensePage extends State<ViewExpensePage> {
 
   @override
   Widget build(BuildContext context) {
-    print("the payer of this expense was ${payer.name}");
     return Scaffold(
       // Display the title at the top of the screen
       appBar: AppBar(
@@ -163,32 +166,35 @@ class _ViewExpensePage extends State<ViewExpensePage> {
               ),
             ),
             // TODO: Display ALL members as check boxes and allow the user to select/deselect to edit this table
-            // SingleChildScrollView(
-            //         child: members!.isEmpty
-            //             ? SizedBox.shrink()
-            //             : SizedBox(
-            //                 height: 200,
-            //                 child: ListView.builder(
-            //                   itemCount: members!.length,
-            //                   itemBuilder: (context, index) {
-            //                     return CheckboxListTile(
-            //                       // The member that you want to add
-            //                       title: Text(members[index].name),
-            //                       value: isChecked[index],
-            //                       tristate: false,
-            //                       // Switch the value when you click
-            //                       onChanged: (bool? value) {
-            //                         setState(() {
-            //                           isChecked[index] = value!;
-            //                         });
-            //                       },
-            //                       activeColor: Colors.white,
-            //                       checkColor: Theme.of(context).primaryColor,
-            //                     );
-            //                   },
-            //                 ),
-            //               ),
-            //       ),
+            SingleChildScrollView(
+              child: expenseMembers.isEmpty
+                  ? SizedBox.shrink()
+                  : SizedBox(
+                      height: 200,
+                      child: ListView.builder(
+                        itemCount: expenseMembers.length,
+                        itemBuilder: (context, index) {
+                          User? user = expenseMembers.keys.elementAt(index);
+                          return CheckboxListTile(
+                            // The member that you want to add
+                            title: Text(user!.name),
+                            // Were they in the expense originally
+                            value: expenseMembers.values.elementAt(index),
+                            tristate: false,
+                            // Switch the value when you click
+                            onChanged: (bool? value) {
+                              setState(() {
+                                expenseMembers.update(
+                                    user, (existingValue) => value!);
+                              });
+                            },
+                            activeColor: Colors.white,
+                            checkColor: Theme.of(context).primaryColor,
+                          );
+                        },
+                      ),
+                    ),
+            ),
             // Confirm Edit (for the user)
             Container(
               height: 50,
@@ -198,12 +204,26 @@ class _ViewExpensePage extends State<ViewExpensePage> {
                   'Confirm Edit',
                   style: TextStyle(color: Colors.white),
                 ),
-                onPressed: () {
-                  // TODO: Call API to update the trip details.
-                  // Again, this will depend on HOW we decide the edit function will work
-
-                  // Go back to the last screen
-                  Navigator.pop(context);
+                onPressed: () async {
+                  List<String>? updatedMembers = [];
+                  expenseMembers.forEach((key, value) =>
+                      value == true ? updatedMembers.add(key!.userId!) : "");
+                  updatedMembers.remove("");
+                  // Update the list of members within the trip
+                  await ExpenseCRUD.update(
+                          widget.expense.id,
+                          widget.expense.name,
+                          widget.expense.description,
+                          widget.expense.cost,
+                          updatedMembers)
+                      .then((response) {
+                    if (response == null) {
+                      print("There was an Error Updating Expense Members");
+                      return;
+                    }
+                    // Go back to the last screen
+                    Navigator.pop(context);
+                  });
                 },
               ),
             ),
