@@ -65,7 +65,8 @@ class _TripsPageState extends State<TripsPage> {
               ),
             ),
             // Display Pagination controls
-            ButtonBar(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Page back
                 TextButton(
