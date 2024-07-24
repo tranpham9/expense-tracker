@@ -29,6 +29,7 @@ class _TripsPageState extends State<TripsPage> {
 
   @override
   void initState() {
+    // On initial load, just load all of the trips
     _searchQuery.text = "";
   }
 

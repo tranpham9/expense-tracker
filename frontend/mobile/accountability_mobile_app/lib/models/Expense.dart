@@ -17,6 +17,7 @@ class Expense {
   String name;
   String description;
   String? tripId;
+  String? payerId;
   double? cost;
   List<String> memberIds;
 
@@ -24,6 +25,7 @@ class Expense {
       {required this.id,
       required this.name,
       required this.tripId,
+      required this.payerId,
       required this.cost,
       required this.description,
       required this.memberIds});
@@ -32,6 +34,7 @@ class Expense {
       id: json["_id"],
       name: json["name"],
       tripId: json["tripId"],
+      payerId: json["payerId"],
       cost: double.parse(json["cost"].toString()),
       description: json["description"],
       memberIds: json["memberIds"] != null
