@@ -34,6 +34,7 @@ import LoadingSkeleton from "../components/LoadingSkeleton";
 import SearchBar from "../components/inputs/SearchBar";
 import { getFormattedCurrency, getInitials } from "../utility/Manipulation";
 import CreateExpenseOverlay from "../components/CreateExpenseOverlay";
+import EditExpenseOverlay from "../components/EditExpenseOverlay";
 // TODO: use this for generating the expense report
 // import GenerateReportIcon from "@mui/icons-material/CurrencyExchange";
 
@@ -50,6 +51,8 @@ export default function Expenses() {
 
     const isCreateExpenseOverlayVisible = useSignal(false);
     const activeDeleteConfirmationDialog = useSignal(""); // houses the id of the current expense which has a confirmation dialog open for it
+
+    const expenseToEdit = useSignal<Expense | null>(null);
 
     // https://stackoverflow.com/questions/74413650/what-is-difference-between-usenavigate-and-redirect-in-react-route-v6
     const navigate = useNavigate();
@@ -274,7 +277,7 @@ export default function Expenses() {
                                             sx={{ p: "5px" }}
                                             aria-label="edit"
                                             onClick={() => {
-                                                // TODO: impl
+                                                expenseToEdit.value = expense;
                                             }}
                                         >
                                             <EditIcon />
@@ -514,6 +517,13 @@ export default function Expenses() {
                 isCreateExpenseOverlayVisible={isCreateExpenseOverlayVisible}
                 tripMembers={members}
                 onSuccessfulCreate={() => {
+                    loadAllData(currentTrip.value!._id);
+                }}
+            />
+            <EditExpenseOverlay
+                expenseToEdit={expenseToEdit}
+                tripMembers={members}
+                onSuccessfulEdit={() => {
                     loadAllData(currentTrip.value!._id);
                 }}
             />
