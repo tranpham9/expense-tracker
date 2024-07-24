@@ -315,6 +315,7 @@ export default function Expenses() {
                                         >
                                             <IconButton
                                                 type="button"
+                                                aria-label="Delete Expense"
                                                 sx={{ p: "5px" }}
                                                 onClick={() => {
                                                     activeDeleteConfirmationDialog.value = expense._id;
@@ -474,7 +475,8 @@ export default function Expenses() {
                                 arrow
                             >
                                 <Chip
-                                    avatar={<Avatar>{getInitials(member.name)}</Avatar>}
+                                    avatar={<Avatar sx={{border: "1px solid black"}}>{getInitials(member.name)}</Avatar>}
+                                    // avatar={<Avatar>{getInitials(member.name)}</Avatar>}
                                     label={amountOwedFormatted}
                                     {...(member.isLeader && {
                                         sx: {
@@ -531,7 +533,7 @@ export default function Expenses() {
                 >
                     <IconButton
                         type="button"
-                        // disabled={*}
+                        aria-label="Create Expense"
                         sx={{ p: "10px", ml: 1 }}
                         onClick={() => {
                             isCreateExpenseOverlayVisible.value = true;
