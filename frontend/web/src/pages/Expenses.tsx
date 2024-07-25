@@ -324,16 +324,21 @@ export default function Expenses() {
                                         sm={2}
                                         textAlign="right"
                                     >
-                                        <IconButton
-                                            type="button"
-                                            sx={{ p: "5px" }}
-                                            aria-label="edit"
-                                            onClick={() => {
-                                                expenseToEdit.value = expense;
-                                            }}
+                                        <Tooltip
+                                            title={<Typography variant="body2">Edit</Typography>}
+                                            arrow
                                         >
-                                            <EditIcon />
-                                        </IconButton>
+                                            <IconButton
+                                                type="button"
+                                                sx={{ p: "5px" }}
+                                                aria-label="edit"
+                                                onClick={() => {
+                                                    expenseToEdit.value = expense;
+                                                }}
+                                            >
+                                                <EditIcon />
+                                            </IconButton>
+                                        </Tooltip>
                                         <Tooltip
                                             title={<Typography variant="body2">Delete</Typography>}
                                             arrow
