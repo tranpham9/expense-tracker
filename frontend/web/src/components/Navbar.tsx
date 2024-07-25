@@ -20,6 +20,7 @@ import { useSignal, useSignals } from "@preact/signals-react/runtime";
 import { currentTrip } from "../Signals/Trip";
 import { SvgIcon } from "@mui/material";
 import Logo from "../assets/logo.svg?react";
+import EditInfoOverlay from "./EditInfoOverlay";
 
 type Page = {
     name: string;
@@ -47,6 +48,7 @@ export default function Navbar() {
     };
 
     const isAccountOverlayVisible = useSignal(false);
+    const isEditInfoOverlayVisible = useSignal(false);
 
     /*
     const [shouldShowAccountOverlay, setShouldShowAccountOverlay] = useState(false);
@@ -111,7 +113,7 @@ export default function Navbar() {
         {
             name: "Settings",
             action: () => {
-                // TODO: impl
+                isEditInfoOverlayVisible.value = true;
             },
         },
         {
@@ -284,6 +286,7 @@ export default function Navbar() {
                 </Container>
             </AppBar>
             <AccountOverlay isAccountOverlayVisible={isAccountOverlayVisible} />
+            <EditInfoOverlay isEditInfoOverlayVisible={isEditInfoOverlayVisible} />
         </>
     );
 }
