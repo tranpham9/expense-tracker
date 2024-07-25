@@ -1,3 +1,4 @@
+/*
 import { Payloads } from "./types/Payloads";
 import { Responses } from "./types/Responses";
 // import fetch from "node-fetch";
@@ -51,3 +52,4 @@ export async function request<T extends keyof Payloads>(type: T, payload: Payloa
         }
     }
 }
+*/

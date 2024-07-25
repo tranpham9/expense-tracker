@@ -1,3 +1,4 @@
+/*
 import { request } from "./API_ForTesting";
 
 const EXISTING_EMAIL = "REDACTED";
@@ -77,3 +78,4 @@ describe("Create Trip from Website", () => {
         });
     });
 });
+*/

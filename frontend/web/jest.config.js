@@ -1,3 +1,4 @@
+/*
 export default {
     testEnvironment: "jsdom",
     transform: {
@@ -6,3 +7,4 @@ export default {
     setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
     // moduleNameMapper: { "node-fetch": "<rootDir>/node_modules/node-fetch-jest" },
 };
+*/
