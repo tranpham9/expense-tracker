@@ -60,12 +60,16 @@ export default function Profile() {
                 </Stack>
             </Box>
             <Divider sx={{ my: 4 }} />
-            <Typography
-                textAlign="center"
-                flexGrow={1}
-            >
-                {user.value.bio || "(No bio provided)"}
-            </Typography>
+            <Box textAlign="center">
+                <Typography
+                    flexGrow={1}
+                    display="inline-block"
+                    textAlign="left"
+                    whiteSpace="pre-wrap"
+                >
+                    {user.value.bio || "(No bio provided)"}
+                </Typography>
+            </Box>
         </Paper>
     ) : (
         <Paper
