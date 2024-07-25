@@ -20,6 +20,7 @@ type UsersResetPasswordPayload = {
     jwt: string;
     newPassword: string;
 };
+type UsersGetPayload = { userId: string };
 
 type TripsSearchPaylod = {
     query?: string;
@@ -63,6 +64,7 @@ export type Payloads = {
     "users/update": UsersUpdatePayload;
     "users/forgotPassword": UsersForgotPasswordPayload;
     "users/resetPassword": UsersResetPasswordPayload;
+    "users/get": UsersGetPayload;
 
     "trips/search": TripsSearchPaylod;
     "trips/create": TripsCreatePayload;

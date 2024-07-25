@@ -12,6 +12,12 @@ export type UsersLoginResponse = {
 type UsersUpdateResponse = object; // empty response (when ignoring jwt)
 type UsersForgotPasswordResponse = { message: string };
 type UsersResetPasswordResponse = { message: string };
+export type UsersGetResponse = {
+    _id: string;
+    name: string;
+    email: string;
+    bio: string;
+};
 
 export type Trip = {
     _id: string;
@@ -66,6 +72,7 @@ export type Responses = {
     "users/update": UsersUpdateResponse;
     "users/forgotPassword": UsersForgotPasswordResponse;
     "users/resetPassword": UsersResetPasswordResponse;
+    "users/get": UsersGetResponse;
 
     "trips/search": TripsSearchResponse;
     "trips/create": TripsCreateResponse;
