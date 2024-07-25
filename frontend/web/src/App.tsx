@@ -14,6 +14,7 @@ import { request } from "./utility/api/API";
 import { userJWT } from "./Signals/Account";
 import { useSignals } from "@preact/signals-react/runtime";
 import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
 
 export default function App() {
     useSignals();
@@ -52,6 +53,11 @@ export default function App() {
                     <Route
                         path={"/resetPassword/:jwt"}
                         element={<ResetPassword />}
+                    />
+                    <Route
+                        path={"/profile/:userId"}
+                        // path={"/profile/:name/:email/:bio"}
+                        element={<Profile />}
                     />
                 </Routes>
             </BrowserRouter>
