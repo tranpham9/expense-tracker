@@ -1,20 +1,22 @@
-// TODO:Need to fix updating the global user in real time. Also fix the weird pop up to white
+// profilepage.dart
 import 'package:accountability_mobile_app/api/user_crud.dart';
 import 'package:accountability_mobile_app/globals.dart';
 import 'package:flutter/material.dart';
 import '../../utility/helpers.dart';
-import 'package:flutter/cupertino.dart';
+import '../../models/User.dart';
 
-// Profile Page Widget
 class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Display the title at the top of the screen
       appBar: AppBar(
-        title: Text("${Globals.user?.name}'s Profile"),
+        title: ValueListenableBuilder<User?>(
+          valueListenable: Globals.userNotifier,
+          builder: (context, user, _) {
+            return Text("${user?.name}'s Profile");
+          },
+        ),
         centerTitle: true,
-        // We don't need a back button to go to some main page
         automaticallyImplyLeading: false,
       ),
       body: Column(
@@ -23,54 +25,72 @@ class ProfilePage extends StatelessWidget {
             child: Column(
               children: [
                 // Name
-                ListTile(
-                  title: Text("${Globals.user?.name}"),
-                  subtitle: Text("Name"),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ElevatedButton(
-                          onPressed: () {
-                            // Navigate to the edit name pop up
-                            Navigator.push(
+                ValueListenableBuilder<User?>(
+                  valueListenable: Globals.userNotifier,
+                  builder: (context, user, _) {
+                    return ListTile(
+                      title: Text("${user?.name}"),
+                      subtitle: Text("Name"),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
                                 context,
-                                // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
                                 MaterialPageRoute(
-                                    builder: (context) => EditProfile(
-                                          credType: "name",
-                                          intiCred: Globals.user?.name,
-                                        )));
-                          },
-                          child: Icon(Icons.edit)),
-                    ],
-                  ),
+                                  builder: (context) => EditProfile(
+                                    credType: "name",
+                                    intiCred: user?.name,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Icon(Icons.edit),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
                 // Bio
-                ListTile(
-                  title: Text("${Globals.user?.bio ?? "'Empty Bio'"}"),
-                  subtitle: Text("Bio"),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ElevatedButton(
-                          onPressed: () {
-                            // Navigate to the edit name pop up
-                            Navigator.push(
+                ValueListenableBuilder<User?>(
+                  valueListenable: Globals.userNotifier,
+                  builder: (context, user, _) {
+                    return ListTile(
+                      title: Text("${user?.bio ?? "'Empty Bio'"}"),
+                      subtitle: Text("Bio"),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
                                 context,
-                                // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
                                 MaterialPageRoute(
-                                    builder: (context) => EditProfile(
-                                        credType: "bio",
-                                        intiCred: Globals.user!.bio ?? "")));
-                          },
-                          child: Icon(Icons.edit)),
-                    ],
-                  ),
+                                  builder: (context) => EditProfile(
+                                    credType: "bio",
+                                    intiCred: user?.bio ?? "",
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Icon(Icons.edit),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
                 // Email
-                ListTile(
-                  title: Text("${Globals.user?.email}"),
-                  subtitle: Text("Email"),
+                ValueListenableBuilder<User?>(
+                  valueListenable: Globals.userNotifier,
+                  builder: (context, user, _) {
+                    return ListTile(
+                      title: Text("${user?.email}"),
+                      subtitle: Text("Email"),
+                    );
+                  },
                 ),
               ],
             ),
@@ -99,8 +119,7 @@ class EditProfile extends StatefulWidget {
   final String credType;
   final String? intiCred;
 
-  const EditProfile(
-      {super.key, required this.credType, required this.intiCred});
+  const EditProfile({super.key, required this.credType, required this.intiCred});
 
   @override
   State<EditProfile> createState() => _EditProfile();
@@ -110,7 +129,6 @@ class _EditProfile extends State<EditProfile> {
   final TextEditingController credentialController = TextEditingController();
   String? credentialError = null;
 
-  // Update the user's information
   static Future<int?> update(String? text, String type) async {
     return await UserCRUD.update(text, type);
   }
@@ -124,14 +142,14 @@ class _EditProfile extends State<EditProfile> {
 
   void validateCred() {
     setState(() {
-      credentialError =
-          validateText(widget.credType, credentialController.text);
+      credentialError = validateText(widget.credType, credentialController.text);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,  // Set the theme color
       title: Text("Change Your ${widget.credType}"),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -154,32 +172,28 @@ class _EditProfile extends State<EditProfile> {
           },
         ),
         ElevatedButton(
-          onPressed:
-              disableButton([credentialError], [credentialController.text])
-                  ? null
-                  : () {
-                      update(credentialController.text, widget.credType)
-                          .then((response) {
-                        if (response == null) {
-                          // TODO: Show there was an error
-                          setState(() {
-                            credentialError =
-                                "There Was An Error Updating Your ${capitalize(widget.credType)}";
-                          });
-                          return;
-                        }
-                        // Update the user's credentials within the app
-                        if (widget.credType == 'email') {
-                          Globals.user?.email = credentialController.text;
-                        } else if (widget.credType == 'name') {
-                          Globals.user?.name = credentialController.text;
-                        } else if (widget.credType == 'bio') {
-                          Globals.user?.bio = credentialController.text;
-                        }
-                        // Go back to the last screen
-                        Navigator.pop(context);
+          onPressed: disableButton([credentialError], [credentialController.text])
+              ? null
+              : () {
+                  update(credentialController.text, widget.credType)
+                      .then((response) {
+                    if (response == null) {
+                      setState(() {
+                        credentialError = "There Was An Error Updating Your ${capitalize(widget.credType)}";
                       });
-                    },
+                      return;
+                    }
+                    if (widget.credType == 'email') {
+                      Globals.user?.email = credentialController.text;
+                    } else if (widget.credType == 'name') {
+                      Globals.user?.name = credentialController.text;
+                    } else if (widget.credType == 'bio') {
+                      Globals.user?.bio = credentialController.text;
+                    }
+                    Globals.userNotifier.notifyListeners();
+                    Navigator.pop(context);
+                  });
+                },
           child: Text('Change ${capitalize(widget.credType)}'),
         ),
       ],
