@@ -251,7 +251,16 @@ export default function Expenses() {
                                                         height: 44,
                                                     }}
                                                 >
-                                                    {getInitials(payerName)}
+                                                    <Box
+                                                        onClick={() => navigate(`/profile/${expense.payerId}`)}
+                                                        sx={{
+                                                            "&:hover": {
+                                                                cursor: "pointer",
+                                                            },
+                                                        }}
+                                                    >
+                                                        {getInitials(payerName)}
+                                                    </Box>
                                                 </Avatar>
                                             </Badge>
                                         </Tooltip>
@@ -286,7 +295,18 @@ export default function Expenses() {
                                                             }}
                                                             invisible={!isMemberTheUser}
                                                         >
-                                                            <Avatar sx={{ width: 40, height: 40 }}>{getInitials(memberName)}</Avatar>
+                                                            <Avatar sx={{ width: 40, height: 40 }}>
+                                                                <Box
+                                                                    onClick={() => navigate(`/profile/${memberId}`)}
+                                                                    sx={{
+                                                                        "&:hover": {
+                                                                            cursor: "pointer",
+                                                                        },
+                                                                    }}
+                                                                >
+                                                                    {getInitials(memberName)}
+                                                                </Box>
+                                                            </Avatar>
                                                         </Badge>
                                                     </Tooltip>
                                                 );
@@ -475,7 +495,20 @@ export default function Expenses() {
                                 arrow
                             >
                                 <Chip
-                                    avatar={<Avatar sx={{border: "1px solid black"}}>{getInitials(member.name)}</Avatar>}
+                                    avatar={
+                                        <Avatar sx={{ border: "1px solid black" }}>
+                                            <Box
+                                                onClick={() => navigate(`/profile/${member._id}`)}
+                                                sx={{
+                                                    "&:hover": {
+                                                        cursor: "pointer",
+                                                    },
+                                                }}
+                                            >
+                                                {getInitials(member.name)}
+                                            </Box>
+                                        </Avatar>
+                                    }
                                     // avatar={<Avatar>{getInitials(member.name)}</Avatar>}
                                     label={amountOwedFormatted}
                                     {...(member.isLeader && {
