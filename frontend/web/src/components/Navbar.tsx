@@ -105,7 +105,7 @@ export default function Navbar() {
         {
             name: "Profile",
             action: () => {
-                // TODO: impl
+                navigate(`/profile/${userInfo.value?.userId}`);
             },
         },
         {
