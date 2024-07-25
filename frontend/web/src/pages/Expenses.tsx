@@ -37,6 +37,10 @@ import CreateExpenseOverlay from "../components/CreateExpenseOverlay";
 import EditExpenseOverlay from "../components/EditExpenseOverlay";
 // TODO: use this for generating the expense report
 // import GenerateReportIcon from "@mui/icons-material/CurrencyExchange";
+import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import Modal from "../components/Modal";
+import { untracked } from "@preact/signals-react";
 
 // TODO: probably remove avatar group and turn them into cards and have cards to include $ owe to friends
 export default function Expenses() {
@@ -72,6 +76,7 @@ export default function Expenses() {
     const snackbarContents = useSignal<{ message: string; severity: "success" | "error" }>({ message: "", severity: "success" });
 
     const isCreateExpenseOverlayVisible = useSignal(false);
+    const isExpenseReportOverlayVisible = useSignal(false);
     const activeDeleteConfirmationDialog = useSignal(""); // houses the id of the current expense which has a confirmation dialog open for it
 
     const expenseToEdit = useSignal<Expense | null>(null);
@@ -389,6 +394,167 @@ export default function Expenses() {
         );
     };
 
+    const ExpenseReportOverlay = () => {
+        useSignals();
+
+        type Owed = {
+            from?: Member;
+            to?: Member;
+            amount: number;
+        };
+        const owed = useComputed<Owed[]>(() => {
+            const res: Owed[] = [];
+            amountsOwed.value.forEach((owerMap, from) => {
+                owerMap.forEach((amount, to) => {
+                    const amountBack = amountsOwed.value.get(to)?.get(from) || 0;
+                    amount -= amountBack;
+                    if (amount > 0) {
+                        const fromMember = untracked(() => membersIncludingUser.value.find((member) => member._id === from));
+                        const toMember = untracked(() => membersIncludingUser.value.find((member) => member._id === to));
+                        res.push({ from: fromMember, to: toMember, amount });
+                    }
+                });
+            });
+            console.log(membersIncludingUser.value, res);
+
+            return res;
+        });
+
+        return (
+            <Modal isOpen={isExpenseReportOverlayVisible}>
+                <Box
+                    sx={{
+                        pt: "10px",
+                    }}
+                >
+                    <Typography
+                        variant="h5"
+                        textAlign="center"
+                    >
+                        Expense Report
+                    </Typography>
+                    <br />
+                    <Box textAlign="center">
+                        <Box
+                            display="inline-block"
+                            textAlign="left"
+                        >
+                            {owed.value.map(({ from, to, amount }) => (
+                                <Box
+                                    key={`${from?._id} ${to?._id}`}
+                                    p={1}
+                                >
+                                    <Tooltip
+                                        title={
+                                            <Box textAlign="center">
+                                                <Typography variant="body2">
+                                                    {from?.name}
+                                                    {from?._id === userInfo.value?.userId ? " (You)" : ""}
+                                                    <br />
+                                                    Owes {getFormattedCurrency(amount)}
+                                                </Typography>
+                                            </Box>
+                                        }
+                                        arrow
+                                    >
+                                        <Badge
+                                            overlap="circular"
+                                            variant="dot"
+                                            badgeContent=" "
+                                            color="error"
+                                            anchorOrigin={{
+                                                vertical: "bottom",
+                                                horizontal: "right",
+                                            }}
+                                            invisible={from?._id !== userInfo.value?.userId}
+                                        >
+                                            <Avatar
+                                                sx={{
+                                                    border: "2px solid black",
+                                                    // borderColor: "secondary.contrastText",
+                                                    // accounts for border
+                                                    width: 44,
+                                                    height: 44,
+                                                }}
+                                            >
+                                                <Box
+                                                    onClick={() => navigate(`/profile/${from?._id}`)}
+                                                    sx={{
+                                                        "&:hover": {
+                                                            cursor: "pointer",
+                                                        },
+                                                    }}
+                                                >
+                                                    {getInitials(from?.name || "")}
+                                                </Box>
+                                            </Avatar>
+                                        </Badge>
+                                    </Tooltip>
+                                    <ArrowForwardIcon sx={{ verticalAlign: "middle" }} />
+                                    <Tooltip
+                                        title={
+                                            <Box textAlign="center">
+                                                <Typography variant="body2">
+                                                    {to?.name}
+                                                    {from?._id === userInfo.value?.userId ? " (You)" : ""}
+                                                    <br />
+                                                    Owed {getFormattedCurrency(amount)}
+                                                </Typography>
+                                            </Box>
+                                        }
+                                        arrow
+                                    >
+                                        <Badge
+                                            overlap="circular"
+                                            variant="dot"
+                                            badgeContent=" "
+                                            color="error"
+                                            anchorOrigin={{
+                                                vertical: "bottom",
+                                                horizontal: "right",
+                                            }}
+                                            invisible={to?._id !== userInfo.value?.userId}
+                                        >
+                                            <Avatar
+                                                sx={{
+                                                    border: "2px solid black",
+                                                    // border: "2px solid",
+                                                    // borderColor: "secondary.contrastText",
+                                                    // accounts for border
+                                                    width: 44,
+                                                    height: 44,
+                                                }}
+                                            >
+                                                <Box
+                                                    onClick={() => navigate(`/profile/${to?._id}`)}
+                                                    sx={{
+                                                        "&:hover": {
+                                                            cursor: "pointer",
+                                                        },
+                                                    }}
+                                                >
+                                                    {getInitials(to?.name || "")}
+                                                </Box>
+                                            </Avatar>
+                                        </Badge>
+                                    </Tooltip>
+                                    <Typography
+                                        // variant="span"
+                                        component="span"
+                                        ml={2}
+                                        sx={{ verticalAlign: "middle" }}
+                                    >
+                                        {getFormattedCurrency(amount)}
+                                    </Typography>
+                                </Box>
+                            ))}
+                        </Box>
+                    </Box>
+                </Box>
+            </Modal>
+        );
+    };
+
     return (
         <>
             <Box
@@ -575,6 +741,21 @@ export default function Expenses() {
                         <AddIcon />
                     </IconButton>
                 </Tooltip>
+                <Tooltip
+                    title={<Typography variant="body2">Show Expense Report</Typography>}
+                    arrow
+                >
+                    <IconButton
+                        type="button"
+                        aria-label="Show Expense Report"
+                        sx={{ p: "10px", ml: 1 }}
+                        onClick={() => {
+                            isExpenseReportOverlayVisible.value = true;
+                        }}
+                    >
+                        <CurrencyExchangeIcon />
+                    </IconButton>
+                </Tooltip>
             </Box>
             {expenses.value ? <RenderedExpenses /> : <LoadingSkeleton />}
             <CreateExpenseOverlay
@@ -591,6 +772,7 @@ export default function Expenses() {
                     loadAllData(currentTrip.value!._id);
                 }}
             />
+            <ExpenseReportOverlay />
         </>
     );
 }
