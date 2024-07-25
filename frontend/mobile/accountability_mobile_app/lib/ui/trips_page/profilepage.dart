@@ -71,24 +71,6 @@ class ProfilePage extends StatelessWidget {
                 ListTile(
                   title: Text("${Globals.user?.email}"),
                   subtitle: Text("Email"),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ElevatedButton(
-                          onPressed: () {
-                            // Navigate to the edit name pop up
-                            Navigator.push(
-                                context,
-                                // Once you click on a Trip, navigate to 'ViewTripPage' to display all of the information
-                                MaterialPageRoute(
-                                    builder: (context) => EditProfile(
-                                          credType: "email",
-                                          intiCred: Globals.user?.email,
-                                        )));
-                          },
-                          child: Icon(Icons.edit)),
-                    ],
-                  ),
                 ),
               ],
             ),
