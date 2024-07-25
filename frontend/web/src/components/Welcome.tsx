@@ -1,4 +1,4 @@
-import { alpha, SvgIcon } from "@mui/material";
+import { alpha, ImageList, ImageListItem, SvgIcon } from "@mui/material";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
@@ -47,7 +47,7 @@ export default function Welcome() {
                 mt={{ xs: 8, sm: 10 }}
                 sx={(theme) => ({
                     alignSelf: "center",
-                    height: { xs: 200, sm: 500 },
+                    // height: { xs: 200, sm: 500 },
                     width: "100%",
                     // backgroundImage:
                     //     theme.palette.mode === "light" ? 'url("/static/images/templates/templates-images/hero-light.png")' : 'url("/static/images/templates/templates-images/hero-dark.png")',
@@ -57,7 +57,20 @@ export default function Welcome() {
                     outlineColor: alpha(theme.palette.primary.main, 0.5),
                     boxShadow: `0 0 12px 8px ${alpha(theme.palette.primary.main, 0.2)}`,
                 })}
-            />
+            >
+                <ImageList
+                    gap={12}
+                    cols={2}
+                    sx={{ p: 2 }}
+                >
+                    <ImageListItem>
+                        <img src="tripsExample.png" alt="Example of the Trips Page" />
+                    </ImageListItem>
+                    <ImageListItem>
+                        <img src="expensesExample.png" alt="Example of the Expenses Page" />
+                    </ImageListItem>
+                </ImageList>
+            </Box>
         </Container>
     );
 }
