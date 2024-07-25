@@ -60,36 +60,36 @@ class ExpenseCRUD {
     return null;
   }
 
-  static Future<int?> update(String expenseId, String name, String description,
-      double? cost, List<String>? memberIds) async {
-    final Dio dio = new Dio();
+  static Future<bool> update(String expenseId, String name, String description,
+    double? cost, List<String>? memberIds) async {
+  final Dio dio = new Dio();
 
-    try {
-      Response response =
-          await dio.post('${Config.remoteApiURL}${Config.updateExpenseAPI}',
-              data: jsonEncode(<String, dynamic?>{
-                'jwt': await UserManager.getJwt(),
-                'expenseId': expenseId,
-                'name': name,
-                'description': description,
-                'cost': cost,
-                'memberIds': memberIds
-              }));
-      // If there was an error, don't refresh jwt
-      if (response.statusCode != 200) {
-        throw Exception("Error in Updating Expense");
-      }
-
-      // Store the jwt
-      await UserManager.saveJwt(response.data['jwt']);
-      // Successful edit
-      return 200;
-    } catch (e) {
-      // Display error message to the console
-      print('Error: $e');
+  try {
+    Response response =
+        await dio.post('${Config.remoteApiURL}${Config.updateExpenseAPI}',
+            data: jsonEncode(<String, dynamic?>{
+              'jwt': await UserManager.getJwt(),
+              'expenseId': expenseId,
+              'name': name,
+              'description': description,
+              'cost': cost,
+              'memberIds': memberIds
+            }));
+    // If there was an error, don't refresh jwt
+    if (response.statusCode != 200) {
+      throw Exception("Error in Updating Expense");
     }
-    return null;
+
+    // Store the jwt
+    await UserManager.saveJwt(response.data['jwt']);
+    // Successful edit
+    return true;
+  } catch (e) {
+    // Display error message to the console
+    print('Error: $e');
   }
+  return false;
+}
 
   // Delete an expense
   static Future<Expense?>? delete(String? id) async {

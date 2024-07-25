@@ -7,58 +7,47 @@ import '../../api/expense_crud.dart';
 import '../../globals.dart';
 import '../../models/Expense.dart';
 import '../../models/User.dart';
+import 'package:flutter/services.dart';
 
+// TODO: Need to decide how we want to implement the edit functionality here...
 class ViewExpensePage extends StatefulWidget {
-  // Each trip has both a nameController and descriptionController associated with it
   final Expense expense;
-  // Pass the list of ALL users in the TRIP (except yourself)
   final List<User> allMembers;
-  // Make sure to pass the nameController and descriptionController of the trip to the function
   const ViewExpensePage(this.expense, this.allMembers);
 
   @override
   State<ViewExpensePage> createState() => _ViewExpensePage();
 }
 
-// TODO: Need to decide how we want to implement the edit functionality here...
 class _ViewExpensePage extends State<ViewExpensePage> {
-  // Keep a map of ALL members of the trip (w/o payer) and keep
-  // track of who was in the expense to being with
   late Map<User?, bool?> expenseMembers;
-  // Will find the payer of the tri
   late User payer;
-  // Determine if you are apart of the expense. If so, you owe the payer
   bool inExpense = false;
-  // Give us the ability to format the doubles as prices in USD
   final oCcy = new NumberFormat("#,##0.00", "en_US");
 
-  // @override
+  @override
   void initState() {
     super.initState();
-    // You are the payer
+    initializeData();
+  }
+
+  void initializeData() {
     if (widget.expense.payerId == Globals.user?.userId) {
       payer = Globals.user!;
     } else {
-      // Identify who paid the expense out of ALL the trip members
       payer = widget.allMembers
           .firstWhere((member) => member.userId == widget.expense.payerId);
-      // Since the current user wasn't the payer, we need to add them to the 'allMembers' list before
-      // we try and determine if they were in the expense or not
       widget.allMembers.add(Globals.user!);
-      // Note that the user WAS apart of the expense
       if (widget.expense.memberIds.contains(Globals.user?.userId)) {
         inExpense = true;
       }
     }
-    // Build a map which maps all users (w/o payer) who were either apart of the expense or weren't
     expenseMembers = {
       for (var user in widget.allMembers)
         if (user.userId != widget.expense.payerId)
           user: widget.expense.memberIds.contains(user.userId)
     };
 
-    //TESTING: just print out the map
-    // Create a new map with user names as keys
     Map<String, bool> expenseMembersWithNames = {
       for (var entry in expenseMembers.entries) entry.key!.name: entry.value!
     };
@@ -66,16 +55,22 @@ class _ViewExpensePage extends State<ViewExpensePage> {
         "The Trip ${widget.expense.name}, payer ${payer.name}:\n $expenseMembersWithNames\n");
   }
 
-  // Given the amount cost and number of people in the expense, divide the cost
-  // amongst all of the members of the trip
   String determinePayment(int membersLen, double? cost) {
     return "\$${oCcy.format(cost! / (membersLen + 1))}";
+  }
+
+  void updateExpense() {
+    setState(() {
+      widget.expense.memberIds = expenseMembers.entries
+          .where((entry) => entry.value!)
+          .map((entry) => entry.key!.userId!)
+          .toList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Display the title at the top of the screen
       appBar: AppBar(
         title: Text(widget.expense.name),
         centerTitle: true,
@@ -83,7 +78,6 @@ class _ViewExpensePage extends State<ViewExpensePage> {
       body: Padding(
         padding: const EdgeInsets.all(10),
         child: Column(
-          // Have our list of containers that will take in text input
           children: <Widget>[
             Row(
               children: [
@@ -103,23 +97,25 @@ class _ViewExpensePage extends State<ViewExpensePage> {
                     ],
                   ),
                 ),
-                // Edit Name and Description of the expense
                 ElevatedButton(
-                    onPressed: () {
-                      // Navigate to the name and notes edit page
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EditExpenseNameNotesPage(
-                            widget.expense,
-                          ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditExpenseNameNotesPage(
+                          widget.expense,
                         ),
-                      );
-                    },
-                    child: Icon(Icons.edit))
+                      ),
+                    ).then((updated) {
+                      if (updated == true) {
+                        setState(() {});
+                      }
+                    });
+                  },
+                  child: Icon(Icons.edit),
+                )
               ],
             ),
-            // Display Cost
             Row(
               children: [
                 Expanded(
@@ -129,26 +125,29 @@ class _ViewExpensePage extends State<ViewExpensePage> {
                   ),
                 ),
                 ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EditExpenseCost(
-                            widget.expense,
-                          ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditExpenseCost(
+                          widget.expense,
                         ),
-                      );
-                    },
-                    child: Icon(Icons.attach_money))
+                      ),
+                    ).then((updated) {
+                      if (updated == true) {
+                        setState(() {});
+                      }
+                    });
+                  },
+                  child: Icon(Icons.attach_money),
+                )
               ],
             ),
-            // Display Payer
             ListTile(
               title: Text(
                 "${payer.name}",
               ),
               subtitle: Text("Who paid this expense?"),
-              // Display how much you will owe the payer
               trailing: Text(
                 style: TextStyle(fontSize: 15),
                 inExpense == false
@@ -165,7 +164,6 @@ class _ViewExpensePage extends State<ViewExpensePage> {
                 ),
               ),
             ),
-            // TODO: Display ALL members as check boxes and allow the user to select/deselect to edit this table
             SingleChildScrollView(
               child: expenseMembers.isEmpty
                   ? SizedBox.shrink()
@@ -176,12 +174,9 @@ class _ViewExpensePage extends State<ViewExpensePage> {
                         itemBuilder: (context, index) {
                           User? user = expenseMembers.keys.elementAt(index);
                           return CheckboxListTile(
-                            // The member that you want to add
                             title: Text(user!.name),
-                            // Were they in the expense originally
                             value: expenseMembers.values.elementAt(index),
                             tristate: false,
-                            // Switch the value when you click
                             onChanged: (bool? value) {
                               setState(() {
                                 expenseMembers.update(
@@ -195,7 +190,6 @@ class _ViewExpensePage extends State<ViewExpensePage> {
                       ),
                     ),
             ),
-            // Confirm Edit (for the user)
             Container(
               height: 50,
               width: double.infinity,
@@ -210,7 +204,6 @@ class _ViewExpensePage extends State<ViewExpensePage> {
                   expenseMembers.forEach((key, value) =>
                       value == true ? updatedMembers.add(key!.userId!) : "");
                   updatedMembers.remove("");
-                  // Update the list of members within the trip
                   await ExpenseCRUD.update(
                           widget.expense.id,
                           widget.expense.name,
@@ -218,19 +211,20 @@ class _ViewExpensePage extends State<ViewExpensePage> {
                           widget.expense.cost,
                           updatedMembers)
                       .then((response) {
-                    if (response == null) {
+                    if (response == true) {
+                      setState(() {
+                        widget.expense.memberIds = updatedMembers;
+                      });
+                      Navigator.pop(context);
+                    } else {
                       print("There was an Error Updating Expense Members");
-                      return;
                     }
-                    // Go back to the last screen
-                    Navigator.pop(context);
                   });
                 },
               ),
             ),
             Center(
               child: ElevatedButton(
-                // Navigate to confirm delete delete
                 onPressed: () async {
                   Navigator.push(
                     context,
@@ -251,10 +245,9 @@ class _ViewExpensePage extends State<ViewExpensePage> {
   }
 }
 
+
 class EditExpenseNameNotesPage extends StatefulWidget {
-  // Pass the expense that you want to change to
   final Expense? expense;
-  // Make sure to pass the nameController and descriptionController of the trip to the function
   const EditExpenseNameNotesPage(this.expense);
 
   @override
@@ -274,7 +267,6 @@ class _EditExpenseNameNotesPage extends State<EditExpenseNameNotesPage> {
   }
 
   Widget build(BuildContext context) {
-    // Build the page
     return AlertDialog(
       title: Text("Edit Name And Description"),
       content: Column(
@@ -308,9 +300,13 @@ class _EditExpenseNameNotesPage extends State<EditExpenseNameNotesPage> {
         ),
         ElevatedButton(
           onPressed: () async {
+            if (nameController.text.isEmpty ||
+                descriptionController.text.isEmpty) {
+              return;
+            }
+
             widget.expense!.name = nameController.text;
             widget.expense!.description = descriptionController.text;
-            // We ONLY send the updated name and description because those are the only things that changed
             await ExpenseCRUD.update(
                     widget.expense!.id,
                     widget.expense!.name,
@@ -318,14 +314,12 @@ class _EditExpenseNameNotesPage extends State<EditExpenseNameNotesPage> {
                     widget.expense!.cost,
                     widget.expense!.memberIds)
                 .then((response) {
-              if (response == null) {
-                print("Error editing Name/Description");
-                return;
+              if (response == true) {
+                Navigator.pop(context, true);
+              } else {
+                print("Error editing name or description");
               }
             });
-            // Go back to the last screen
-            Navigator.pop(context);
-            return;
           },
           child: Text(
             'Save',
@@ -338,9 +332,7 @@ class _EditExpenseNameNotesPage extends State<EditExpenseNameNotesPage> {
 }
 
 class EditExpenseCost extends StatefulWidget {
-  // Pass the expense that you want to change to
   final Expense? expense;
-  // Make sure to pass the nameController and descriptionController of the trip to the function
   const EditExpenseCost(this.expense);
 
   @override
@@ -350,32 +342,33 @@ class EditExpenseCost extends StatefulWidget {
 class _EditExpenseCost extends State<EditExpenseCost> {
   TextEditingController costController = TextEditingController();
   String? costError;
+
   @override
   void initState() {
-    // Make sure we display the current cost of the expense
     costController.text = widget.expense!.cost.toString();
-    costController.addListener(() {
-      setState(() {
-        costError = validateText("cost", costController.text);
-      });
-    });
   }
 
   Widget build(BuildContext context) {
-    // Build the page
     return AlertDialog(
       title: Text("Edit Cost"),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           TextFormField(
-            keyboardType: TextInputType.number,
             controller: costController,
             decoration: InputDecoration(
               labelText: 'Cost',
               errorText: costError,
             ),
+            maxLines: null,
+            keyboardType: TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(
+                RegExp(r'^\d+\.?\d{0,2}'),
+              ),
+            ],
           ),
+          SizedBox(height: 20.0),
         ],
       ),
       actions: <Widget>[
@@ -387,9 +380,14 @@ class _EditExpenseCost extends State<EditExpenseCost> {
         ),
         ElevatedButton(
           onPressed: () async {
-            // Convert the text to a double
-            widget.expense!.cost = double.parse(costController.text);
-            // We ONLY send the updated name and description because those are the only things that changed
+            double? newCost = double.tryParse(costController.text);
+            if (newCost == null || newCost <= 0) {
+              setState(() {
+                costError = 'Invalid cost';
+              });
+              return;
+            }
+            widget.expense!.cost = newCost;
             await ExpenseCRUD.update(
                     widget.expense!.id,
                     widget.expense!.name,
@@ -397,14 +395,12 @@ class _EditExpenseCost extends State<EditExpenseCost> {
                     widget.expense!.cost,
                     widget.expense!.memberIds)
                 .then((response) {
-              if (response == null) {
-                print("Error editing Name/Description");
-                return;
+              if (response == true) {
+                Navigator.pop(context, true);
+              } else {
+                print("Error editing cost");
               }
             });
-            // Go back to the last screen
-            Navigator.pop(context);
-            return;
           },
           child: Text(
             'Save',
@@ -415,6 +411,7 @@ class _EditExpenseCost extends State<EditExpenseCost> {
     );
   }
 }
+
 
 // TODO: Implement a check box sort of system to determine who was apart of the expense
 // It is assumed that the person creating the expense is the payer
