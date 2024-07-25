@@ -496,7 +496,7 @@ export default function Expenses() {
                                             <Box textAlign="center">
                                                 <Typography variant="body2">
                                                     {to?.name}
-                                                    {from?._id === userInfo.value?.userId ? " (You)" : ""}
+                                                    {to?._id === userInfo.value?.userId ? " (You)" : ""}
                                                     <br />
                                                     Owed {getFormattedCurrency(amount)}
                                                 </Typography>
